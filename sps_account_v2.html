@@ -110,8 +110,6 @@
         </div>
 
         <div class="header-actions">
-            <button onclick="clearAllTransactions()" class="btn btn-rose"><i class="fa-solid fa-trash-can"></i> 🗑️ ล้างข้อมูลทั้งหมด</button>
-            <button onclick="restoreStandardDataset()" class="btn btn-amber"><i class="fa-solid fa-rotate-left"></i> ⚡ ดึงข้อมูลตัวอย่าง 27 รายการ</button>
             <button onclick="openModal('quick-sync-modal')" class="btn btn-emerald"><i class="fa-solid fa-key"></i> 📱 ซิงก์ด่วน / ย้ายข้อมูล</button>
             <button onclick="syncPushToCloud(true)" class="btn btn-purple"><i class="fa-solid fa-cloud-arrow-up"></i> ☁️ ซิงก์คลาวด์สด</button>
             <button onclick="openModal('manual-entry-modal')" class="btn btn-indigo"><i class="fa-solid fa-plus"></i> ➕ เพิ่มรายการใหม่</button>
@@ -180,7 +178,7 @@
             </div>
             
             <div id="global-filter-status-bar" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e2e8f0; font-size: 11px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                <span id="global-filter-badge" class="badge-status badge-paid">🟢 แสดงข้อมูลรวมทั้งหมด (27 รายการ)</span>
+                <span id="global-filter-badge" class="badge-status badge-paid">🟢 แสดงข้อมูลรวมทั้งหมด (0 รายการ)</span>
                 <span id="global-filter-summary-text" style="color: #64748b; font-weight: 500;">แสดงผลรายการทั้งหมดที่มีในสมุดบัญชี</span>
             </div>
         </div>
@@ -239,11 +237,11 @@
                     <div>
                         <div style="font-size: 11px; color: #a5b4fc; font-weight: 600;">📊 ดัชนีสุขภาพทางการเงิน (Financial Health Score)</div>
                         <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 4px;">
-                            <span id="ai-health-score-num" style="font-size: 28px; font-weight: 800; font-family: monospace; color: #34d399;">85/100</span>
+                            <span id="ai-health-score-num" style="font-size: 28px; font-weight: 800; font-family: monospace; color: #34d399;">100/100</span>
                             <span id="ai-health-score-status" class="badge-status badge-paid" style="font-size: 10px;">🟢 ดีเยี่ยม</span>
                         </div>
                         <div style="width: 100%; background: rgba(255,255,255,0.1); height: 6px; border-radius: 4px; margin-top: 6px; overflow: hidden;">
-                            <div id="ai-health-score-bar" style="width: 85%; height: 100%; background: linear-gradient(90deg, #10b981, #34d399); transition: all 0.5s;"></div>
+                            <div id="ai-health-score-bar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #10b981, #34d399); transition: all 0.5s;"></div>
                         </div>
                     </div>
 
@@ -326,7 +324,6 @@
                 <div class="box-header">
                     <div class="box-title"><i class="fa-solid fa-list-check"></i> ตารางรายการบัญชี SPS V2 ล่าสุด</div>
                     <div>
-                        <button onclick="clearAllTransactions()" class="btn btn-rose btn-sm"><i class="fa-solid fa-trash-can"></i> ล้างข้อมูล</button>
                         <button onclick="openModal('manual-entry-modal')" class="btn btn-indigo btn-sm">➕ เพิ่มรายการใหม่</button>
                     </div>
                 </div>
@@ -829,8 +826,6 @@
 
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button onclick="processBackupTextImport()" class="btn btn-emerald"><i class="fa-solid fa-file-import"></i> 📥 นำเข้าข้อมูลแบ็กอัพทันที</button>
-                    <button onclick="clearAllTransactions()" class="btn btn-rose"><i class="fa-solid fa-trash-can"></i> 🗑️ ล้างข้อมูลในระบบทั้งหมด</button>
-                    <button onclick="restoreStandardDataset()" class="btn btn-amber"><i class="fa-solid fa-rotate-left"></i> ⚡ ดึงข้อมูลตัวอย่าง 27 รายการ</button>
                     <button onclick="downloadBackupFile()" class="btn btn-purple"><i class="fa-solid fa-download"></i> 💾 ดาวน์โหลดไฟล์สำรองข้อมูล</button>
                 </div>
             </div>
@@ -976,35 +971,7 @@
         const TODAY_DATE_STR = "22/08/2026";
         const PUBLIC_CLOUD_RELAY_URL = "https://jsonblob.com/api/jsonBlob/1271501178652434432";
 
-        const INITIAL_TRANSACTIONS = [
-            { id: "SPS-INC/001", date: "01/08/2026", delivery_date: "01/08/2026", credit_days: 30, due_date: "31/08/2026", type: "Income", desc: "ค่าบริการพัฒนาระบบซอฟต์แวร์ SPS", vendor: "บริษัท เอพีซีไอ จำกัด", before_vat: 150000.00, vat: 10500.00, wht: 4500.00, net: 156000.00, status: "Paid", file_data: null, slip_data: null, pay_date: "01/08/2026" },
-            { id: "SPS-INC/002", date: "15/08/2026", delivery_date: "15/08/2026", credit_days: 30, due_date: "14/09/2026", type: "Income", desc: "ค่าสินค้าและบริการฝ่ายปฏิบัติการ SPS", vendor: "บริษัท คู่ค้าเอสพีเอส จำกัด", before_vat: 66333.47, vat: 4643.34, wht: 1990.00, net: 68986.81, status: "Paid", file_data: null, slip_data: null, pay_date: "15/08/2026" },
-            { id: "SPS-EXP/001", date: "03/08/2026", delivery_date: "01/08/2026", credit_days: 14, due_date: "15/08/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000.00, vat: 2450.00, wht: 1750.00, net: 35700.00, status: "Paid", file_data: null, slip_data: null, pay_date: "03/08/2026" },
-            { id: "SPS-EXP/002", date: "05/08/2026", delivery_date: "05/08/2026", credit_days: 30, due_date: "04/09/2026", type: "Expense", desc: "ค่าบริการระบบ Cloud Server (AWS / Google)", vendor: "บริษัท คลาวด์ เทคโนโลยี จำกัด", before_vat: 15000.00, vat: 1050.00, wht: 450.00, net: 15600.00, status: "Paid", file_data: null, slip_data: null, pay_date: "05/08/2026" },
-            { id: "SPS-EXP/003", date: "10/08/2026", delivery_date: "10/08/2026", credit_days: 30, due_date: "09/09/2026", type: "Expense", desc: "ค่าโฆษณา Facebook & Google Ads", vendor: "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด", before_vat: 20000.00, vat: 1400.00, wht: 400.00, net: 21000.00, status: "Paid", file_data: null, slip_data: null, pay_date: "10/08/2026" },
-            { id: "SPS-EXP/004", date: "18/08/2026", delivery_date: "18/08/2026", credit_days: 30, due_date: "17/09/2026", type: "Expense", desc: "ซื้ออุปกรณ์สำนักงานและวัสดุสินค้า", vendor: "บริษัท หนัง และสินค้าทั่วไป จำกัด", before_vat: 35612.14, vat: 2492.85, wht: 0.00, net: 38104.99, status: "Paid", file_data: null, slip_data: null, pay_date: "18/08/2026" },
-            { id: "SPS-PD/001", date: "01/08/2026", delivery_date: "01/08/2026", credit_days: 14, due_date: "15/08/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงานงวดที่ 2", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000.00, vat: 2450.00, wht: 1750.00, net: 37450.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/002", date: "05/08/2026", delivery_date: "05/08/2026", credit_days: 30, due_date: "04/09/2026", type: "Expense", desc: "ค่าเซิร์ฟเวอร์คลาวด์และฐานข้อมูล", vendor: "บริษัท คลาวด์ เทคโนโลยี จำกัด", before_vat: 15000.00, vat: 1050.00, wht: 450.00, net: 16050.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/003", date: "18/08/2026", delivery_date: "18/08/2026", credit_days: 30, due_date: "17/09/2026", type: "Expense", desc: "ค่าทำการตลาดการโฆษณาออนไลน์", vendor: "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด", before_vat: 20000.00, vat: 1400.00, wht: 400.00, net: 21400.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/004", date: "19/08/2026", delivery_date: "19/08/2026", credit_days: 31, due_date: "19/09/2026", type: "Expense", desc: "ซื้ออุปกรณ์คอมพิวเตอร์ประจำทีม", vendor: "บริษัท ไอที ซิตี้ จำกัด (มหาชน)", before_vat: 28000.00, vat: 1960.00, wht: 0.00, net: 29960.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/005", date: "28/08/2026", delivery_date: "28/08/2026", credit_days: 30, due_date: "27/09/2026", type: "Expense", desc: "ค่าสัญญาบริการบำรุงรักษาสื่อ", vendor: "บริษัท โกลบอล โลจิสติกส์ จำกัด", before_vat: 14018.69, vat: 981.31, wht: 0.00, net: 15000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/006", date: "05/09/2026", delivery_date: "05/09/2026", credit_days: 15, due_date: "20/09/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงานสาขาประจำเดือน", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 16308.41, vat: 1141.59, wht: 0.00, net: 17450.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/007", date: "08/08/2026", delivery_date: "08/08/2026", credit_days: 30, due_date: "07/09/2026", type: "Expense", desc: "ค่าลิขสิทธิ์ซอฟต์แวร์ประจำปี", vendor: "บริษัท ซอฟต์แวร์ไทย จำกัด", before_vat: 11214.95, vat: 785.05, wht: 0.00, net: 12000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/008", date: "10/08/2026", delivery_date: "10/08/2026", credit_days: 30, due_date: "09/09/2026", type: "Expense", desc: "ค่าบริการทำความสะอาดสำนักงาน", vendor: "บริษัท คลีนนิ่ง เซอร์วิส จำกัด", before_vat: 9345.79, vat: 654.21, wht: 0.00, net: 10000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/009", date: "12/08/2026", delivery_date: "12/08/2026", credit_days: 30, due_date: "11/09/2026", type: "Expense", desc: "ค่าบริการรักษาความปลอดภัย", vendor: "บริษัท รปภ. มั่นคง จำกัด", before_vat: 10280.37, vat: 719.63, wht: 0.00, net: 11000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/010", date: "14/08/2026", delivery_date: "14/08/2026", credit_days: 30, due_date: "13/09/2026", type: "Expense", desc: "ค่าอินเทอร์เน็ตความเร็วสูงสำนักงาน", vendor: "บริษัท ทรู คอร์ปอเรชั่น จำกัด", before_vat: 4672.90, vat: 327.10, wht: 0.00, net: 5000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/011", date: "15/08/2026", delivery_date: "15/08/2026", credit_days: 30, due_date: "14/09/2026", type: "Expense", desc: "ค่าไฟฟ้าและน้ำประปาประจำเดือน", vendor: "การไฟฟ้านครหลวง", before_vat: 14018.69, vat: 981.31, wht: 0.00, net: 15000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/012", date: "16/08/2026", delivery_date: "16/08/2026", credit_days: 30, due_date: "15/09/2026", type: "Expense", desc: "ค่าจ้างที่ปรึกษาด้านบัญชีและภาษี", vendor: "บริษัท บัญชีคุณภาพ จำกัด", before_vat: 18691.59, vat: 1308.41, wht: 0.00, net: 20000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/013", date: "17/08/2026", delivery_date: "17/08/2026", credit_days: 30, due_date: "16/09/2026", type: "Expense", desc: "ค่าเบี้ยประกันภัยทรัพย์สินสำนักงาน", vendor: "บริษัท ประกันภัยไทย จำกัด", before_vat: 11214.95, vat: 785.05, wht: 0.00, net: 12000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/014", date: "20/08/2026", delivery_date: "20/08/2026", credit_days: 30, due_date: "19/09/2026", type: "Expense", desc: "ค่าจัดอบรมสัมมนาบุคลากรประจำปี", vendor: "สถาบันฝึกอบรมไทย จำกัด", before_vat: 14018.69, vat: 981.31, wht: 0.00, net: 15000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/015", date: "21/08/2026", delivery_date: "21/08/2026", credit_days: 30, due_date: "20/09/2026", type: "Expense", desc: "ค่าบริการซ่อมบำรุงเครื่องปรับอากาศ", vendor: "บริษัท แอร์เย็น จำกัด", before_vat: 7476.64, vat: 523.36, wht: 0.00, net: 8000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/016", date: "22/08/2026", delivery_date: "22/08/2026", credit_days: 30, due_date: "21/09/2026", type: "Expense", desc: "ค่าจัดส่งเอกสารและพัสดุด่วน", vendor: "บริษัท ไปรษณีย์ไทย จำกัด", before_vat: 2803.74, vat: 196.26, wht: 0.00, net: 3000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/017", date: "23/08/2026", delivery_date: "23/08/2026", credit_days: 30, due_date: "22/09/2026", type: "Expense", desc: "ค่าบริการกำจัดขยะและสิ่งแวดล้อม", vendor: "สำนักงานเขตกรุงเทพมหานคร", before_vat: 1869.16, vat: 130.84, wht: 0.00, net: 2000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/018", date: "24/08/2026", delivery_date: "24/08/2026", credit_days: 30, due_date: "23/09/2026", type: "Expense", desc: "ค่าเครื่องดื่มและสวัสดิการพนักงาน", vendor: "บริษัท สินค้าเครื่องดื่ม จำกัด", before_vat: 5607.48, vat: 392.52, wht: 0.00, net: 6000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/019", date: "25/08/2026", delivery_date: "25/08/2026", credit_days: 30, due_date: "24/09/2026", type: "Expense", desc: "ค่าพิมพ์เอกสารและโบร์ชัวร์ประชาสัมพันธ์", vendor: "โรงพิมพ์คุณภาพ จำกัด", before_vat: 8411.21, vat: 588.79, wht: 0.00, net: 9000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/020", date: "26/08/2026", delivery_date: "26/08/2026", credit_days: 30, due_date: "25/09/2026", type: "Expense", desc: "ค่าเช่าเครื่องถ่ายเอกสารประจำเดือน", vendor: "บริษัท ฟูจิฟิล์ม จำกัด", before_vat: 6542.06, vat: 457.94, wht: 0.00, net: 7000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/021", date: "27/08/2026", delivery_date: "27/08/2026", credit_days: 30, due_date: "26/09/2026", type: "Expense", desc: "ค่าเติมน้ำมันรถยนต์ส่วนกลางบริษัท", vendor: "บริษัท ปตท. จำกัด (มหาชน)", before_vat: 7420.56, vat: 519.44, wht: 0.00, net: 7940.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null }
-        ];
+        const INITIAL_TRANSACTIONS = [];
 
         let vendorMemory = {
             "บริษัท สาทร เรียลเอสเตท จำกัด": { category: "ค่าเช่าสำนักงาน", credit: 14, confidence: 99 },
@@ -1126,24 +1093,6 @@
                 localStorage.setItem(STORAGE_PREFIX + 'HAS_INITIALIZED', 'true');
             } catch(e) {}
             updateGlobalYearOptions();
-        }
-
-        function clearAllTransactions() {
-            if (confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการล้างข้อมูลในระบบทั้งหมด?")) {
-                transactions = [];
-                saveState();
-                renderLedger();
-                alert("🗑️ ล้างข้อมูลเรียบร้อยแล้ว! ระบบเป็น 0 รายการพร้อมสำหรับการใช้งานของคุณครับ");
-            }
-        }
-
-        function restoreStandardDataset() {
-            if (confirm("⚡ ดึงข้อมูลตัวอย่าง 27 รายการเดิมกลับมาลงระบบ?")) {
-                transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
-                saveState();
-                renderLedger();
-                alert("✅ โหลดชุดข้อมูลตัวอย่าง 27 รายการเรียบร้อยแล้ว!");
-            }
         }
 
         /* NATIVE DRAG & DROP OCR INITIALIZATION */
@@ -1369,7 +1318,7 @@
             const tbodyDash = document.getElementById('ledger-table-body');
             if (tbodyDash) {
                 if (activeTxs.length === 0) {
-                    tbodyDash.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:30px; color:#64748b;">📭 ไม่พบรายการบัญชีตรงตามเงื่อนไขตัวกรอง (ลองปรับเลือกเดือน/ปี หรือกดปุ่ม "⚡ ข้อมูลรวมทั้งหมด")</td></tr>`;
+                    tbodyDash.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:30px; color:#64748b;">📭 ยังไม่มีรายการบัญชีในระบบ (กดปุ่ม "➕ เพิ่มรายการใหม่" หรือ "🧠 สแกนเอกสาร AI" เพื่อเริ่มใช้งาน)</td></tr>`;
                 } else {
                     tbodyDash.innerHTML = activeTxs.map(t => `
                         <tr>
@@ -1428,7 +1377,7 @@
 
             if (tbodyPendingInc) {
                 if (pendingIncomes.length === 0) {
-                    tbodyPendingInc.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอรับเงินครบกำหนดในเดือน/ปีนี้</td></tr>`;
+                    tbodyPendingInc.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอรับเงินในขณะนี้</td></tr>`;
                 } else {
                     tbodyPendingInc.innerHTML = pendingIncomes.map(t => {
                         const diffDays = Math.ceil((parseDDMMYYYY(t.due_date).getTime() - today.getTime()) / (1000 * 3600 * 24));
@@ -1452,7 +1401,7 @@
 
             if (tbodyPendingExp) {
                 if (pendingExpenses.length === 0) {
-                    tbodyPendingExp.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอจ่ายเงินครบกำหนดในเดือน/ปีนี้</td></tr>`;
+                    tbodyPendingExp.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอจ่ายเงินในขณะนี้</td></tr>`;
                 } else {
                     tbodyPendingExp.innerHTML = pendingExpenses.map(t => {
                         const diffDays = Math.ceil((parseDDMMYYYY(t.due_date).getTime() - today.getTime()) / (1000 * 3600 * 24));
@@ -1671,7 +1620,7 @@
                     html += `<li><strong>${t.vendor}</strong> (ยอด ${formatTHB(t.net)}) — กำหนดชำระ: ${t.due_date}</li>`;
                 });
             } else {
-                html += `<li>ไม่มีรายการลูกหนี้ค้างชำระในเดือน/ปีนี้</li>`;
+                html += `<li>ไม่มีรายการลูกหนี้ค้างชำระในขณะนี้</li>`;
             }
 
             html += `
@@ -1688,7 +1637,7 @@
                     html += `<li><strong>${t.vendor}</strong> (ยอด ${formatTHB(t.net)}) — ครบกำหนด ${t.due_date} (ขอขยายเครดิตเพิ่ม 15 วัน)</li>`;
                 });
             } else {
-                html += `<li>ไม่มีภาระเจ้าหนี้ค้างจ่ายในเดือน/ปีนี้</li>`;
+                html += `<li>ไม่มีภาระเจ้าหนี้ค้างจ่ายในขณะนี้</li>`;
             }
 
             html += `
@@ -1734,12 +1683,12 @@
             let planText = `⚡ [แผนปฏิบัติการแก้สภาพคล่องฉุกเฉิน AI SPS V2 (3 เดือน)]\nวันที่: ${TODAY_DATE_STR}\n------------------------------\n1. เร่งรัดทวงถามลูกหนี้ 3 รายแรก (ยึดตามวันครบกำหนด):\n`;
             if (pendingInc.length > 0) {
                 pendingInc.slice(0, 3).forEach(t => { planText += `- ${t.vendor} (${formatTHB(t.net)}) | กำหนดชำระ: ${t.due_date}\n`; });
-            } else { planText += `- ไม่มีลูกหนี้ค้างชำระในเดือน/ปีนี้\n`; }
+            } else { planText += `- ไม่มีลูกหนี้ค้างชำระในขณะนี้\n`; }
 
             planText += `\n2. เจรจาชะลอหรือขยายเครดิตเจ้าหนี้ 3 รายแรก (ยึดตามวันครบกำหนด):\n`;
             if (pendingExp.length > 0) {
                 pendingExp.slice(0, 3).forEach(t => { planText += `- ${t.vendor} (${formatTHB(t.net)}) | กำหนดชำระ: ${t.due_date}\n`; });
-            } else { planText += `- ไม่มีเจ้าหนี้ค้างจ่ายในเดือน/ปีนี้\n`; }
+            } else { planText += `- ไม่มีเจ้าหนี้ค้างจ่ายในขณะนี้\n`; }
 
             planText += `------------------------------\n🎯 เป้าหมาย: ดึงเงินสดเข้าทันทีและชะลอรายจ่ายเพื่อรักษาสภาพคล่อง 100%!`;
 
@@ -1792,7 +1741,7 @@
 
             if (tbodyCreditor) {
                 if (expTxs.length === 0) {
-                    tbodyCreditor.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">📭 ยังไม่มีข้อมูลรายการเจ้าหนี้ / รายจ่าย (ตามเงื่อนไขตัวกรอง)</td></tr>`;
+                    tbodyCreditor.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">📭 ยังไม่มีข้อมูลรายการเจ้าหนี้ / รายจ่าย</td></tr>`;
                 } else {
                     tbodyCreditor.innerHTML = expTxs.map(t => {
                         const isPaid = t.status === 'Paid';
@@ -1821,7 +1770,7 @@
 
             if (tbodyCustomer) {
                 if (incTxs.length === 0) {
-                    tbodyCustomer.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">📭 ยังไม่มีข้อมูลรายการลูกค้า / รายรับ (ตามเงื่อนไขตัวกรอง)</td></tr>`;
+                    tbodyCustomer.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">📭 ยังไม่มีข้อมูลรายการลูกค้า / รายรับ</td></tr>`;
                 } else {
                     tbodyCustomer.innerHTML = incTxs.map(t => {
                         const isPaid = t.status === 'Paid';
@@ -1891,7 +1840,7 @@
 
             if (tbodyInc) {
                 if (paidIncomes.length === 0) {
-                    tbodyInc.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายรับที่ชำระแล้ว (ตามเงื่อนไขตัวกรอง)</td></tr>`;
+                    tbodyInc.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายรับที่ชำระแล้ว</td></tr>`;
                 } else {
                     tbodyInc.innerHTML = paidIncomes.map(t => {
                         const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
@@ -1920,7 +1869,7 @@
 
             if (tbodyExp) {
                 if (paidExpenses.length === 0) {
-                    tbodyExp.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายจ่ายที่จ่ายแล้ว (ตามเงื่อนไขตัวกรอง)</td></tr>`;
+                    tbodyExp.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายจ่ายที่จ่ายแล้ว</td></tr>`;
                 } else {
                     tbodyExp.innerHTML = paidExpenses.map(t => {
                         const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
@@ -2115,7 +2064,7 @@
             const catMap = {};
             expTxs.forEach(t => { catMap[t.desc || "ทั่วไป"] = (catMap[t.desc || "ทั่วไป"] || 0) + (t.before_vat || t.net); });
             const expLabels = Object.keys(catMap).length > 0 ? Object.keys(catMap) : ['ไม่มีค่าใช้จ่าย'];
-            const expData = Object.values(catMap).length > 0 ? Object.values(catMap) : [1];
+            const expData = Object.values(catMap).length > 0 ? Object.values(catMap) : [0];
 
             const ctxExp = document.getElementById('expenseChart');
             if (ctxExp) {
@@ -2417,16 +2366,11 @@
         }
 
         window.onload = function() {
-            const hasInit = localStorage.getItem(STORAGE_PREFIX + 'HAS_INITIALIZED');
-            if (hasInit) {
-                const saved = localStorage.getItem(STORAGE_PREFIX + 'TRANSACTIONS');
-                if (saved) {
-                    try {
-                        transactions = JSON.parse(saved);
-                    } catch(e) { transactions = []; }
-                } else {
-                    transactions = [];
-                }
+            const saved = localStorage.getItem(STORAGE_PREFIX + 'TRANSACTIONS');
+            if (saved) {
+                try {
+                    transactions = JSON.parse(saved);
+                } catch(e) { transactions = []; }
             } else {
                 transactions = [];
                 saveState();
