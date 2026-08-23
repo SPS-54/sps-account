@@ -1719,9 +1719,9 @@
         function restoreStandardDataset() {
             transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
             vendorMemory = JSON.parse(JSON.stringify(INITIAL_VENDOR_MEMORY));
-            saveState();
-            renderLedger();
-            syncPushToCloud();
+            try { saveState(); } catch(e) {}
+            try { renderLedger(); } catch(e) {}
+            try { syncPushToCloud(); } catch(e) {}
             alert('⚡ ดึงข้อมูลมาตรฐาน 27 รายการ (ยอดรวม ฿318,250.00) กลับคืนสู่ระบบเรียบร้อยแล้วครับ!');
         }
 
@@ -1865,16 +1865,22 @@
                 const btn = document.getElementById('btn-' + t);
                 if (sec) {
                     if (t === tabId) {
+                        sec.style.display = 'block';
                         sec.classList.remove('hidden');
                     } else {
+                        sec.style.display = 'none';
                         sec.classList.add('hidden');
                     }
                 }
                 if (btn) {
                     if (t === tabId) {
                         btn.className = "tab-btn active-tab flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all bg-indigo-600 text-white shadow-md";
+                        btn.style.backgroundColor = '#4f46e5';
+                        btn.style.color = '#ffffff';
                     } else {
                         btn.className = "tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all";
+                        btn.style.backgroundColor = 'transparent';
+                        btn.style.color = '#475569';
                     }
                 }
             });
