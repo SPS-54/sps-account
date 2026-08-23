@@ -104,13 +104,14 @@
         <div class="app-brand">
             <div class="brand-badge">SPS</div>
             <div>
-                <div class="brand-title">SPS บัญชี-การเงิน V2 <span class="mode-badge">AI Learning Active</span></div>
+                <div class="brand-title">SPS บัญชี-การเงิน V2 <span class="mode-badge">Clean Mode</span></div>
                 <div class="brand-subtitle">ระบบบัญชี-การเงินอิสระ SPS V2 (Cloud & Multi-Device Sync)</div>
             </div>
         </div>
 
         <div class="header-actions">
-            <button onclick="restoreStandardDataset()" class="btn btn-amber"><i class="fa-solid fa-rotate-left"></i> ⚡ ดึงข้อมูล 27 รายการ</button>
+            <button onclick="clearAllTransactions()" class="btn btn-rose"><i class="fa-solid fa-trash-can"></i> 🗑️ ล้างข้อมูลทั้งหมด</button>
+            <button onclick="restoreStandardDataset()" class="btn btn-amber"><i class="fa-solid fa-rotate-left"></i> ⚡ ดึงข้อมูลตัวอย่าง 27 รายการ</button>
             <button onclick="openModal('quick-sync-modal')" class="btn btn-emerald"><i class="fa-solid fa-key"></i> 📱 ซิงก์ด่วน / ย้ายข้อมูล</button>
             <button onclick="syncPushToCloud(true)" class="btn btn-purple"><i class="fa-solid fa-cloud-arrow-up"></i> ☁️ ซิงก์คลาวด์สด</button>
             <button onclick="openModal('manual-entry-modal')" class="btn btn-indigo"><i class="fa-solid fa-plus"></i> ➕ เพิ่มรายการใหม่</button>
@@ -122,8 +123,8 @@
 
         <!-- STATUS BANNER -->
         <div class="banner">
-            <i class="fa-solid fa-brain text-amber-400" style="font-size: 16px;"></i>
-            <span><strong>ระบบสแกนเอกสาร AI เรียนรู้อัตโนมัติ (AI Active Learning Scanner):</strong> AI จะจดจำคู่ค้า หมวดหมู่ค่าใช้จ่าย และภาษีจากการบันทึกของคุณ เพื่อช่วยสแกนในครั้งถัดไปอย่างแม่นยำ</span>
+            <i class="fa-solid fa-shield-check text-amber-400" style="font-size: 16px;"></i>
+            <span><strong>ระบบ SPS บัญชี-การเงิน V2 (Clean Mode):</strong> ข้อมูลสะอาด พร้อมสำหรับการนำเข้าไฟล์แบ็กอัพ หรือบันทึกรายการใหม่ของคุณ 100%</span>
         </div>
 
         <!-- NAVIGATION TABS -->
@@ -154,12 +155,12 @@
                 <div class="kpi-card profit">
                     <div class="kpi-label">📈 กำไรสุทธิ SPS (Net Profit)</div>
                     <div class="kpi-num" id="kpi-profit">฿0.00</div>
-                    <div class="kpi-subtext" id="kpi-margin">Profit Margin: 51.2%</div>
+                    <div class="kpi-subtext" id="kpi-margin">Profit Margin: 0.0%</div>
                 </div>
                 <div class="kpi-card pending">
                     <div class="kpi-label">⏳ ยอดรอชำระรวม (Pending Payments)</div>
                     <div class="kpi-num" id="kpi-pending-total">฿0.00</div>
-                    <div class="kpi-subtext" id="kpi-pending-count">21 รายการค้างชำระ</div>
+                    <div class="kpi-subtext" id="kpi-pending-count">0 รายการค้างชำระ</div>
                 </div>
             </div>
 
@@ -182,7 +183,10 @@
             <div class="content-box">
                 <div class="box-header">
                     <div class="box-title"><i class="fa-solid fa-list-check"></i> ตารางรายการบัญชี SPS V2 ล่าสุด</div>
-                    <button onclick="openModal('manual-entry-modal')" class="btn btn-indigo btn-sm">➕ เพิ่มรายการใหม่</button>
+                    <div>
+                        <button onclick="clearAllTransactions()" class="btn btn-rose btn-sm"><i class="fa-solid fa-trash-can"></i> ล้างข้อมูล</button>
+                        <button onclick="openModal('manual-entry-modal')" class="btn btn-indigo btn-sm">➕ เพิ่มรายการใหม่</button>
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table>
@@ -430,7 +434,8 @@
 
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button onclick="processBackupTextImport()" class="btn btn-emerald"><i class="fa-solid fa-file-import"></i> 📥 นำเข้าข้อมูลแบ็กอัพทันที</button>
-                    <button onclick="restoreStandardDataset()" class="btn btn-amber"><i class="fa-solid fa-rotate-left"></i> ⚡ ดึงข้อมูลมาตรฐาน 27 รายการ</button>
+                    <button onclick="clearAllTransactions()" class="btn btn-rose"><i class="fa-solid fa-trash-can"></i> 🗑️ ล้างข้อมูลในระบบทั้งหมด</button>
+                    <button onclick="restoreStandardDataset()" class="btn btn-amber"><i class="fa-solid fa-rotate-left"></i> ⚡ ดึงข้อมูลตัวอย่าง 27 รายการ</button>
                     <button onclick="downloadBackupFile()" class="btn btn-purple"><i class="fa-solid fa-download"></i> 💾 ดาวน์โหลดไฟล์สำรองข้อมูล</button>
                 </div>
             </div>
@@ -624,79 +629,96 @@
             try {
                 localStorage.setItem(STORAGE_PREFIX + 'TRANSACTIONS', JSON.stringify(transactions));
                 localStorage.setItem(STORAGE_PREFIX + 'VENDOR_MEMORY', JSON.stringify(vendorMemory));
+                localStorage.setItem(STORAGE_PREFIX + 'HAS_INITIALIZED', 'true');
             } catch(e) {}
         }
 
+        function clearAllTransactions() {
+            if (confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการล้างข้อมูลในระบบทั้งหมด?")) {
+                transactions = [];
+                saveState();
+                renderLedger();
+                alert("🗑️ ล้างข้อมูลตัวอย่างและข้อมูลในระบบเรียบร้อยแล้ว! ระบบเป็น 0 รายการพร้อมให้นำเข้าแบ็กอัพของคุณครับ");
+            }
+        }
+
         function restoreStandardDataset() {
-            alert('⚡ กำลังดึงข้อมูลมาตรฐาน 27 รายการ...');
-            transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
-            saveState();
-            renderLedger();
-            alert('✅ ดึงข้อมูลมาตรฐาน 27 รายการเรียบร้อยแล้ว!');
+            if (confirm("⚡ ดึงข้อมูลตัวอย่าง 27 รายการเดิมกลับมาลงระบบ?")) {
+                transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+                saveState();
+                renderLedger();
+                alert("✅ โหลดชุดข้อมูลตัวอย่าง 27 รายการเรียบร้อยแล้ว!");
+            }
         }
 
         function renderLedger() {
-            if (!transactions || transactions.length === 0) {
-                transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
-            }
-
             // 1. Calculate KPI
             let inc = transactions.filter(t => t.type === 'Income').reduce((a,b) => a + (b.before_vat || b.net || 0), 0);
             let exp = transactions.filter(t => t.type === 'Expense').reduce((a,b) => a + (b.before_vat || b.net || 0), 0);
             let profit = inc - exp;
+            let profitMargin = inc > 0 ? ((profit / inc) * 100).toFixed(1) : "0.0";
             let pendingItems = transactions.filter(t => t.status !== 'Paid');
             let pendingTotal = pendingItems.reduce((a,b) => a + (b.net || 0), 0);
 
             if (document.getElementById('kpi-income')) document.getElementById('kpi-income').innerText = formatTHB(inc);
             if (document.getElementById('kpi-expense')) document.getElementById('kpi-expense').innerText = formatTHB(exp);
             if (document.getElementById('kpi-profit')) document.getElementById('kpi-profit').innerText = formatTHB(profit);
+            if (document.getElementById('kpi-margin')) document.getElementById('kpi-margin').innerText = `Profit Margin: ${profitMargin}%`;
             if (document.getElementById('kpi-pending-total')) document.getElementById('kpi-pending-total').innerText = formatTHB(pendingTotal);
             if (document.getElementById('kpi-pending-count')) document.getElementById('kpi-pending-count').innerText = `${pendingItems.length} รายการค้างชำระ`;
 
             // 2. Render Dashboard Table
             const tbodyDash = document.getElementById('ledger-table-body');
             if (tbodyDash) {
-                tbodyDash.innerHTML = transactions.map(t => `
-                    <tr>
-                        <td style="font-family:monospace; font-weight:bold; color:#4f46e5;">${t.id}</td>
-                        <td style="font-family:monospace;">${t.date}</td>
-                        <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
-                        <td style="font-family:monospace; font-weight:bold; color:#d97706;">${t.credit_days || 30} วัน</td>
-                        <td style="font-family:monospace; font-weight:bold; color:#e11d48;">${t.due_date}</td>
-                        <td>${t.desc}</td>
-                        <td style="font-weight:600;">${t.vendor}</td>
-                        <td style="text-align:right; font-family:monospace; font-weight:bold;">${formatTHB(t.net)}</td>
-                        <td style="text-align:center;">
-                            ${t.status === 'Paid' ? '<span class="badge-status badge-paid">ชำระแล้ว</span>' : '<span class="badge-status badge-pending">รอชำระ</span>'}
-                        </td>
-                        <td style="text-align:center;">
-                            ${t.status === 'Paid' ? '<button class="btn btn-outline btn-sm" disabled>เรียบร้อย</button>' : `<button onclick="openPaymentModal('${t.id}')" class="btn btn-amber btn-sm">แจ้งชำระ</button>`}
-                        </td>
-                    </tr>
-                `).join('');
+                if (transactions.length === 0) {
+                    tbodyDash.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:30px; color:#64748b;">📭 ยังไม่มีข้อมูลในระบบ (กดปุ่ม "📥 นำเข้า/สำรองข้อมูล" หรือ "➕ เพิ่มรายการใหม่" ได้เลยครับ)</td></tr>`;
+                } else {
+                    tbodyDash.innerHTML = transactions.map(t => `
+                        <tr>
+                            <td style="font-family:monospace; font-weight:bold; color:#4f46e5;">${t.id}</td>
+                            <td style="font-family:monospace;">${t.date}</td>
+                            <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
+                            <td style="font-family:monospace; font-weight:bold; color:#d97706;">${t.credit_days || 30} วัน</td>
+                            <td style="font-family:monospace; font-weight:bold; color:#e11d48;">${t.due_date}</td>
+                            <td>${t.desc}</td>
+                            <td style="font-weight:600;">${t.vendor}</td>
+                            <td style="text-align:right; font-family:monospace; font-weight:bold;">${formatTHB(t.net)}</td>
+                            <td style="text-align:center;">
+                                ${t.status === 'Paid' ? '<span class="badge-status badge-paid">ชำระแล้ว</span>' : '<span class="badge-status badge-pending">รอชำระ</span>'}
+                            </td>
+                            <td style="text-align:center;">
+                                ${t.status === 'Paid' ? '<button class="btn btn-outline btn-sm" disabled>เรียบร้อย</button>' : `<button onclick="openPaymentModal('${t.id}')" class="btn btn-amber btn-sm">แจ้งชำระ</button>`}
+                            </td>
+                        </tr>
+                    `).join('');
+                }
             }
 
             // 3. Render Pending Table
             const tbodyPending = document.getElementById('pending-table-body');
             if (tbodyPending) {
                 const today = parseDDMMYYYY(TODAY_DATE_STR);
-                tbodyPending.innerHTML = pendingItems.map(t => {
-                    const diffDays = Math.ceil((parseDDMMYYYY(t.due_date).getTime() - today.getTime()) / (1000 * 3600 * 24));
-                    let countdown = diffDays > 0 ? `<span class="badge-status badge-pending">เหลือ ${diffDays} วัน</span>` : `<span class="badge-status badge-overdue">เกินกำหนด</span>`;
-                    return `
-                        <tr>
-                            <td style="font-family:monospace; font-weight:bold; color:#4f46e5;">${t.id}</td>
-                            <td style="font-family:monospace; font-weight:bold; color:#e11d48; background:#ffe4e6;">${t.due_date}</td>
-                            <td style="text-align:center;">${countdown}</td>
-                            <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
-                            <td style="font-family:monospace; font-weight:bold; color:#d97706;">${t.credit_days || 30} วัน</td>
-                            <td style="font-weight:600;">${t.vendor}</td>
-                            <td>${t.desc}</td>
-                            <td style="text-align:right; font-family:monospace; font-weight:bold; color:#e11d48;">${formatTHB(t.net)}</td>
-                            <td style="text-align:center;"><button onclick="openPaymentModal('${t.id}')" class="btn btn-rose btn-sm">💳 แจ้งชำระ</button></td>
-                        </tr>
-                    `;
-                }).join('');
+                if (pendingItems.length === 0) {
+                    tbodyPending.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px; color:#64748b;">🎉 ไม่มีรายการค้างชำระในขณะนี้</td></tr>`;
+                } else {
+                    tbodyPending.innerHTML = pendingItems.map(t => {
+                        const diffDays = Math.ceil((parseDDMMYYYY(t.due_date).getTime() - today.getTime()) / (1000 * 3600 * 24));
+                        let countdown = diffDays > 0 ? `<span class="badge-status badge-pending">เหลือ ${diffDays} วัน</span>` : `<span class="badge-status badge-overdue">เกินกำหนด</span>`;
+                        return `
+                            <tr>
+                                <td style="font-family:monospace; font-weight:bold; color:#4f46e5;">${t.id}</td>
+                                <td style="font-family:monospace; font-weight:bold; color:#e11d48; background:#ffe4e6;">${t.due_date}</td>
+                                <td style="text-align:center;">${countdown}</td>
+                                <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
+                                <td style="font-family:monospace; font-weight:bold; color:#d97706;">${t.credit_days || 30} วัน</td>
+                                <td style="font-weight:600;">${t.vendor}</td>
+                                <td>${t.desc}</td>
+                                <td style="text-align:right; font-family:monospace; font-weight:bold; color:#e11d48;">${formatTHB(t.net)}</td>
+                                <td style="text-align:center;"><button onclick="openPaymentModal('${t.id}')" class="btn btn-rose btn-sm">💳 แจ้งชำระ</button></td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
             }
 
             renderSupplierLedger();
@@ -716,31 +738,39 @@
                 if (t.status === 'Paid') suppMap[t.vendor].paid += t.net;
                 else suppMap[t.vendor].unpaid += t.net;
             });
-            tbody.innerHTML = Object.values(suppMap).map(s => `
-                <tr>
-                    <td style="font-weight:700;">${s.name}</td>
-                    <td>${s.type === 'Income' ? '🟢 ลูกค้า/รายรับ' : '🔴 เจ้าหนี้/รายจ่าย'}</td>
-                    <td>${s.count} รายการ</td>
-                    <td style="text-align:right; font-family:monospace; font-weight:700; color:#047857;">${formatTHB(s.paid)}</td>
-                    <td style="text-align:right; font-family:monospace; font-weight:700; color:#be123c;">${formatTHB(s.unpaid)}</td>
-                </tr>
-            `).join('');
+            if (Object.keys(suppMap).length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#64748b;">📭 ยังไม่มีข้อมูลซัพพลายเออร์</td></tr>`;
+            } else {
+                tbody.innerHTML = Object.values(suppMap).map(s => `
+                    <tr>
+                        <td style="font-weight:700;">${s.name}</td>
+                        <td>${s.type === 'Income' ? '🟢 ลูกค้า/รายรับ' : '🔴 เจ้าหนี้/รายจ่าย'}</td>
+                        <td>${s.count} รายการ</td>
+                        <td style="text-align:right; font-family:monospace; font-weight:700; color:#047857;">${formatTHB(s.paid)}</td>
+                        <td style="text-align:right; font-family:monospace; font-weight:700; color:#be123c;">${formatTHB(s.unpaid)}</td>
+                    </tr>
+                `).join('');
+            }
         }
 
         function renderInOutLedger() {
             const tbody = document.getElementById('inout-table-body');
             if (!tbody) return;
-            tbody.innerHTML = transactions.map(t => `
-                <tr>
-                    <td style="font-family:monospace; font-weight:700;">${t.id}</td>
-                    <td style="font-family:monospace;">${t.date}</td>
-                    <td>${t.type === 'Income' ? '🟢 รายรับ' : '🔴 รายจ่าย'}</td>
-                    <td>${t.desc}</td>
-                    <td style="font-weight:600;">${t.vendor}</td>
-                    <td style="text-align:right; font-family:monospace; font-weight:700;">${formatTHB(t.net)}</td>
-                    <td style="text-align:center;">${t.status === 'Paid' ? 'ชำระแล้ว' : 'รอชำระ'}</td>
-                </tr>
-            `).join('');
+            if (transactions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:#64748b;">📭 ยังไม่มีข้อมูลรายรับ-รายจ่าย</td></tr>`;
+            } else {
+                tbody.innerHTML = transactions.map(t => `
+                    <tr>
+                        <td style="font-family:monospace; font-weight:700;">${t.id}</td>
+                        <td style="font-family:monospace;">${t.date}</td>
+                        <td>${t.type === 'Income' ? '🟢 รายรับ' : '🔴 รายจ่าย'}</td>
+                        <td>${t.desc}</td>
+                        <td style="font-weight:600;">${t.vendor}</td>
+                        <td style="text-align:right; font-family:monospace; font-weight:700;">${formatTHB(t.net)}</td>
+                        <td style="text-align:center;">${t.status === 'Paid' ? 'ชำระแล้ว' : 'รอชำระ'}</td>
+                    </tr>
+                `).join('');
+            }
         }
 
         function renderAIMemoryTable() {
@@ -880,7 +910,7 @@
             if (cashflowChartObj) cashflowChartObj.destroy();
 
             const weeks = ['สัปดาห์ 1', 'สัปดาห์ 2', 'สัปดาห์ 3', 'สัปดาห์ 4', 'สัปดาห์ 5', 'สัปดาห์ 6', 'สัปดาห์ 7', 'สัปดาห์ 8', 'สัปดาห์ 9', 'สัปดาห์ 10', 'สัปดาห์ 11', 'สัปดาห์ 12'];
-            const cashData = [250000, 220000, 195000, 310000, 280000, 260000, 240000, 380000, 350000, 330000, 310000, 450000];
+            const cashData = transactions.length > 0 ? [250000, 220000, 195000, 310000, 280000, 260000, 240000, 380000, 350000, 330000, 310000, 450000] : [0,0,0,0,0,0,0,0,0,0,0,0];
 
             cashflowChartObj = new Chart(ctx, {
                 type: 'line',
@@ -954,7 +984,7 @@
                 const res = await fetch(PUBLIC_CLOUD_RELAY_URL);
                 if (res.ok) {
                     const jsonRes = await res.json();
-                    if (jsonRes && jsonRes.transactions && Array.isArray(jsonRes.transactions) && jsonRes.transactions.length > 0) {
+                    if (jsonRes && jsonRes.transactions && Array.isArray(jsonRes.transactions)) {
                         transactions = jsonRes.transactions;
                         saveState();
                         renderLedger();
@@ -989,7 +1019,7 @@
             if (!raw) { alert('⚠️ กรุณาวางข้อความแบ็กอัพ หรือเลือกไฟล์ก่อนครับ'); return; }
             try {
                 const parsed = JSON.parse(raw);
-                if (Array.isArray(parsed) && parsed.length > 0) {
+                if (Array.isArray(parsed)) {
                     transactions = parsed;
                     saveState();
                     renderLedger();
@@ -1025,15 +1055,20 @@
         }
 
         window.onload = function() {
-            const saved = localStorage.getItem(STORAGE_PREFIX + 'TRANSACTIONS');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    if (Array.isArray(parsed) && parsed.length > 0) transactions = parsed;
-                } catch(e) {}
-            }
-            if (!transactions || transactions.length === 0) {
-                transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+            const hasInit = localStorage.getItem(STORAGE_PREFIX + 'HAS_INITIALIZED');
+            if (hasInit) {
+                const saved = localStorage.getItem(STORAGE_PREFIX + 'TRANSACTIONS');
+                if (saved) {
+                    try {
+                        transactions = JSON.parse(saved);
+                    } catch(e) { transactions = []; }
+                } else {
+                    transactions = [];
+                }
+            } else {
+                // First time setup -> start clean with 0 items!
+                transactions = [];
+                saveState();
             }
 
             const savedMem = localStorage.getItem(STORAGE_PREFIX + 'VENDOR_MEMORY');
