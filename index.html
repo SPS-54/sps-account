@@ -1222,6 +1222,7 @@
         const SYSTEM_NAME = "SPS บัญชี-การเงิน V1";
         const TODAY_DATE_STR = "22/08/2026";
         const TODAY_ISO = "2026-08-22";
+        var PUBLIC_CLOUD_RELAY_URL = "https://jsonblob.com/api/jsonBlob/1271501178652434432";
 
         // COMPLETE INITIAL DATASET MATCHING USER SCREENSHOT EXACTLY (REVENUE: ฿216,333.47, EXPENSES: ฿105,612.14, NET PROFIT: ฿110,721.33, PENDING: ฿318,250.00 - 21 ITEMS)
         const INITIAL_TRANSACTIONS = [
@@ -1712,8 +1713,6 @@
             };
             reader.readAsText(file);
         }
-
-        const PUBLIC_CLOUD_RELAY_URL = "https://kvdb.io/SPS_V1_SECURE_CLOUD_RELAY/sps_master_store";
 
         function copySystemDataCode() {
             const dataObj = {
