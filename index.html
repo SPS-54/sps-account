@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPS บัญชี-การเงิน V2 (Separate Paid Income & Expense Ledger)</title>
+    <title>SPS บัญชี-การเงิน V2 (Full Reconciliation Summary Engine)</title>
     <!-- Google Fonts Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
@@ -104,7 +104,7 @@
         <div class="app-brand">
             <div class="brand-badge">SPS</div>
             <div>
-                <div class="brand-title">SPS บัญชี-การเงิน V2 <span class="mode-badge">Document Viewer</span></div>
+                <div class="brand-title">SPS บัญชี-การเงิน V2 <span class="mode-badge">Reconciliation Engine</span></div>
                 <div class="brand-subtitle">ระบบบัญชี-การเงินอิสระ SPS V2 (Cloud & Multi-Device Sync)</div>
             </div>
         </div>
@@ -123,8 +123,8 @@
 
         <!-- STATUS BANNER -->
         <div class="banner">
-            <i class="fa-solid fa-scale-balanced text-amber-400" style="font-size: 16px;"></i>
-            <span><strong>ปรับปรุงเมนูรายรับ-รายจ่าย:</strong> แยกตารางแสดงเฉพาะรายการรับชำระแล้วและจ่ายเงินแล้ว โดยเรียงข้อมูลตามลำดับเวลาจากอดีตมาปัจจุบันและอนาคต!</span>
+            <i class="fa-solid fa-calculator text-amber-400" style="font-size: 16px;"></i>
+            <span><strong>เพิ่มระบบสรุปกระทบยอด (Reconciliation Summary):</strong> ครอบคลุมทั้ง 3 เมนู (รอรับ/รอจ่าย, เจ้าหนี้/ลูกค้า, รายรับ-รายจ่าย) พร้อมสรุปผลต่างสุทธิและภาษีแบบสด!</span>
         </div>
 
         <!-- NAVIGATION TABS -->
@@ -318,9 +318,38 @@
             </div>
         </div>
 
-        <!-- TAB 3: PENDING VIEW -->
+        <!-- TAB 3: PENDING VIEW (WITH RECONCILIATION SUMMARY) -->
         <div id="view-pending" class="tab-view" style="display: none;">
             
+            <!-- RECONCILIATION CARD FOR PENDING RECEIVABLES & PAYABLES -->
+            <div class="content-box" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff;">
+                <div class="box-title" style="color: #38bdf8; margin-bottom: 14px;">
+                    <i class="fa-solid fa-calculator"></i> ⚖️ สรุปกระทบยอดเงินสด รอรับ - รอจ่าย (Pending Cash Reconciliation)
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+                    <div style="background: rgba(255,255,255,0.08); padding: 14px; border-radius: 10px; border-left: 4px solid #10b981;">
+                        <div style="font-size: 11px; color: #a7f3d0;">🟢 ยอดรวมรอรับเงิน (Pending Receivables)</div>
+                        <div id="recon-pending-inc" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #34d399; margin-top: 4px;">฿0.00</div>
+                        <div id="recon-pending-inc-count" style="font-size: 11px; color: #94a3b8; margin-top: 2px;">0 รายการ</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.08); padding: 14px; border-radius: 10px; border-left: 4px solid #f43f5e;">
+                        <div style="font-size: 11px; color: #fecdd3;">🔴 ยอดรวมรอจ่ายเงิน (Pending Payables)</div>
+                        <div id="recon-pending-exp" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #fb7185; margin-top: 4px;">฿0.00</div>
+                        <div id="recon-pending-exp-count" style="font-size: 11px; color: #94a3b8; margin-top: 2px;">0 รายการ</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.08); padding: 14px; border-radius: 10px; border-left: 4px solid #38bdf8;">
+                        <div style="font-size: 11px; color: #bae6fd;">⚖️ ผลต่างกระทบยอดสุทธิ (Net Pending Impact)</div>
+                        <div id="recon-pending-net" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #38bdf8; margin-top: 4px;">฿0.00</div>
+                        <div id="recon-pending-status" style="font-size: 11px; color: #e2e8f0; margin-top: 2px;">สถานะ: สมดุล</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.08); padding: 14px; border-radius: 10px; border-left: 4px solid #f59e0b;">
+                        <div style="font-size: 11px; color: #fde68a;">⚠️ เกินกำหนดชำระ (Overdue Items)</div>
+                        <div id="recon-pending-overdue" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #fbbf24; margin-top: 4px;">0 รายการ</div>
+                        <div id="recon-pending-overdue-amt" style="font-size: 11px; color: #94a3b8; margin-top: 2px;">ยอดรวม ฿0.00</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- TABLE 1: PENDING RECEIVABLES -->
             <div class="content-box">
                 <div class="box-header">
@@ -383,9 +412,38 @@
 
         </div>
 
-        <!-- TAB 4: SUPPLIER VIEW (ITEMIZED BY DATE WITH DOCUMENT VIEWER & DOWNLOAD) -->
+        <!-- TAB 4: SUPPLIER VIEW (WITH RECONCILIATION SUMMARY) -->
         <div id="view-supplier" class="tab-view" style="display: none;">
             
+            <!-- RECONCILIATION CARD FOR CREDITORS & CUSTOMERS -->
+            <div class="content-box" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff;">
+                <div class="box-title" style="color: #38bdf8; margin-bottom: 14px;">
+                    <i class="fa-solid fa-scale-unbalanced-flip"></i> ⚖️ สรุปกระทบยอดภาพรวม เจ้าหนี้ - ลูกค้า (Creditor & Customer Reconciliation)
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+                    <div style="background: rgba(255,255,255,0.08); padding: 14px; border-radius: 10px; border-left: 4px solid #10b981;">
+                        <div style="font-size: 11px; color: #a7f3d0;">🟢 ยอดรวมธุรกรรมลูกค้าทั้งหมด</div>
+                        <div id="recon-supp-cust-total" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #34d399; margin-top: 4px;">฿0.00</div>
+                        <div id="recon-supp-cust-unpaid" style="font-size: 11px; color: #94a3b8; margin-top: 2px;">ค้างรับ: ฿0.00</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.08); padding: 14px; border-radius: 10px; border-left: 4px solid #f43f5e;">
+                        <div style="font-size: 11px; color: #fecdd3;">🔴 ยอดรวมธุรกรรมเจ้าหนี้ทั้งหมด</div>
+                        <div id="recon-supp-cred-total" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #fb7185; margin-top: 4px;">฿0.00</div>
+                        <div id="recon-supp-cred-unpaid" style="font-size: 11px; color: #94a3b8; margin-top: 2px;">ค้างจ่าย: ฿0.00</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.08); padding: 14px; border-radius: 10px; border-left: 4px solid #8b5cf6;">
+                        <div style="font-size: 11px; color: #ddd6fe;">⚖️ กระทบยอดค้างชำระสุทธิ (Net Outstanding)</div>
+                        <div id="recon-supp-net-unpaid" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #a78bfa; margin-top: 4px;">฿0.00</div>
+                        <div id="recon-supp-unpaid-desc" style="font-size: 11px; color: #e2e8f0; margin-top: 2px;">ส่วนต่างยอดค้างรับ-ค้างจ่าย</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.08); padding: 14px; border-radius: 10px; border-left: 4px solid #38bdf8;">
+                        <div style="font-size: 11px; color: #bae6fd;">📊 อัตราการเก็บเงินชำระ (Settlement Rate)</div>
+                        <div id="recon-supp-settle-rate" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #38bdf8; margin-top: 4px;">0.0%</div>
+                        <div id="recon-supp-tx-count" style="font-size: 11px; color: #94a3b8; margin-top: 2px;">รวม 0 รายการ</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- TABLE 1: CREDITORS / PAYABLES DETAILED BY DATE -->
             <div class="content-box">
                 <div class="box-header">
@@ -450,9 +508,38 @@
 
         </div>
 
-        <!-- TAB 5: INOUT VIEW (SEPARATED PAID RECEIVABLES & PAYABLES TABLES) -->
+        <!-- TAB 5: INOUT VIEW (WITH RECONCILIATION SUMMARY) -->
         <div id="view-inout" class="tab-view" style="display: none;">
             
+            <!-- RECONCILIATION CARD FOR CASH & TAX -->
+            <div class="content-box" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff;">
+                <div class="box-title" style="color: #38bdf8; margin-bottom: 14px;">
+                    <i class="fa-solid fa-receipt"></i> ⚖️ สรุปกระทบยอดเงินสดรับ-จ่าย และภาษี (Cash & Tax Reconciliation)
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+                    <div style="background: rgba(255,255,255,0.08); padding: 14px; border-radius: 10px; border-left: 4px solid #10b981;">
+                        <div style="font-size: 11px; color: #a7f3d0;">🟢 ยอดเงินสดรับเข้าสุทธิ (Cash Inflow)</div>
+                        <div id="recon-inout-inc-net" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #34d399; margin-top: 4px;">฿0.00</div>
+                        <div id="recon-inout-vat-sale" style="font-size: 11px; color: #94a3b8; margin-top: 2px;">ภาษีขาย 7%: ฿0.00</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.08); padding: 14px; border-radius: 10px; border-left: 4px solid #f43f5e;">
+                        <div style="font-size: 11px; color: #fecdd3;">🔴 ยอดเงินสดจ่ายออกสุทธิ (Cash Outflow)</div>
+                        <div id="recon-inout-exp-net" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #fb7185; margin-top: 4px;">฿0.00</div>
+                        <div id="recon-inout-vat-buy" style="font-size: 11px; color: #94a3b8; margin-top: 2px;">ภาษีซื้อ 7%: ฿0.00</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.08); padding: 14px; border-radius: 10px; border-left: 4px solid #4f46e5;">
+                        <div style="font-size: 11px; color: #c7d2fe;">📈 กระทบยอดกระแสเงินสดสุทธิ (Net Cash Profit)</div>
+                        <div id="recon-inout-cash-profit" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #818cf8; margin-top: 4px;">฿0.00</div>
+                        <div id="recon-inout-margin" style="font-size: 11px; color: #e2e8f0; margin-top: 2px;">Net Margin: 0.0%</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.08); padding: 14px; border-radius: 10px; border-left: 4px solid #f59e0b;">
+                        <div style="font-size: 11px; color: #fde68a;">🏛️ สรุปกระทบยอด ภ.พ.30 & หัก ณ ที่จ่าย</div>
+                        <div id="recon-inout-vat-net" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #fbbf24; margin-top: 4px;">฿0.00</div>
+                        <div id="recon-inout-wht-total" style="font-size: 11px; color: #94a3b8; margin-top: 2px;">หัก ณ ที่จ่าย 3% รวม: ฿0.00</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- TABLE 1: PAID INCOMES / RECEIVABLES -->
             <div class="content-box">
                 <div class="box-header">
@@ -796,7 +883,7 @@
         }
 
         function renderLedger() {
-            // 1. Calculate KPI
+            // 1. Calculate Dashboard KPI
             let inc = transactions.filter(t => t.type === 'Income').reduce((a,b) => a + (b.before_vat || b.net || 0), 0);
             let exp = transactions.filter(t => t.type === 'Expense').reduce((a,b) => a + (b.before_vat || b.net || 0), 0);
             let profit = inc - exp;
@@ -839,7 +926,7 @@
                 }
             }
 
-            // 3. Render Split Pending Tables (Receivables & Payables)
+            // 3. Render Split Pending Tables & Reconciliation Summary
             const tbodyPendingInc = document.getElementById('pending-inc-table-body');
             const tbodyPendingExp = document.getElementById('pending-exp-table-body');
 
@@ -853,11 +940,26 @@
 
             const incTotal = pendingIncomes.reduce((a,b) => a + (b.net || 0), 0);
             const expTotal = pendingExpenses.reduce((a,b) => a + (b.net || 0), 0);
+            const pendingNetImpact = incTotal - expTotal;
+
+            const today = parseDDMMYYYY(TODAY_DATE_STR);
+            const overdueIncomes = pendingIncomes.filter(t => parseDDMMYYYY(t.due_date).getTime() < today.getTime());
+            const overdueExpenses = pendingExpenses.filter(t => parseDDMMYYYY(t.due_date).getTime() < today.getTime());
+            const totalOverdueCount = overdueIncomes.length + overdueExpenses.length;
+            const totalOverdueAmt = overdueIncomes.reduce((a,b) => a + (b.net||0), 0) + overdueExpenses.reduce((a,b) => a + (b.net||0), 0);
+
+            // Populate Pending Reconciliation Summary Box
+            if (document.getElementById('recon-pending-inc')) document.getElementById('recon-pending-inc').innerText = formatTHB(incTotal);
+            if (document.getElementById('recon-pending-inc-count')) document.getElementById('recon-pending-inc-count').innerText = `${pendingIncomes.length} รายการรอรับ`;
+            if (document.getElementById('recon-pending-exp')) document.getElementById('recon-pending-exp').innerText = formatTHB(expTotal);
+            if (document.getElementById('recon-pending-exp-count')) document.getElementById('recon-pending-exp-count').innerText = `${pendingExpenses.length} รายการรอจ่าย`;
+            if (document.getElementById('recon-pending-net')) document.getElementById('recon-pending-net').innerText = (pendingNetImpact >= 0 ? '+' : '') + formatTHB(pendingNetImpact);
+            if (document.getElementById('recon-pending-status')) document.getElementById('recon-pending-status').innerText = pendingNetImpact >= 0 ? '🟢 คาดการณ์เงินสดสุทธิเป็นบวก' : '🔴 คาดการณ์เงินสดสุทธิติดลบ';
+            if (document.getElementById('recon-pending-overdue')) document.getElementById('recon-pending-overdue').innerText = `${totalOverdueCount} รายการ`;
+            if (document.getElementById('recon-pending-overdue-amt')) document.getElementById('recon-pending-overdue-amt').innerText = `ยอดรวม ${formatTHB(totalOverdueAmt)}`;
 
             if (document.getElementById('pending-inc-summary')) document.getElementById('pending-inc-summary').innerText = `รวม ${pendingIncomes.length} รายการ (${formatTHB(incTotal)})`;
             if (document.getElementById('pending-exp-summary')) document.getElementById('pending-exp-summary').innerText = `รวม ${pendingExpenses.length} รายการ (${formatTHB(expTotal)})`;
-
-            const today = parseDDMMYYYY(TODAY_DATE_STR);
 
             if (tbodyPendingInc) {
                 if (pendingIncomes.length === 0) {
@@ -929,14 +1031,30 @@
                 return parseDDMMYYYY(a.date || a.due_date) - parseDDMMYYYY(b.date || b.due_date);
             });
 
+            const custTotal = incTxs.reduce((a,b) => a + (b.net || 0), 0);
+            const credTotal = expTxs.reduce((a,b) => a + (b.net || 0), 0);
+            const custUnpaid = incTxs.filter(t => t.status !== 'Paid').reduce((a,b) => a + (b.net || 0), 0);
+            const credUnpaid = expTxs.filter(t => t.status !== 'Paid').reduce((a,b) => a + (b.net || 0), 0);
+            const netUnpaidDiff = custUnpaid - credUnpaid;
+            const paidCount = transactions.filter(t => t.status === 'Paid').length;
+            const settleRate = transactions.length > 0 ? ((paidCount / transactions.length) * 100).toFixed(1) : "0.0";
+
+            // Populate Supplier/Customer Reconciliation Summary Box
+            if (document.getElementById('recon-supp-cust-total')) document.getElementById('recon-supp-cust-total').innerText = formatTHB(custTotal);
+            if (document.getElementById('recon-supp-cust-unpaid')) document.getElementById('recon-supp-cust-unpaid').innerText = `ค้างรับ: ${formatTHB(custUnpaid)}`;
+            if (document.getElementById('recon-supp-cred-total')) document.getElementById('recon-supp-cred-total').innerText = formatTHB(credTotal);
+            if (document.getElementById('recon-supp-cred-unpaid')) document.getElementById('recon-supp-cred-unpaid').innerText = `ค้างจ่าย: ${formatTHB(credUnpaid)}`;
+            if (document.getElementById('recon-supp-net-unpaid')) document.getElementById('recon-supp-net-unpaid').innerText = (netUnpaidDiff >= 0 ? '+' : '') + formatTHB(netUnpaidDiff);
+            if (document.getElementById('recon-supp-unpaid-desc')) document.getElementById('recon-supp-unpaid-desc').innerText = netUnpaidDiff >= 0 ? '🟢 ลูกหนี้ค้างรับมากกว่า' : '🔴 เจ้าหนี้ค้างจ่ายมากกว่า';
+            if (document.getElementById('recon-supp-settle-rate')) document.getElementById('recon-supp-settle-rate').innerText = `${settleRate}%`;
+            if (document.getElementById('recon-supp-tx-count')) document.getElementById('recon-supp-tx-count').innerText = `รวม ${transactions.length} รายการ`;
+
             if (document.getElementById('supplier-exp-summary')) {
-                const unpaidExp = expTxs.filter(t => t.status !== 'Paid').reduce((a,b) => a + (b.net || 0), 0);
-                document.getElementById('supplier-exp-summary').innerText = `รวม ${expTxs.length} รายการ (ยอดค้างจ่าย: ${formatTHB(unpaidExp)})`;
+                document.getElementById('supplier-exp-summary').innerText = `รวม ${expTxs.length} รายการ (ยอดค้างจ่าย: ${formatTHB(credUnpaid)})`;
             }
 
             if (document.getElementById('supplier-inc-summary')) {
-                const unpaidInc = incTxs.filter(t => t.status !== 'Paid').reduce((a,b) => a + (b.net || 0), 0);
-                document.getElementById('supplier-inc-summary').innerText = `รวม ${incTxs.length} รายการ (ยอดค้างรับ: ${formatTHB(unpaidInc)})`;
+                document.getElementById('supplier-inc-summary').innerText = `รวม ${incTxs.length} รายการ (ยอดค้างรับ: ${formatTHB(custUnpaid)})`;
             }
 
             if (tbodyCreditor) {
@@ -1014,6 +1132,22 @@
 
             const totalIncNet = paidIncomes.reduce((a,b) => a + (b.net || 0), 0);
             const totalExpNet = paidExpenses.reduce((a,b) => a + (b.net || 0), 0);
+            const vatSales = paidIncomes.reduce((a,b) => a + (b.vat || 0), 0);
+            const vatBuys = paidExpenses.reduce((a,b) => a + (b.vat || 0), 0);
+            const whtTotal = paidIncomes.reduce((a,b) => a + (b.wht || 0), 0) + paidExpenses.reduce((a,b) => a + (b.wht || 0), 0);
+            const cashProfit = totalIncNet - totalExpNet;
+            const vatNet = vatSales - vatBuys;
+            const margin = totalIncNet > 0 ? ((cashProfit / totalIncNet) * 100).toFixed(1) : "0.0";
+
+            // Populate InOut Cash & Tax Reconciliation Summary Box
+            if (document.getElementById('recon-inout-inc-net')) document.getElementById('recon-inout-inc-net').innerText = formatTHB(totalIncNet);
+            if (document.getElementById('recon-inout-vat-sale')) document.getElementById('recon-inout-vat-sale').innerText = `ภาษีขาย 7%: ${formatTHB(vatSales)}`;
+            if (document.getElementById('recon-inout-exp-net')) document.getElementById('recon-inout-exp-net').innerText = formatTHB(totalExpNet);
+            if (document.getElementById('recon-inout-vat-buy')) document.getElementById('recon-inout-vat-buy').innerText = `ภาษีซื้อ 7%: ${formatTHB(vatBuys)}`;
+            if (document.getElementById('recon-inout-cash-profit')) document.getElementById('recon-inout-cash-profit').innerText = (cashProfit >= 0 ? '+' : '') + formatTHB(cashProfit);
+            if (document.getElementById('recon-inout-margin')) document.getElementById('recon-inout-margin').innerText = `Net Profit Margin: ${margin}%`;
+            if (document.getElementById('recon-inout-vat-net')) document.getElementById('recon-inout-vat-net').innerText = vatNet >= 0 ? `นำส่งภาษี ${formatTHB(vatNet)}` : `ขอคืนภาษี ${formatTHB(Math.abs(vatNet))}`;
+            if (document.getElementById('recon-inout-wht-total')) document.getElementById('recon-inout-wht-total').innerText = `หัก ณ ที่จ่าย 3% รวม: ${formatTHB(whtTotal)}`;
 
             if (document.getElementById('inout-inc-summary')) {
                 document.getElementById('inout-inc-summary').innerText = `รวม ${paidIncomes.length} รายการ (รับชำระแล้ว: ${formatTHB(totalIncNet)})`;
