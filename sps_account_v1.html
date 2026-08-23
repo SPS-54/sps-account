@@ -2282,26 +2282,42 @@
             }
 
             const totalPendingAmt = pendingTxs.reduce((sum, t) => sum + t.net, 0);
-            document.getElementById('kpi-pending-total').innerText = formatTHB(totalPendingAmt);
-            document.getElementById('kpi-pending-count').innerText = `${pendingTxs.length} รายการค้างชำระ SPS V1`;
-            document.getElementById('pending-table-badge').innerText = `${pendingTxs.length} รายการรอชำระ`;
+            const pendingTotalEl = document.getElementById('kpi-pending-total');
+            if (pendingTotalEl) pendingTotalEl.innerText = formatTHB(totalPendingAmt);
 
-            let inc = filteredAllTx.filter(t => t.type === 'Income').reduce((a,b) => a + b.before_vat, 0);
-            let exp = filteredAllTx.filter(t => t.type === 'Expense').reduce((a,b) => a + b.before_vat, 0);
+            const pendingCountEl = document.getElementById('kpi-pending-count');
+            if (pendingCountEl) pendingCountEl.innerText = `${pendingTxs.length} รายการค้างชำระ SPS V1`;
+
+            const pendingBadgeEl = document.getElementById('pending-table-badge');
+            if (pendingBadgeEl) pendingBadgeEl.innerText = `${pendingTxs.length} รายการรอชำระ`;
+
+            let inc = filteredAllTx.filter(t => t.type === 'Income').reduce((a,b) => a + (b.before_vat || 0), 0);
+            let exp = filteredAllTx.filter(t => t.type === 'Expense').reduce((a,b) => a + (b.before_vat || 0), 0);
             let profit = inc - exp;
             let margin = inc > 0 ? (profit / inc * 100).toFixed(1) : 0;
 
-            document.getElementById('kpi-income').innerText = formatTHB(inc);
-            document.getElementById('kpi-expense').innerText = formatTHB(exp);
-            document.getElementById('kpi-profit').innerText = formatTHB(profit);
-            document.getElementById('kpi-margin').innerText = `Profit Margin: ${margin}%`;
-            document.getElementById('ledger-count').innerText = `${filteredAllTx.length} รายการ`;
-            document.getElementById('ai-memory-count').innerText = Object.keys(vendorMemory).length;
+            const kpiIncomeEl = document.getElementById('kpi-income');
+            if (kpiIncomeEl) kpiIncomeEl.innerText = formatTHB(inc);
 
-            renderDashboardCharts(filteredAllTx);
-            renderPendingTab();
-            renderSupplierLedger();
-            renderInOutLedger();
+            const kpiExpenseEl = document.getElementById('kpi-expense');
+            if (kpiExpenseEl) kpiExpenseEl.innerText = formatTHB(exp);
+
+            const kpiProfitEl = document.getElementById('kpi-profit');
+            if (kpiProfitEl) kpiProfitEl.innerText = formatTHB(profit);
+
+            const kpiMarginEl = document.getElementById('kpi-margin');
+            if (kpiMarginEl) kpiMarginEl.innerText = `Profit Margin: ${margin}%`;
+
+            const ledgerCountEl = document.getElementById('ledger-count');
+            if (ledgerCountEl) ledgerCountEl.innerText = `${filteredAllTx.length} รายการ`;
+
+            const aiMemCountEl = document.getElementById('ai-memory-count');
+            if (aiMemCountEl) aiMemCountEl.innerText = Object.keys(vendorMemory).length;
+
+            try { renderDashboardCharts(filteredAllTx); } catch(e) {}
+            try { renderPendingTab(); } catch(e) {}
+            try { renderSupplierLedger(); } catch(e) {}
+            try { renderInOutLedger(); } catch(e) {}
         }
 
         function renderDashboardCharts(activeTxList) {
