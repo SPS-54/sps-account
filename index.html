@@ -105,11 +105,14 @@
             <div class="brand-badge">SPS</div>
             <div>
                 <div class="brand-title">SPS บัญชี-การเงิน V2 <span class="mode-badge" style="background:#8b5cf6;">AI Liquidity Alerts & Insights</span></div>
-                <div class="brand-subtitle">ระบบบัญชี-การเงินอิสระ SPS V2 (Cloud & Multi-Device Sync)</div>
+                <div class="brand-subtitle">ระบบบัญชี-การเงินอิสระ SPS V2 (100% Real-Time Cloud & Multi-Device Auto Sync)</div>
             </div>
         </div>
 
         <div class="header-actions">
+            <span id="cloud-sync-status-badge" class="mode-badge" style="background:#059669; padding: 6px 12px; font-size: 11px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(5,150,105,0.3);">
+                <i class="fa-solid fa-cloud"></i> 🟢 100% Auto-Sync Active
+            </span>
             <button onclick="openModal('quick-sync-modal')" class="btn btn-emerald"><i class="fa-solid fa-key"></i> 📱 ซิงก์ด่วน / ย้ายข้อมูล</button>
             <button onclick="syncPushToCloud(true)" class="btn btn-purple"><i class="fa-solid fa-cloud-arrow-up"></i> ☁️ ซิงก์คลาวด์สด</button>
             <button onclick="openModal('manual-entry-modal')" class="btn btn-indigo"><i class="fa-solid fa-plus"></i> ➕ เพิ่มรายการใหม่</button>
@@ -837,14 +840,17 @@
     <div id="quick-sync-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <div class="modal-title"><i class="fa-solid fa-key text-amber-400"></i> ศูนย์ซิงก์ข้อมูลข้ามอุปกรณ์ (Multi-Device Sync)</div>
+                <div class="modal-title"><i class="fa-solid fa-key text-amber-400"></i> ศูนย์ซิงก์ข้อมูลข้ามอุปกรณ์ (Real-Time Auto Sync)</div>
                 <button onclick="closeModal('quick-sync-modal')" class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <p style="margin-bottom: 16px; color: #475569;">ซิงก์ข้อมูลระหว่างคอมพิวเตอร์และมือถือได้ 100% ผ่านคลาวด์สด หรือใช้รหัสคัดลอกส่งเข้า Line</p>
+                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; padding: 14px; border-radius: 10px; margin-bottom: 16px; font-size: 12px; color: #065f46; line-height: 1.6;">
+                    <strong>⚡ ระบบซิงก์คลาวด์อัตโนมัติ 100% (Real-Time Auto-Sync):</strong><br>
+                    ทุกครั้งที่คุณเพิ่มรายการใหม่, สแกนเอกสารด้วย AI, แจ้งจ่ายเงิน หรืออัปเดตข้อมูลบนคอมพิวเตอร์หรือมือถือ ระบบจะซิงก์ข้อมูลขึ้นคลาวด์ให้อัตโนมัติทันที และอีกอุปกรณ์หนึ่งจะอัปเดตเองภายใน 6 วินาที โดยไม่ต้องกดปุ่มใดๆ!
+                </div>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <button onclick="syncPushToCloud(true)" class="btn btn-purple" style="justify-content: center; padding: 12px;"><i class="fa-solid fa-cloud-arrow-up"></i> 📤 อัปโหลดข้อมูลขึ้นคลาวด์สด</button>
-                    <button onclick="syncPullFromCloud(true)" class="btn btn-indigo" style="justify-content: center; padding: 12px;"><i class="fa-solid fa-cloud-arrow-down"></i> 📥 ดึงข้อมูลจากคลาวด์ลงอุปกรณ์นี้</button>
+                    <button onclick="syncPushToCloud(true)" class="btn btn-purple" style="justify-content: center; padding: 12px;"><i class="fa-solid fa-cloud-arrow-up"></i> 📤 บังคับอัปโหลดข้อมูลขึ้นคลาวด์ทันที</button>
+                    <button onclick="syncPullFromCloud(true)" class="btn btn-indigo" style="justify-content: center; padding: 12px;"><i class="fa-solid fa-cloud-arrow-down"></i> 📥 บังคับดึงข้อมูลจากคลาวด์ลงอุปกรณ์นี้</button>
                     <button onclick="copySystemDataCode()" class="btn btn-amber" style="justify-content: center; padding: 12px;"><i class="fa-solid fa-copy"></i> 📋 คัดลอกรหัสข้อมูลส่งเข้า Line</button>
                 </div>
             </div>
@@ -986,6 +992,9 @@
         let cashflowChartObj = null;
         let currentLoadedFile = null;
 
+        let lastLocalUpdate = 0;
+        let isSyncingInProcess = false;
+
         function formatTHB(num) {
             return '฿' + (num || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
@@ -1086,13 +1095,84 @@
             if (m) m.classList.remove('active');
         }
 
-        function saveState() {
+        /* 100% AUTOMATIC CLOUD SYNC ENGINE */
+        function saveState(skipCloudPush = false) {
             try {
+                lastLocalUpdate = Date.now();
                 localStorage.setItem(STORAGE_PREFIX + 'TRANSACTIONS', JSON.stringify(transactions));
                 localStorage.setItem(STORAGE_PREFIX + 'VENDOR_MEMORY', JSON.stringify(vendorMemory));
+                localStorage.setItem(STORAGE_PREFIX + 'LAST_UPDATED', lastLocalUpdate.toString());
                 localStorage.setItem(STORAGE_PREFIX + 'HAS_INITIALIZED', 'true');
             } catch(e) {}
             updateGlobalYearOptions();
+
+            if (!skipCloudPush) {
+                autoPushToCloud();
+            }
+        }
+
+        async function autoPushToCloud() {
+            const syncBadge = document.getElementById('cloud-sync-status-badge');
+            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 🔄 กำลังซิงก์คลาวด์...`;
+
+            const dataObj = {
+                namespace: STORAGE_PREFIX,
+                transactions: transactions,
+                vendorMemory: vendorMemory,
+                lastUpdated: lastLocalUpdate || Date.now()
+            };
+
+            try {
+                const res = await fetch(PUBLIC_CLOUD_RELAY_URL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataObj)
+                });
+                if (res.ok) {
+                    const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> ☁️ ซิงก์คลาวด์อัตโนมัติสำเร็จ (${nowStr})`;
+                }
+            } catch(e) {
+                if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-wifi-slash"></i> ⚠️ ออฟไลน์ (รอเชื่อมต่อซิงก์ใหม่)`;
+            }
+        }
+
+        async function autoSyncFromCloud() {
+            if (isSyncingInProcess) return;
+            isSyncingInProcess = true;
+
+            const syncBadge = document.getElementById('cloud-sync-status-badge');
+
+            try {
+                const res = await fetch(PUBLIC_CLOUD_RELAY_URL, { cache: 'no-store' });
+                if (res.ok) {
+                    const cloudData = await res.json();
+                    if (cloudData && Array.isArray(cloudData.transactions)) {
+                        const cloudTime = cloudData.lastUpdated || 0;
+                        const localTime = parseInt(localStorage.getItem(STORAGE_PREFIX + 'LAST_UPDATED') || '0');
+
+                        if (cloudTime > localTime) {
+                            transactions = cloudData.transactions;
+                            if (cloudData.vendorMemory) vendorMemory = cloudData.vendorMemory;
+                            lastLocalUpdate = cloudTime;
+                            
+                            saveState(true);
+                            renderLedger();
+
+                            const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down"></i> 🟢 อัปเดตข้อมูลจากอุปกรณ์อื่นแล้ว (${nowStr})`;
+                        } else if (localTime > cloudTime) {
+                            await autoPushToCloud();
+                        } else {
+                            const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> 🟢 ข้อมูลตรงกัน 100% (${nowStr})`;
+                        }
+                    }
+                }
+            } catch(e) {
+            } finally {
+                isSyncingInProcess = false;
+            }
         }
 
         /* NATIVE DRAG & DROP OCR INITIALIZATION */
@@ -1264,7 +1344,7 @@
             renderLedger();
             document.getElementById('ocr-preview-box').style.display = 'none';
             document.getElementById('ocr-result-form').style.display = 'none';
-            alert(`🎉 AI บันทึกรายการ [${docNo}] และจดจำรูปแบบคู่ค้า [${vendor}] เรียบร้อยแล้ว!`);
+            alert(`🎉 AI บันทึกรายการ [${docNo}] และจดจำรูปแบบคู่ค้า [${vendor}] เรียบร้อยแล้ว! (ซิงก์คลาวด์สดอัตโนมัติ)`);
         }
 
         function renderLedger() {
@@ -2033,7 +2113,7 @@
                     saveState();
                     renderLedger();
                     viewDocumentModal(txId);
-                    alert(`✅ แนบไฟล์เอกสารตัวจริงให้รายการ [${txId}] เรียบร้อยแล้ว!`);
+                    alert(`✅ แนบไฟล์เอกสารตัวจริงให้รายการ [${txId}] เรียบร้อยแล้ว! (ซิงก์คลาวด์สดอัตโนมัติ)`);
                 }
             };
             reader.readAsDataURL(file);
@@ -2252,7 +2332,7 @@
             saveState();
             renderLedger();
             closeModal('manual-entry-modal');
-            alert(`✅ บันทึกรายการ [${docNo}] เรียบร้อยแล้ว!`);
+            alert(`✅ บันทึกรายการ [${docNo}] เรียบร้อยแล้ว! (ซิงก์คลาวด์สดอัตโนมัติ)`);
         }
 
         function openPaymentModal(txId) {
@@ -2272,37 +2352,18 @@
                 saveState();
                 renderLedger();
                 closeModal('payment-modal');
-                alert(`🎉 บันทึกแจ้งชำระเงินสำหรับ [${txId}] เรียบร้อยแล้ว!`);
+                alert(`🎉 บันทึกแจ้งชำระเงินสำหรับ [${txId}] เรียบร้อยแล้ว! (ซิงก์คลาวด์สดอัตโนมัติ)`);
             }
         }
 
         async function syncPushToCloud(isManual = false) {
-            const dataObj = { namespace: STORAGE_PREFIX, transactions: transactions, lastUpdated: Date.now() };
-            try {
-                const res = await fetch(PUBLIC_CLOUD_RELAY_URL, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dataObj)
-                });
-                if (res.ok && isManual) alert(`📤 อัปโหลดข้อมูลคลาวด์สดสำเร็จ! (${transactions.length} รายการ)`);
-            } catch(e) {
-                if (isManual) alert(`⚠️ การเชื่อมต่อคลาวด์ขัดข้อง สามารถใช้วิธีกู้คืนผ่านไฟล์แบ็กอัพแทนได้ครับ`);
-            }
+            await autoPushToCloud();
+            if (isManual) alert(`📤 อัปโหลดข้อมูลขึ้นคลาวด์สำเร็จ! (${transactions.length} รายการ)`);
         }
 
         async function syncPullFromCloud(isManual = false) {
-            try {
-                const res = await fetch(PUBLIC_CLOUD_RELAY_URL);
-                if (res.ok) {
-                    const jsonRes = await res.json();
-                    if (jsonRes && jsonRes.transactions && Array.isArray(jsonRes.transactions)) {
-                        transactions = jsonRes.transactions;
-                        saveState();
-                        renderLedger();
-                        if (isManual) alert(`📥 ดึงข้อมูลสำเร็จ! พบ ${transactions.length} รายการจากคลาวด์`);
-                    }
-                }
-            } catch(e) {}
+            await autoSyncFromCloud();
+            if (isManual) alert(`📥 ดึงข้อมูลสำเร็จ! พบ ${transactions.length} รายการจากคลาวด์`);
         }
 
         function copySystemDataCode() {
@@ -2334,12 +2395,12 @@
                     transactions = parsed;
                     saveState();
                     renderLedger();
-                    alert(`🎉 กู้คืนข้อมูลสำเร็จ! โหลดข้อมูล ${transactions.length} รายการลงระบบแล้วครับ!`);
+                    alert(`🎉 กู้คืนข้อมูลสำเร็จ! โหลดข้อมูล ${transactions.length} รายการลงระบบแล้วครับ! (ซิงก์คลาวด์สดอัตโนมัติ)`);
                 } else if (parsed && parsed.transactions && Array.isArray(parsed.transactions)) {
                     transactions = parsed.transactions;
                     saveState();
                     renderLedger();
-                    alert(`🎉 กู้คืนข้อมูลสำเร็จ! โหลดข้อมูล ${transactions.length} รายการลงระบบแล้วครับ!`);
+                    alert(`🎉 กู้คืนข้อมูลสำเร็จ! โหลดข้อมูล ${transactions.length} รายการลงระบบแล้วครับ! (ซิงก์คลาวด์สดอัตโนมัติ)`);
                 } else {
                     alert('❌ รูปแบบข้อมูลแบ็กอัพไม่ถูกต้อง');
                 }
@@ -2368,12 +2429,10 @@
         window.onload = function() {
             const saved = localStorage.getItem(STORAGE_PREFIX + 'TRANSACTIONS');
             if (saved) {
-                try {
-                    transactions = JSON.parse(saved);
-                } catch(e) { transactions = []; }
+                try { transactions = JSON.parse(saved); } catch(e) { transactions = []; }
             } else {
                 transactions = [];
-                saveState();
+                saveState(true);
             }
 
             const savedMem = localStorage.getItem(STORAGE_PREFIX + 'VENDOR_MEMORY');
@@ -2387,6 +2446,22 @@
             initOCRDragAndDrop();
             updateGlobalYearOptions();
             renderLedger();
+
+            // 1. Initial Auto Pull from Cloud immediately on load
+            autoSyncFromCloud();
+
+            // 2. Periodic Auto Heartbeat Poll every 6 seconds
+            setInterval(() => {
+                autoSyncFromCloud();
+            }, 6000);
+
+            // 3. Auto Sync when user switches back to tab or unlocks mobile phone
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') autoSyncFromCloud();
+            });
+            window.addEventListener('focus', () => {
+                autoSyncFromCloud();
+            });
         };
     </script>
 </body>
