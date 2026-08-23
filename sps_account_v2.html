@@ -126,13 +126,13 @@
             <div style="display: flex; align-items: center; gap: 12px;">
                 <i id="liquidity-banner-icon" class="fa-solid fa-shield-halved text-emerald-300" style="font-size: 22px;"></i>
                 <div>
-                    <div id="liquidity-banner-title" style="font-weight: 700; font-size: 13px;">🟢 ระบบประมวลผลสภาพคล่องอัตโนมัติ: สภาพคล่องปลอดภัย</div>
+                    <div id="liquidity-banner-title" style="font-weight: 700; font-size: 13px;">🟢 ระบบประมวลผลสภาพคล่องอัตโนมัติ (3 เดือน): สภาพคล่องปลอดภัย</div>
                     <div id="liquidity-banner-desc" style="font-size: 11px; opacity: 0.9; margin-top: 2px;">เงินสดสำรองอยู่ในเกณฑ์มาตรฐาน ไม่มีรายการค้างชำระเกินกำหนด</div>
                 </div>
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <button onclick="openAIEmergencyPlanModal()" class="btn btn-amber btn-sm"><i class="fa-solid fa-bolt"></i> ⚡ แผนแก้สภาพคล่องฉุกเฉิน</button>
-                <button onclick="switchTab('forecast')" class="btn btn-outline btn-sm" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);"><i class="fa-solid fa-chart-line"></i> ดูพยากรณ์เงินสด</button>
+                <button onclick="switchTab('forecast')" class="btn btn-outline btn-sm" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);"><i class="fa-solid fa-chart-line"></i> ดูพยากรณ์เงินสด 3 เดือน</button>
             </div>
         </div>
 
@@ -143,7 +143,7 @@
             <button onclick="switchTab('pending')" id="nav-pending" class="nav-link"><i class="fa-solid fa-hourglass-half"></i> แยกตาราง รอรับ / รอจ่าย</button>
             <button onclick="switchTab('supplier')" id="nav-supplier" class="nav-link"><i class="fa-solid fa-truck-field"></i> แยกตาราง เจ้าหนี้ / ลูกค้า</button>
             <button onclick="switchTab('inout')" id="nav-inout" class="nav-link"><i class="fa-solid fa-scale-balanced"></i> รายรับ-รายจ่าย</button>
-            <button onclick="switchTab('forecast')" id="nav-forecast" class="nav-link"><i class="fa-solid fa-chart-line"></i> พยากรณ์เงินสด SPS</button>
+            <button onclick="switchTab('forecast')" id="nav-forecast" class="nav-link"><i class="fa-solid fa-chart-line"></i> พยากรณ์เงินสด 3 เดือน SPS</button>
             <button onclick="switchTab('advisor')" id="nav-advisor" class="nav-link"><i class="fa-solid fa-comments"></i> ผู้ช่วย AI ภาษี & คำแนะนำ (Advisor)</button>
             <button onclick="switchTab('backup')" id="nav-backup" class="nav-link"><i class="fa-solid fa-file-import"></i> 📥 นำเข้า/สำรองข้อมูล (Backup)</button>
         </div>
@@ -177,7 +177,7 @@
             <div class="content-box" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: #ffffff; border: 1px solid #4338ca; box-shadow: 0 10px 25px -5px rgba(67, 56, 202, 0.25);">
                 <div class="box-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px; margin-bottom: 18px;">
                     <div class="box-title" style="color: #a5b4fc;">
-                        <i class="fa-solid fa-brain text-purple-400" style="font-size: 20px;"></i> 🧠 ระบบวิเคราะห์สภาพคล่องอัตโนมัติ & คำแนะนำทางการเงินอัจฉริยะจาก AI
+                        <i class="fa-solid fa-brain text-purple-400" style="font-size: 20px;"></i> 🧠 ระบบวิเคราะห์สภาพคล่องอัตโนมัติ & คำแนะนำทางการเงินอัจฉริยะจาก AI (ระยะเวลา 3 เดือน)
                     </div>
                     <div style="display: flex; gap: 8px;">
                         <button onclick="copyAIReportToClipboard()" class="btn btn-amber btn-sm"><i class="fa-solid fa-copy"></i> 📋 คัดลอกรายงาน AI ส่งเข้า Line</button>
@@ -709,7 +709,7 @@
                     <i class="fa-solid fa-sliders text-indigo-400"></i> ตั้งค่าการพยากรณ์เงินสดและเกณฑ์สำรองขั้นต่ำ (Dynamic Cashflow Simulation)
                 </div>
                 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; align-items: flex-end;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: flex-end;">
                     <div>
                         <label style="font-size: 12px; font-weight: 600; color: #a7f3d0; display: block; margin-bottom: 6px;">💰 เงินสดเริ่มต้น / ยอดยกมา (ปรับเปลี่ยนได้เอง):</label>
                         <input type="number" id="forecast-init-cash" value="100000" oninput="renderCashflowChart()" onkeyup="renderCashflowChart()" onchange="renderCashflowChart()" class="form-control" style="font-weight: 800; color: #047857; background: #ecfdf5; font-size: 15px; border: 2px solid #10b981;">
@@ -718,8 +718,16 @@
                         <label style="font-size: 12px; font-weight: 600; color: #fde68a; display: block; margin-bottom: 6px;">🛡️ เกณฑ์เงินสดสำรองขั้นต่ำ (บาท):</label>
                         <input type="number" id="forecast-min-reserve" value="50000" oninput="renderCashflowChart()" onkeyup="renderCashflowChart()" onchange="renderCashflowChart()" class="form-control" style="font-weight: 800; color: #d97706; background: #fffbeb; font-size: 15px; border: 2px solid #f59e0b;">
                     </div>
+                    <div>
+                        <label style="font-size: 12px; font-weight: 600; color: #c7d2fe; display: block; margin-bottom: 6px;">📅 ระยะเวลาพยากรณ์:</label>
+                        <select id="forecast-months" onchange="renderCashflowChart()" class="form-control" style="font-weight: 700; color: #4f46e5; background: #eef2ff; font-size: 14px; border: 2px solid #6366f1;">
+                            <option value="3" selected>🗓️ 3 เดือน (90 วัน / 18 ช่วง)</option>
+                            <option value="2">🗓️ 2 เดือน (60 วัน / 12 ช่วง)</option>
+                            <option value="1">🗓️ 1 เดือน (30 วัน / 6 ช่วง)</option>
+                        </select>
+                    </div>
                     <div style="background: rgba(255,255,255,0.08); padding: 12px; border-radius: 10px; border-left: 4px solid #38bdf8;">
-                        <div style="font-size: 11px; color: #bae6fd;">คาดการณ์เงินสดคงเหลือปลายทาง:</div>
+                        <div id="forecast-end-label" style="font-size: 11px; color: #bae6fd;">คาดการณ์เงินสดคงเหลือปลายทาง (3 เดือน):</div>
                         <div id="forecast-end-balance" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #38bdf8; margin-top: 2px;">฿0.00</div>
                     </div>
                     <div style="background: rgba(255,255,255,0.08); padding: 12px; border-radius: 10px; border-left: 4px solid #10b981;">
@@ -732,8 +740,8 @@
             <!-- CHART CARD -->
             <div class="content-box">
                 <div class="box-header">
-                    <div class="box-title"><i class="fa-solid fa-chart-line text-purple-600"></i> กราฟเส้นพยากรณ์กระแสเงินสดรายวัน (All-Line Cashflow Projection Chart)</div>
-                    <div style="font-size: 12px; color: #64748b;">แสดง <u>เส้นยอดรอรับ, เส้นยอดรอจ่าย และเส้นคาดการณ์เงินสดคงเหลือ</u> ตามวันที่จริง</div>
+                    <div class="box-title"><i class="fa-solid fa-chart-line text-purple-600"></i> กราฟเส้นพยากรณ์กระแสเงินสดรายวัน (All-Line Cashflow Projection Chart - 3 เดือน / 90 วัน)</div>
+                    <div style="font-size: 12px; color: #64748b;">แสดง <u>เส้นยอดรอรับ, เส้นยอดรอจ่าย และเส้นคาดการณ์เงินสดคงเหลือ</u> ครอบคลุมระยะเวลา 3 เดือนตามวันที่จริง</div>
                 </div>
                 <div style="height: 380px; position: relative;">
                     <canvas id="cashflowChart"></canvas>
@@ -1329,12 +1337,16 @@
             try { renderCashflowChart(); } catch(e) {}
         }
 
-        /* DYNAMIC AI LIQUIDITY ALERT & RECOMMENDATIONS ENGINE */
+        /* DYNAMIC AI LIQUIDITY ALERT & RECOMMENDATIONS ENGINE (3-MONTH FORECAST) */
         function updateAILiquidityAlertsAndRecommendations() {
             const initCashInput = document.getElementById('forecast-init-cash');
             const minReserveInput = document.getElementById('forecast-min-reserve');
+            const forecastMonthsInput = document.getElementById('forecast-months');
+            
             const initCash = initCashInput ? (parseFloat(initCashInput.value) || 100000) : 100000;
             const minReserve = minReserveInput ? (parseFloat(minReserveInput.value) || 50000) : 50000;
+            const months = forecastMonthsInput ? (parseInt(forecastMonthsInput.value) || 3) : 3;
+            const totalPeriods = months * 6; // 6 periods per month (5-day steps) = 90 days total for 3 months
 
             const today = parseDDMMYYYY(TODAY_DATE_STR);
 
@@ -1351,7 +1363,7 @@
             let lowestProjectedBal = initCash;
             let lowestBalDate = TODAY_DATE_STR;
 
-            for (let i = 0; i < 8; i++) {
+            for (let i = 0; i < totalPeriods; i++) {
                 const pStart = new Date(today);
                 pStart.setDate(pStart.getDate() + (i * 5));
                 const pEnd = new Date(today);
@@ -1386,19 +1398,19 @@
                     banner.style.background = '#881337';
                     banner.style.borderColor = '#e11d48';
                     icon.className = 'fa-solid fa-triangle-exclamation text-rose-300';
-                    title.innerHTML = `🚨 [เตือนภัยวิกฤตสภาพคล่อง] คาดการณ์เงินสดติดลบ ${formatTHB(lowestProjectedBal)} ณ วันที่ ${lowestBalDate}`;
+                    title.innerHTML = `🚨 [เตือนภัยวิกฤตสภาพคล่อง 3 เดือน] คาดการณ์เงินสดติดลบ ${formatTHB(lowestProjectedBal)} ณ วันที่ ${lowestBalDate}`;
                     desc.innerText = `มีรายการรอจ่ายเกินกว่าเงินสดที่มีอยู่ แนะนำให้เร่งติดตามลูกหนี้หรือชะลอการจ่ายตามแผนฉุกเฉิน AI`;
                 } else if (lowestProjectedBal < minReserve || overdueExp.length > 0) {
                     banner.style.background = '#78350f';
                     banner.style.borderColor = '#d97706';
                     icon.className = 'fa-solid fa-circle-exclamation text-amber-300';
-                    title.innerHTML = `⚠️ [เตือนภัยเงินสดตึงตัว] เงินสดต่ำสุด ${formatTHB(lowestProjectedBal)} ต่ำกว่าเกณฑ์สำรอง (${formatTHB(minReserve)})`;
+                    title.innerHTML = `⚠️ [เตือนภัยเงินสดตึงตัว 3 เดือน] เงินสดต่ำสุด ${formatTHB(lowestProjectedBal)} ต่ำกว่าเกณฑ์สำรอง (${formatTHB(minReserve)})`;
                     desc.innerText = `พบรายการค้างชำระเกินกำหนด ${overdueExp.length + overdueInc.length} รายการ (รวม ${formatTHB(totalOverdueIncAmt + totalOverdueExpAmt)})`;
                 } else {
                     banner.style.background = '#065f46';
                     banner.style.borderColor = '#047857';
                     icon.className = 'fa-solid fa-shield-halved text-emerald-300';
-                    title.innerHTML = `🟢 [ระบบประมวลผลสภาพคล่อง] สภาพคล่องทางการเงินแข็งแกร่ง (คาดการณ์เงินสดต่ำสุด ${formatTHB(lowestProjectedBal)})`;
+                    title.innerHTML = `🟢 [ระบบประมวลผลสภาพคล่อง 3 เดือน] สภาพคล่องทางการเงินแข็งแกร่ง (คาดการณ์เงินสดต่ำสุด ${formatTHB(lowestProjectedBal)})`;
                     desc.innerText = `เงินสดสำรองเพียงพอ ไม่มีรายการค้างชำระเกินกำหนด สภาพคล่องพร้อมขยายธุรกิจ`;
                 }
             }
@@ -1476,9 +1488,9 @@
             if (recRes) {
                 if (lowestProjectedBal < minReserve) {
                     const diff = minReserve - lowestProjectedBal;
-                    recRes.innerHTML = `📌 <strong>เงินสดคาดการณ์ต่ำกว่าเกณฑ์:</strong> ขาดอยู่อีก <strong>${formatTHB(diff)}</strong><br>💡 <strong>คำแนะนำ AI:</strong> ปรับเพิ่มเงินสดเริ่มต้น หรือชะลอรายจ่ายที่ไม่จำเป็นเพื่อรักษาระดับสำรองขั้นต่ำ ${formatTHB(minReserve)}`;
+                    recRes.innerHTML = `📌 <strong>เงินสดคาดการณ์ต่ำกว่าเกณฑ์:</strong> ขาดอยู่อีก <strong>${formatTHB(diff)}</strong> (พยากรณ์ 3 เดือน)<br>💡 <strong>คำแนะนำ AI:</strong> ปรับเพิ่มเงินสดเริ่มต้น หรือชะลอรายจ่ายที่ไม่จำเป็นเพื่อรักษาระดับสำรองขั้นต่ำ ${formatTHB(minReserve)}`;
                 } else {
-                    recRes.innerHTML = `📌 <strong>เงินสดสำรองเพียงพอ:</strong> คาดการณ์เงินสดต่ำสุด ${formatTHB(lowestProjectedBal)} สูงกว่าเกณฑ์สำรอง ${formatTHB(minReserve)}<br>💡 <strong>คำแนะนำ AI:</strong> สภาพคล่องส่วนเกินสามารถนำไปลงทุนหมุนเวียนเพิ่มกำไรให้บริษัทได้`;
+                    recRes.innerHTML = `📌 <strong>เงินสดสำรองเพียงพอ:</strong> คาดการณ์เงินสดต่ำสุด ${formatTHB(lowestProjectedBal)} สูงกว่าเกณฑ์สำรอง ${formatTHB(minReserve)} (พยากรณ์ 3 เดือน)<br>💡 <strong>คำแนะนำ AI:</strong> สภาพคล่องส่วนเกินสามารถนำไปลงทุนหมุนเวียนเพิ่มกำไรให้บริษัทได้`;
                 }
             }
 
@@ -1537,7 +1549,7 @@
                 </div>
 
                 <div style="background: rgba(217, 119, 6, 0.1); border-left: 4px solid #f59e0b; padding: 12px; border-radius: 8px;">
-                    <div style="font-weight: 700; color: #fbbf24; font-size: 13px;">3. สรุปผลลัพธ์สภาพคล่องหลังปฏิบัติตามแผน</div>
+                    <div style="font-weight: 700; color: #fbbf24; font-size: 13px;">3. สรุปผลลัพธ์สภาพคล่องหลังปฏิบัติตามแผน (ประมวลผล 3 เดือน)</div>
                     <div style="margin-top: 4px; line-height: 1.6;">
                         กระแสเงินสดหมุนเวียนจะเพิ่มขึ้นสูงสุด <strong>${formatTHB(pendingInc.slice(0,3).reduce((a,b)=>a+(b.net||0),0))}</strong> และชะลอรายจ่ายออกไปได้ <strong>${formatTHB(pendingExp.slice(0,3).reduce((a,b)=>a+(b.net||0),0))}</strong> ส่งผลให้สภาพคล่องปลอดภัย 100%!
                     </div>
@@ -1557,7 +1569,7 @@
             const incTotal = pendingInc.reduce((a,b) => a + (b.net || 0), 0);
             const expTotal = pendingExp.reduce((a,b) => a + (b.net || 0), 0);
 
-            const reportStr = `🧠 [รายงานการประมวลผลสภาพคล่อง & คำแนะนำ AI SPS V2]\nวันที่: ${TODAY_DATE_STR}\n------------------------------\n💰 เงินสดเริ่มต้น: ${formatTHB(initCash)}\n🟢 ยอดรอรับเงินรวม: ${formatTHB(incTotal)} (${pendingInc.length} รายการ)\n🔴 ยอดรอจ่ายเงินรวม: ${formatTHB(expTotal)} (${pendingExp.length} รายการ)\n🛡️ เกณฑ์เงินสดสำรองขั้นต่ำ: ${formatTHB(minReserve)}\n------------------------------\n💡 คำแนะนำ AI:\n1. เร่งรัดลูกหนี้ค้างชำระเพื่อเพิ่มกระแสเงินสดรับเข้า\n2. จัดลำดับความสำคัญจ่ายชำระเจ้าหนี้ตามวันครบกำหนด\n3. รักษาระดับเงินสดสำรองให้ปลอดภัยเสมอ!`;
+            const reportStr = `🧠 [รายงานการประมวลผลสภาพคล่อง 3 เดือน & คำแนะนำ AI SPS V2]\nวันที่: ${TODAY_DATE_STR}\n------------------------------\n💰 เงินสดเริ่มต้น: ${formatTHB(initCash)}\n🟢 ยอดรอรับเงินรวม: ${formatTHB(incTotal)} (${pendingInc.length} รายการ)\n🔴 ยอดรอจ่ายเงินรวม: ${formatTHB(expTotal)} (${pendingExp.length} รายการ)\n🛡️ เกณฑ์เงินสดสำรองขั้นต่ำ: ${formatTHB(minReserve)}\n------------------------------\n💡 คำแนะนำ AI:\n1. เร่งรัดลูกหนี้ค้างชำระเพื่อเพิ่มกระแสเงินสดรับเข้า\n2. จัดลำดับความสำคัญจ่ายชำระเจ้าหนี้ตามวันครบกำหนด\n3. รักษาระดับเงินสดสำรองให้ปลอดภัยเสมอ!`;
 
             navigator.clipboard.writeText(reportStr).then(() => {
                 alert("📋 คัดลอกรายงานคำแนะนำ AI สภาพคล่องเรียบร้อยแล้ว!\nนำไปกดวางส่งในแชท Line ผู้บริหารได้เลยครับ!");
@@ -1570,7 +1582,7 @@
             const pendingInc = transactions.filter(t => t.status !== 'Paid' && t.type === 'Income');
             const pendingExp = transactions.filter(t => t.status !== 'Paid' && t.type === 'Expense');
             
-            let planText = `⚡ [แผนปฏิบัติการแก้สภาพคล่องฉุกเฉิน AI SPS V2]\nวันที่: ${TODAY_DATE_STR}\n------------------------------\n1. เร่งรัดทวงถามลูกหนี้ 3 รายแรก:\n`;
+            let planText = `⚡ [แผนปฏิบัติการแก้สภาพคล่องฉุกเฉิน AI SPS V2 (3 เดือน)]\nวันที่: ${TODAY_DATE_STR}\n------------------------------\n1. เร่งรัดทวงถามลูกหนี้ 3 รายแรก:\n`;
             if (pendingInc.length > 0) {
                 pendingInc.slice(0, 3).forEach(t => { planText += `- ${t.vendor} (${formatTHB(t.net)})\n`; });
             } else { planText += `- ไม่มีลูกหนี้ค้างชำระ\n`; }
@@ -1900,7 +1912,7 @@
                 </body>
                 </html>
             `;
-            const blob = new Blob([htmlContent], { type: 'html/text;charset=utf-8' });
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -1973,7 +1985,7 @@
             }
         }
 
-        /* TAB 6: DYNAMIC CASHFLOW WITH FULL LINE CHARTS & CUSTOMIZABLE INITIAL CASH */
+        /* TAB 6: DYNAMIC CASHFLOW WITH FULL LINE CHARTS & CUSTOMIZABLE INITIAL CASH (3-MONTH HORIZON) */
         function renderCashflowChart() {
             if (typeof Chart === 'undefined') return;
             const ctx = document.getElementById('cashflowChart');
@@ -1981,6 +1993,8 @@
 
             const initCash = parseFloat(document.getElementById('forecast-init-cash').value) || 0;
             const minReserve = parseFloat(document.getElementById('forecast-min-reserve').value) || 0;
+            const months = parseInt(document.getElementById('forecast-months')?.value) || 3;
+            const totalPeriods = months * 6; // 6 periods per month = 18 periods for 3 months (90 days)
 
             const today = parseDDMMYYYY(TODAY_DATE_STR);
             const dateLabels = [];
@@ -1994,7 +2008,7 @@
             const pendingInc = transactions.filter(t => t.status !== 'Paid' && t.type === 'Income');
             const pendingExp = transactions.filter(t => t.status !== 'Paid' && t.type === 'Expense');
 
-            for (let i = 0; i < 8; i++) {
+            for (let i = 0; i < totalPeriods; i++) {
                 const pStart = new Date(today);
                 pStart.setDate(pStart.getDate() + (i * 5));
                 const pEnd = new Date(today);
@@ -2024,16 +2038,19 @@
             if (document.getElementById('forecast-end-balance')) {
                 document.getElementById('forecast-end-balance').innerText = formatTHB(runningCash);
             }
+            if (document.getElementById('forecast-end-label')) {
+                document.getElementById('forecast-end-label').innerText = `คาดการณ์เงินสดคงเหลือปลายทาง (${months} เดือน):`;
+            }
 
             const statusBox = document.getElementById('forecast-reserve-status');
             const lowestBal = Math.min(...netBalanceSeries);
             if (statusBox) {
                 if (lowestBal >= minReserve) {
                     statusBox.className = 'badge-status badge-paid';
-                    statusBox.innerText = `🟢 สภาพคล่องปลอดภัย (เงินสดต่ำสุด ${formatTHB(lowestBal)})`;
+                    statusBox.innerText = `🟢 สภาพคล่องปลอดภัย (${months} เดือน / ต่ำสุด ${formatTHB(lowestBal)})`;
                 } else {
                     statusBox.className = 'badge-status badge-overdue';
-                    statusBox.innerText = `⚠️ ต่ำกว่าเกณฑ์สำรอง! (เงินสดต่ำสุด ${formatTHB(lowestBal)})`;
+                    statusBox.innerText = `⚠️ ต่ำกว่าเกณฑ์สำรอง! (${months} เดือน / ต่ำสุด ${formatTHB(lowestBal)})`;
                 }
             }
 
@@ -2068,14 +2085,14 @@
                         },
                         {
                             type: 'line',
-                            label: '📈 ยอดคาดการณ์เงินสดคงเหลือ',
+                            label: `📈 ยอดคาดการณ์เงินสดคงเหลือ (${months} เดือน)`,
                             data: netBalanceSeries,
                             borderColor: '#4f46e5',
                             backgroundColor: 'rgba(79, 70, 229, 0.15)',
                             fill: true,
                             tension: 0.3,
                             borderWidth: 3,
-                            pointRadius: 5
+                            pointRadius: 4
                         },
                         {
                             type: 'line',
