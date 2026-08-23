@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPS บัญชี-การเงิน V2 (Real Drag & Drop AI Scanner)</title>
+    <title>SPS บัญชี-การเงิน V2 (AI Liquidity Alerts & Recommendations)</title>
     <!-- Google Fonts Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
@@ -43,7 +43,7 @@
         /* CONTAINER */
         .main-container { max-width: 1240px; margin: 24px auto; padding: 0 16px; }
 
-        .banner { background: #065f46; color: #ecfdf5; padding: 12px 18px; border-radius: 12px; font-size: 12px; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border: 1px solid #047857; }
+        .banner { padding: 14px 20px; border-radius: 12px; font-size: 12px; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; border: 1px solid transparent; }
 
         /* NAVIGATION TABS */
         .nav-tabs { display: flex; gap: 6px; margin-bottom: 24px; background: #ffffff; padding: 8px; border-radius: 14px; border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02); flex-wrap: wrap; }
@@ -81,7 +81,7 @@
         .modal-overlay { display: none !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.75); z-index: 99999; justify-content: center; align-items: center; padding: 16px; backdrop-filter: blur(4px); }
         .modal-overlay.active { display: flex !important; }
         .modal-card { background: #ffffff; border-radius: 16px; width: 100%; max-width: 580px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid #cbd5e1; }
-        .modal-header { background: #0f172a; color: #ffffff; padding: 18px 24px; display: flex; justify-content: space-between; align- items: center; }
+        .modal-header { background: #0f172a; color: #ffffff; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; }
         .modal-title { font-size: 16px; font-weight: 700; }
         .modal-close { background: transparent; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; }
         .modal-close:hover { color: #ffffff; }
@@ -104,7 +104,7 @@
         <div class="app-brand">
             <div class="brand-badge">SPS</div>
             <div>
-                <div class="brand-title">SPS บัญชี-การเงิน V2 <span class="mode-badge">Drag & Drop OCR</span></div>
+                <div class="brand-title">SPS บัญชี-การเงิน V2 <span class="mode-badge" style="background:#8b5cf6;">AI Liquidity Alerts & Insights</span></div>
                 <div class="brand-subtitle">ระบบบัญชี-การเงินอิสระ SPS V2 (Cloud & Multi-Device Sync)</div>
             </div>
         </div>
@@ -121,10 +121,19 @@
     <!-- MAIN CONTAINER -->
     <div class="main-container">
 
-        <!-- STATUS BANNER -->
-        <div class="banner">
-            <i class="fa-solid fa-cloud-arrow-up text-amber-400" style="font-size: 16px;"></i>
-            <span><strong>อัปเดตระบบสแกนเอกสาร AI:</strong> รองรับการ <u>ลากและวางไฟล์ (Drag & Drop)</u> รูปภาพสลิป/ใบเสร็จ/ใบกำกับภาษี หรือไฟล์ PDF เข้าสู่ระบบโดยตรงได้แล้ว!</span>
+        <!-- DYNAMIC AUTOMATIC LIQUIDITY ALERT BANNER -->
+        <div id="liquidity-alert-banner" class="banner" style="background: #065f46; border: 1px solid #047857; color: #ecfdf5; margin-bottom: 20px; transition: all 0.3s ease-in-out;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <i id="liquidity-banner-icon" class="fa-solid fa-shield-halved text-emerald-300" style="font-size: 22px;"></i>
+                <div>
+                    <div id="liquidity-banner-title" style="font-weight: 700; font-size: 13px;">🟢 ระบบประมวลผลสภาพคล่องอัตโนมัติ: สภาพคล่องปลอดภัย</div>
+                    <div id="liquidity-banner-desc" style="font-size: 11px; opacity: 0.9; margin-top: 2px;">เงินสดสำรองอยู่ในเกณฑ์มาตรฐาน ไม่มีรายการค้างชำระเกินกำหนด</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button onclick="openAIEmergencyPlanModal()" class="btn btn-amber btn-sm"><i class="fa-solid fa-bolt"></i> ⚡ แผนแก้สภาพคล่องฉุกเฉิน</button>
+                <button onclick="switchTab('forecast')" class="btn btn-outline btn-sm" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);"><i class="fa-solid fa-chart-line"></i> ดูพยากรณ์เงินสด</button>
+            </div>
         </div>
 
         <!-- NAVIGATION TABS -->
@@ -135,7 +144,7 @@
             <button onclick="switchTab('supplier')" id="nav-supplier" class="nav-link"><i class="fa-solid fa-truck-field"></i> แยกตาราง เจ้าหนี้ / ลูกค้า</button>
             <button onclick="switchTab('inout')" id="nav-inout" class="nav-link"><i class="fa-solid fa-scale-balanced"></i> รายรับ-รายจ่าย</button>
             <button onclick="switchTab('forecast')" id="nav-forecast" class="nav-link"><i class="fa-solid fa-chart-line"></i> พยากรณ์เงินสด SPS</button>
-            <button onclick="switchTab('advisor')" id="nav-advisor" class="nav-link"><i class="fa-solid fa-comments"></i> ผู้ช่วย AI ภาษี (Advisor)</button>
+            <button onclick="switchTab('advisor')" id="nav-advisor" class="nav-link"><i class="fa-solid fa-comments"></i> ผู้ช่วย AI ภาษี & คำแนะนำ (Advisor)</button>
             <button onclick="switchTab('backup')" id="nav-backup" class="nav-link"><i class="fa-solid fa-file-import"></i> 📥 นำเข้า/สำรองข้อมูล (Backup)</button>
         </div>
 
@@ -161,6 +170,90 @@
                     <div class="kpi-label">⏳ ยอดรอชำระรวม (Pending Payments)</div>
                     <div class="kpi-num" id="kpi-pending-total">฿0.00</div>
                     <div class="kpi-subtext" id="kpi-pending-count">0 รายการค้างชำระ</div>
+                </div>
+            </div>
+
+            <!-- AI LIQUIDITY ALERT & FINANCIAL INSIGHTS CONTAINER -->
+            <div class="content-box" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: #ffffff; border: 1px solid #4338ca; box-shadow: 0 10px 25px -5px rgba(67, 56, 202, 0.25);">
+                <div class="box-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px; margin-bottom: 18px;">
+                    <div class="box-title" style="color: #a5b4fc;">
+                        <i class="fa-solid fa-brain text-purple-400" style="font-size: 20px;"></i> 🧠 ระบบวิเคราะห์สภาพคล่องอัตโนมัติ & คำแนะนำทางการเงินอัจฉริยะจาก AI
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="copyAIReportToClipboard()" class="btn btn-amber btn-sm"><i class="fa-solid fa-copy"></i> 📋 คัดลอกรายงาน AI ส่งเข้า Line</button>
+                        <button onclick="openAIEmergencyPlanModal()" class="btn btn-rose btn-sm"><i class="fa-solid fa-shield-cat"></i> ⚡ แผนแก้สภาพคล่องฉุกเฉิน</button>
+                    </div>
+                </div>
+
+                <!-- HEALTH INDEX SCORE & METRICS BAR -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px; background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                    <div>
+                        <div style="font-size: 11px; color: #a5b4fc; font-weight: 600;">📊 ดัชนีสุขภาพทางการเงิน (Financial Health Score)</div>
+                        <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 4px;">
+                            <span id="ai-health-score-num" style="font-size: 28px; font-weight: 800; font-family: monospace; color: #34d399;">85/100</span>
+                            <span id="ai-health-score-status" class="badge-status badge-paid" style="font-size: 10px;">🟢 ดีเยี่ยม</span>
+                        </div>
+                        <div style="width: 100%; background: rgba(255,255,255,0.1); height: 6px; border-radius: 4px; margin-top: 6px; overflow: hidden;">
+                            <div id="ai-health-score-bar" style="width: 85%; height: 100%; background: linear-gradient(90deg, #10b981, #34d399); transition: all 0.5s;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style="font-size: 11px; color: #bae6fd; font-weight: 600;">🛡️ ระยะเวลาเงินสดคุ้มครอง (Cash Runway Cushion)</div>
+                        <div id="ai-runway-days" style="font-size: 22px; font-weight: 800; font-family: monospace; color: #38bdf8; margin-top: 4px;">33 วัน</div>
+                        <div id="ai-runway-subtext" style="font-size: 11px; color: #94a3b8; margin-top: 2px;">คุ้มครองค่าใช้จ่ายประจำได้มากกว่า 1 เดือน</div>
+                    </div>
+
+                    <div>
+                        <div style="font-size: 11px; color: #fde68a; font-weight: 600;">⚠️ ความเสี่ยงค้างชำระ (Overdue Exposure)</div>
+                        <div id="ai-overdue-risk-amt" style="font-size: 22px; font-weight: 800; font-family: monospace; color: #fbbf24; margin-top: 4px;">฿0.00</div>
+                        <div id="ai-overdue-risk-count" style="font-size: 11px; color: #94a3b8; margin-top: 2px;">0 รายการเกินกำหนดชำระ</div>
+                    </div>
+                </div>
+
+                <!-- 4 RECOMMENDATION CARDS GRID -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+                    
+                    <!-- CARD 1: RECEIVABLES RECOMMENDATION -->
+                    <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 16px;">
+                        <div style="font-weight: 700; font-size: 13px; color: #34d399; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-hand-holding-dollar"></i> 1. เร่งรัดการเก็บเงินจากลูกหนี้
+                        </div>
+                        <div id="ai-rec-receivables" style="font-size: 12px; line-height: 1.6; color: #e2e8f0;">
+                            กำลังวิเคราะห์รายการค้างรับ...
+                        </div>
+                    </div>
+
+                    <!-- CARD 2: PAYABLES RECOMMENDATION -->
+                    <div style="background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 12px; padding: 16px;">
+                        <div style="font-weight: 700; font-size: 13px; color: #fb7185; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-hourglass-start"></i> 2. บริหารและเจรจาเครดิตเจ้าหนี้
+                        </div>
+                        <div id="ai-rec-payables" style="font-size: 12px; line-height: 1.6; color: #e2e8f0;">
+                            กำลังวิเคราะห์รายการค้างจ่าย...
+                        </div>
+                    </div>
+
+                    <!-- CARD 3: CASH RESERVE RECOMMENDATION -->
+                    <div style="background: rgba(217, 119, 6, 0.08); border: 1px solid rgba(217, 119, 6, 0.3); border-radius: 12px; padding: 16px;">
+                        <div style="font-weight: 700; font-size: 13px; color: #fbbf24; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-piggy-bank"></i> 3. วางเกณฑ์สำรองป้องกันขาดมือ
+                        </div>
+                        <div id="ai-rec-reserve" style="font-size: 12px; line-height: 1.6; color: #e2e8f0;">
+                            กำลังวิเคราะห์เกณฑ์สำรองขั้นต่ำ...
+                        </div>
+                    </div>
+
+                    <!-- CARD 4: TAX & CASHFLOW GAINS RECOMMENDATION -->
+                    <div style="background: rgba(129, 140, 248, 0.08); border: 1px solid rgba(129, 140, 248, 0.3); border-radius: 12px; padding: 16px;">
+                        <div style="font-weight: 700; font-size: 13px; color: #a78bfa; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-scale-balanced"></i> 4. สิทธิประโยชน์ภาษี & แคชโฟลว์
+                        </div>
+                        <div id="ai-rec-tax" style="font-size: 12px; line-height: 1.6; color: #e2e8f0;">
+                            กำลังวิเคราะห์ภาษีซื้อสะสม...
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -210,7 +303,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: AI SCANNER VIEW (REAL DRAG & DROP ENABLED) -->
+        <!-- TAB 2: AI SCANNER VIEW -->
         <div id="view-ocr" class="tab-view" style="display: none;">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px;">
                 
@@ -220,7 +313,7 @@
                         <i class="fa-solid fa-expand text-emerald-600"></i> สแกนใบเสร็จ / ใบกำกับภาษีด้วย AI (AI Active Learning OCR)
                     </div>
                     
-                    <!-- UPLOAD DROPZONE WITH REAL DRAG & DROP -->
+                    <!-- UPLOAD DROPZONE -->
                     <div id="ocr-dropzone" onclick="document.getElementById('ocr-file-input').click()" style="border: 2px dashed #4f46e5; background: #f8fafc; padding: 28px; border-radius: 12px; text-align: center; cursor: pointer; margin-bottom: 16px; transition: all 0.2s;">
                         <i class="fa-solid fa-cloud-arrow-up" style="font-size: 38px; color: #4f46e5; margin-bottom: 8px;"></i>
                         <p style="font-weight: 700; font-size: 14px; color: #0f172a;">คลิก หรือ ลากไฟล์เอกสารมาวางที่นี่ได้เลย (Drag & Drop Active)</p>
@@ -607,15 +700,46 @@
 
         </div>
 
-        <!-- TAB 6: FORECAST VIEW -->
+        <!-- TAB 6: FORECAST VIEW (FULL LINE CHART & EDITABLE INITIAL CASH ENGINE) -->
         <div id="view-forecast" class="tab-view" style="display: none;">
+            
+            <!-- FORECAST PARAMETERS CONTROL CARD -->
+            <div class="content-box" style="background: #0f172a; color: #ffffff;">
+                <div class="box-title" style="color: #38bdf8; margin-bottom: 16px;">
+                    <i class="fa-solid fa-sliders text-indigo-400"></i> ตั้งค่าการพยากรณ์เงินสดและเกณฑ์สำรองขั้นต่ำ (Dynamic Cashflow Simulation)
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; align-items: flex-end;">
+                    <div>
+                        <label style="font-size: 12px; font-weight: 600; color: #a7f3d0; display: block; margin-bottom: 6px;">💰 เงินสดเริ่มต้น / ยอดยกมา (ปรับเปลี่ยนได้เอง):</label>
+                        <input type="number" id="forecast-init-cash" value="100000" oninput="renderCashflowChart()" onkeyup="renderCashflowChart()" onchange="renderCashflowChart()" class="form-control" style="font-weight: 800; color: #047857; background: #ecfdf5; font-size: 15px; border: 2px solid #10b981;">
+                    </div>
+                    <div>
+                        <label style="font-size: 12px; font-weight: 600; color: #fde68a; display: block; margin-bottom: 6px;">🛡️ เกณฑ์เงินสดสำรองขั้นต่ำ (บาท):</label>
+                        <input type="number" id="forecast-min-reserve" value="50000" oninput="renderCashflowChart()" onkeyup="renderCashflowChart()" onchange="renderCashflowChart()" class="form-control" style="font-weight: 800; color: #d97706; background: #fffbeb; font-size: 15px; border: 2px solid #f59e0b;">
+                    </div>
+                    <div style="background: rgba(255,255,255,0.08); padding: 12px; border-radius: 10px; border-left: 4px solid #38bdf8;">
+                        <div style="font-size: 11px; color: #bae6fd;">คาดการณ์เงินสดคงเหลือปลายทาง:</div>
+                        <div id="forecast-end-balance" style="font-size: 20px; font-weight: 800; font-family: monospace; color: #38bdf8; margin-top: 2px;">฿0.00</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.08); padding: 12px; border-radius: 10px; border-left: 4px solid #10b981;">
+                        <div style="font-size: 11px; color: #a7f3d0;">สถานะสภาพคล่องสำรอง:</div>
+                        <div style="margin-top: 4px;"><span id="forecast-reserve-status" class="badge-status badge-paid">🟢 ปลอดภัย</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHART CARD -->
             <div class="content-box">
-                <div class="box-title" style="margin-bottom: 12px;"><i class="fa-solid fa-chart-line text-purple-600"></i> พยากรณ์กระแสเงินสด SPS V2 ล่วงหน้า 12 สัปดาห์</div>
-                <p style="font-size: 12px; color: #64748b; margin-bottom: 16px;">คำนวณประมาณการเงินสดคงเหลือล่วงหน้าแบบ Dynamic Projection</p>
-                <div style="height: 280px; position: relative;">
+                <div class="box-header">
+                    <div class="box-title"><i class="fa-solid fa-chart-line text-purple-600"></i> กราฟเส้นพยากรณ์กระแสเงินสดรายวัน (All-Line Cashflow Projection Chart)</div>
+                    <div style="font-size: 12px; color: #64748b;">แสดง <u>เส้นยอดรอรับ, เส้นยอดรอจ่าย และเส้นคาดการณ์เงินสดคงเหลือ</u> ตามวันที่จริง</div>
+                </div>
+                <div style="height: 380px; position: relative;">
                     <canvas id="cashflowChart"></canvas>
                 </div>
             </div>
+
         </div>
 
         <!-- TAB 7: ADVISOR VIEW -->
@@ -767,6 +891,24 @@
             <div class="modal-footer">
                 <button onclick="closeModal('doc-view-modal')" class="btn btn-outline">ปิด</button>
                 <button id="doc-modal-download-btn" class="btn btn-emerald"><i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดเอกสาร</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: AI EMERGENCY CASH PLAN MODAL -->
+    <div id="ai-emergency-plan-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 620px;">
+            <div class="modal-header" style="background: #1e1b4b; border-bottom: 1px solid #4338ca;">
+                <div class="modal-title" style="color: #fb7185;"><i class="fa-solid fa-shield-cat text-amber-400"></i> ⚡ แผนปฏิบัติการแก้สภาพคล่องฉุกเฉินจาก AI</div>
+                <button onclick="closeModal('ai-emergency-plan-modal')" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" style="background: #0f172a; color: #f8fafc; font-size: 12px;">
+                <p style="margin-bottom: 14px; color: #cbd5e1; font-size: 13px;">AI ประมวลผลแผนเร่งด่วน 3 ขั้นตอน เพื่อดึงสภาพคล่องและป้องกันเงินสดติดลบ:</p>
+                <div id="ai-emergency-plan-content" style="display: flex; flex-direction: column; gap: 12px;"></div>
+            </div>
+            <div class="modal-footer" style="background: #1e293b; border-top: 1px solid #334155;">
+                <button onclick="closeModal('ai-emergency-plan-modal')" class="btn btn-outline" style="color:#fff; border-color:#475569;">ปิด</button>
+                <button onclick="copyAIEmergencyPlanToClipboard()" class="btn btn-amber"><i class="fa-solid fa-copy"></i> 📋 คัดลอกแผนฉุกเฉินส่งเข้า Line บริหาร</button>
             </div>
         </div>
     </div>
@@ -944,7 +1086,6 @@
                 if (file.type.startsWith('image/')) {
                     previewImg.src = e.target.result;
                 } else {
-                    // PDF fallback representation
                     previewImg.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%234f46e5" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><text x="6" y="16" fill="%234f46e5" font-size="6" font-family="sans-serif" font-weight="bold">PDF DOC</text></svg>';
                 }
 
@@ -1044,7 +1185,6 @@
             const previewImg = document.getElementById('ocr-preview-img');
             const fileData = (previewImg && previewImg.src && previewImg.src.startsWith('data:image')) ? previewImg.src : null;
 
-            // Learn Vendor Profile
             vendorMemory[vendor] = { category: desc || "ค่าใช้จ่ายทั่วไป", credit: creditDays, confidence: 99 };
 
             transactions.unshift({
@@ -1059,7 +1199,6 @@
         }
 
         function renderLedger() {
-            // 1. Calculate Dashboard KPI
             let inc = transactions.filter(t => t.type === 'Income').reduce((a,b) => a + (b.before_vat || b.net || 0), 0);
             let exp = transactions.filter(t => t.type === 'Expense').reduce((a,b) => a + (b.before_vat || b.net || 0), 0);
             let profit = inc - exp;
@@ -1075,7 +1214,6 @@
             if (document.getElementById('kpi-pending-total')) document.getElementById('kpi-pending-total').innerText = formatTHB(pendingTotal);
             if (document.getElementById('kpi-pending-count')) document.getElementById('kpi-pending-count').innerText = `${allPending.length} รายการค้างชำระ`;
 
-            // 2. Render Dashboard Table
             const tbodyDash = document.getElementById('ledger-table-body');
             if (tbodyDash) {
                 if (transactions.length === 0) {
@@ -1102,7 +1240,6 @@
                 }
             }
 
-            // 3. Render Split Pending Tables & Reconciliation Summary
             const tbodyPendingInc = document.getElementById('pending-inc-table-body');
             const tbodyPendingExp = document.getElementById('pending-exp-table-body');
 
@@ -1124,7 +1261,6 @@
             const totalOverdueCount = overdueIncomes.length + overdueExpenses.length;
             const totalOverdueAmt = overdueIncomes.reduce((a,b) => a + (b.net||0), 0) + overdueExpenses.reduce((a,b) => a + (b.net||0), 0);
 
-            // Populate Pending Reconciliation Summary Box
             if (document.getElementById('recon-pending-inc')) document.getElementById('recon-pending-inc').innerText = formatTHB(incTotal);
             if (document.getElementById('recon-pending-inc-count')) document.getElementById('recon-pending-inc-count').innerText = `${pendingIncomes.length} รายการรอรับ`;
             if (document.getElementById('recon-pending-exp')) document.getElementById('recon-pending-exp').innerText = formatTHB(expTotal);
@@ -1188,8 +1324,269 @@
             renderSupplierLedger();
             renderInOutLedger();
             renderAIMemoryTable();
+            updateAILiquidityAlertsAndRecommendations();
             try { renderDashboardCharts(); } catch(e) {}
             try { renderCashflowChart(); } catch(e) {}
+        }
+
+        /* DYNAMIC AI LIQUIDITY ALERT & RECOMMENDATIONS ENGINE */
+        function updateAILiquidityAlertsAndRecommendations() {
+            const initCashInput = document.getElementById('forecast-init-cash');
+            const minReserveInput = document.getElementById('forecast-min-reserve');
+            const initCash = initCashInput ? (parseFloat(initCashInput.value) || 100000) : 100000;
+            const minReserve = minReserveInput ? (parseFloat(minReserveInput.value) || 50000) : 50000;
+
+            const today = parseDDMMYYYY(TODAY_DATE_STR);
+
+            const pendingInc = transactions.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = transactions.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+
+            const overdueInc = pendingInc.filter(t => parseDDMMYYYY(t.due_date).getTime() < today.getTime());
+            const overdueExp = pendingExp.filter(t => parseDDMMYYYY(t.due_date).getTime() < today.getTime());
+
+            const totalOverdueIncAmt = overdueInc.reduce((a,b) => a + (b.net || 0), 0);
+            const totalOverdueExpAmt = overdueExp.reduce((a,b) => a + (b.net || 0), 0);
+
+            let runningCash = initCash;
+            let lowestProjectedBal = initCash;
+            let lowestBalDate = TODAY_DATE_STR;
+
+            for (let i = 0; i < 8; i++) {
+                const pStart = new Date(today);
+                pStart.setDate(pStart.getDate() + (i * 5));
+                const pEnd = new Date(today);
+                pEnd.setDate(pEnd.getDate() + ((i + 1) * 5) - 1);
+                const dStr = `${String(pStart.getDate()).padStart(2,'0')}/${String(pStart.getMonth()+1).padStart(2,'0')}/${pStart.getFullYear()}`;
+
+                const periodInc = pendingInc.filter(t => {
+                    const d = parseDDMMYYYY(t.due_date || t.date);
+                    return d >= pStart && d <= pEnd;
+                }).reduce((a,b) => a + (b.net || 0), 0);
+
+                const periodExp = pendingExp.filter(t => {
+                    const d = parseDDMMYYYY(t.due_date || t.date);
+                    return d >= pStart && d <= pEnd;
+                }).reduce((a,b) => a + (b.net || 0), 0);
+
+                runningCash += (periodInc - periodExp);
+                if (runningCash < lowestProjectedBal) {
+                    lowestProjectedBal = runningCash;
+                    lowestBalDate = dStr;
+                }
+            }
+
+            // BANNER ALERT UPDATE
+            const banner = document.getElementById('liquidity-alert-banner');
+            const icon = document.getElementById('liquidity-banner-icon');
+            const title = document.getElementById('liquidity-banner-title');
+            const desc = document.getElementById('liquidity-banner-desc');
+
+            if (banner && title && desc && icon) {
+                if (lowestProjectedBal < 0) {
+                    banner.style.background = '#881337';
+                    banner.style.borderColor = '#e11d48';
+                    icon.className = 'fa-solid fa-triangle-exclamation text-rose-300';
+                    title.innerHTML = `🚨 [เตือนภัยวิกฤตสภาพคล่อง] คาดการณ์เงินสดติดลบ ${formatTHB(lowestProjectedBal)} ณ วันที่ ${lowestBalDate}`;
+                    desc.innerText = `มีรายการรอจ่ายเกินกว่าเงินสดที่มีอยู่ แนะนำให้เร่งติดตามลูกหนี้หรือชะลอการจ่ายตามแผนฉุกเฉิน AI`;
+                } else if (lowestProjectedBal < minReserve || overdueExp.length > 0) {
+                    banner.style.background = '#78350f';
+                    banner.style.borderColor = '#d97706';
+                    icon.className = 'fa-solid fa-circle-exclamation text-amber-300';
+                    title.innerHTML = `⚠️ [เตือนภัยเงินสดตึงตัว] เงินสดต่ำสุด ${formatTHB(lowestProjectedBal)} ต่ำกว่าเกณฑ์สำรอง (${formatTHB(minReserve)})`;
+                    desc.innerText = `พบรายการค้างชำระเกินกำหนด ${overdueExp.length + overdueInc.length} รายการ (รวม ${formatTHB(totalOverdueIncAmt + totalOverdueExpAmt)})`;
+                } else {
+                    banner.style.background = '#065f46';
+                    banner.style.borderColor = '#047857';
+                    icon.className = 'fa-solid fa-shield-halved text-emerald-300';
+                    title.innerHTML = `🟢 [ระบบประมวลผลสภาพคล่อง] สภาพคล่องทางการเงินแข็งแกร่ง (คาดการณ์เงินสดต่ำสุด ${formatTHB(lowestProjectedBal)})`;
+                    desc.innerText = `เงินสดสำรองเพียงพอ ไม่มีรายการค้างชำระเกินกำหนด สภาพคล่องพร้อมขยายธุรกิจ`;
+                }
+            }
+
+            // FINANCIAL HEALTH SCORE
+            let score = 100;
+            if (lowestProjectedBal < 0) score -= 50;
+            else if (lowestProjectedBal < minReserve) score -= 25;
+            if (overdueExp.length > 0) score -= 15;
+            if (overdueInc.length > 0) score -= 10;
+            score = Math.max(0, Math.min(100, score));
+
+            const scoreNum = document.getElementById('ai-health-score-num');
+            const scoreBar = document.getElementById('ai-health-score-bar');
+            const scoreBadge = document.getElementById('ai-health-score-status');
+
+            if (scoreNum && scoreBar && scoreBadge) {
+                scoreNum.innerText = `${score}/100`;
+                scoreBar.style.width = `${score}%`;
+                if (score >= 75) {
+                    scoreBar.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
+                    scoreBadge.className = 'badge-status badge-paid';
+                    scoreBadge.innerText = '🟢 แข็งแกร่ง';
+                } else if (score >= 50) {
+                    scoreBar.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+                    scoreBadge.className = 'badge-status badge-pending';
+                    scoreBadge.innerText = '🟡 พึงระวัง';
+                } else {
+                    scoreBar.style.background = 'linear-gradient(90deg, #e11d48, #f43f5e)';
+                    scoreBadge.className = 'badge-status badge-overdue';
+                    scoreBadge.innerText = '🚨 เสี่ยงตึงตัววิกฤต';
+                }
+            }
+
+            const avgDailyExp = 3000;
+            const runwayDays = Math.max(0, Math.floor(initCash / avgDailyExp));
+            if (document.getElementById('ai-runway-days')) {
+                document.getElementById('ai-runway-days').innerText = `${runwayDays} วัน`;
+            }
+            if (document.getElementById('ai-overdue-risk-amt')) {
+                document.getElementById('ai-overdue-risk-amt').innerText = formatTHB(totalOverdueIncAmt + totalOverdueExpAmt);
+            }
+            if (document.getElementById('ai-overdue-risk-count')) {
+                document.getElementById('ai-overdue-risk-count').innerText = `${overdueInc.length + overdueExp.length} รายการเกินกำหนดชำระ`;
+            }
+
+            // 4 ACTIONABLE AI RECOMMENDATIONS
+            const recInc = document.getElementById('ai-rec-receivables');
+            if (recInc) {
+                if (overdueInc.length > 0) {
+                    const topCust = overdueInc[0];
+                    recInc.innerHTML = `📌 <strong>พบลูกหนี้เกินกำหนด:</strong> <span style="color:#fde68a;">[${topCust.vendor}]</span> ยอด ${formatTHB(topCust.net)} เกินกำหนดแล้ว<br>💡 <strong>คำแนะนำ AI:</strong> ติดตามทวงถามทันที หรือเสนอส่วนลดเงินสด (Cash Discount 1.5%) เพื่อดึงเงินสด <strong>${formatTHB(totalOverdueIncAmt)}</strong> เข้ามาในระบบด่วน`;
+                } else if (pendingInc.length > 0) {
+                    const nextCust = pendingInc[0];
+                    recInc.innerHTML = `📌 <strong>รายการรอเก็บเงินถัดไป:</strong> <span style="color:#a7f3d0;">[${nextCust.vendor}]</span> ยอด ${formatTHB(nextCust.net)} (ครบกำหนด ${nextCust.due_date})<br>💡 <strong>คำแนะนำ AI:</strong> ส่งใบแจ้งหนี้ล่วงหน้า 5 วันทำการเพื่อยืนยันวันโอนชำระเงินตามกำหนด`;
+                } else {
+                    recInc.innerHTML = `📌 <strong>ไม่มีลูกหนี้ค้างชำระ:</strong> ระบบเก็บเงินสดได้ 100%<br>💡 <strong>คำแนะนำ AI:</strong> รักษารูปแบบเครดิตเทอม 30 วันมาตรฐานเพื่อจูงใจลูกค้าใหม่`;
+                }
+            }
+
+            const recExp = document.getElementById('ai-rec-payables');
+            if (recExp) {
+                if (overdueExp.length > 0) {
+                    const topSupp = overdueExp[0];
+                    recExp.innerHTML = `📌 <strong>มีเจ้าหนี้เกินกำหนด:</strong> <span style="color:#fecdd3;">[${topSupp.vendor}]</span> ยอด ${formatTHB(topSupp.net)}<br>💡 <strong>คำแนะนำ AI:</strong> ชำระยอดนี้เป็นลำดับแรกเพื่อรักษาเครดิต หรือขอแบ่งชำระเป็น 2 งวดหากเงินสดตึงตัว`;
+                } else if (pendingExp.length > 0) {
+                    const nextSupp = pendingExp[0];
+                    recExp.innerHTML = `📌 <strong>เจ้าหนี้รอชำระถัดไป:</strong> <span style="color:#fed7aa;">[${nextSupp.vendor}]</span> ยอด ${formatTHB(nextSupp.net)} (ครบกำหนด ${nextSupp.due_date})<br>💡 <strong>คำแนะนำ AI:</strong> ชะลอการจ่ายให้ใกล้กับวันครบกำหนดที่สุด เพื่อถือครองกระแสเงินสดสำรองไว้ให้นานที่สุด`;
+                } else {
+                    recExp.innerHTML = `📌 <strong>ไม่มีภาระเจ้าหนี้ค้างจ่าย:</strong><br>💡 <strong>คำแนะนำ AI:</strong> พิจารณาเจรจาขอส่วนลดการชำระเงินเร็ว (Early Payment Discount) จากซัพพลายเออร์หลัก 2-3%`;
+                }
+            }
+
+            const recRes = document.getElementById('ai-rec-reserve');
+            if (recRes) {
+                if (lowestProjectedBal < minReserve) {
+                    const diff = minReserve - lowestProjectedBal;
+                    recRes.innerHTML = `📌 <strong>เงินสดคาดการณ์ต่ำกว่าเกณฑ์:</strong> ขาดอยู่อีก <strong>${formatTHB(diff)}</strong><br>💡 <strong>คำแนะนำ AI:</strong> ปรับเพิ่มเงินสดเริ่มต้น หรือชะลอรายจ่ายที่ไม่จำเป็นเพื่อรักษาระดับสำรองขั้นต่ำ ${formatTHB(minReserve)}`;
+                } else {
+                    recRes.innerHTML = `📌 <strong>เงินสดสำรองเพียงพอ:</strong> คาดการณ์เงินสดต่ำสุด ${formatTHB(lowestProjectedBal)} สูงกว่าเกณฑ์สำรอง ${formatTHB(minReserve)}<br>💡 <strong>คำแนะนำ AI:</strong> สภาพคล่องส่วนเกินสามารถนำไปลงทุนหมุนเวียนเพิ่มกำไรให้บริษัทได้`;
+                }
+            }
+
+            const recTax = document.getElementById('ai-rec-tax');
+            if (recTax) {
+                const vatSales = transactions.filter(t => t.status === 'Paid' && t.type === 'Income').reduce((a,b) => a + (b.vat||0), 0);
+                const vatBuys = transactions.filter(t => t.status === 'Paid' && t.type === 'Expense').reduce((a,b) => a + (b.vat||0), 0);
+                const vatNet = vatSales - vatBuys;
+                const whtTotal = transactions.filter(t => t.status === 'Paid').reduce((a,b) => a + (b.wht||0), 0);
+
+                recTax.innerHTML = `📌 <strong>กระทบยอดภาษีสะสม:</strong> ภาษีซื้อ ${formatTHB(vatBuys)} | หัก ณ ที่จ่ายสะสม ${formatTHB(whtTotal)}<br>💡 <strong>คำแนะนำ AI:</strong> ${vatNet < 0 ? `ยื่นขอคืนภาษีซื้อ ภ.พ.30 จำนวน <strong>${formatTHB(Math.abs(vatNet))}</strong> เพื่อเปลี่ยนเป็นกระแสเงินสดรับกลับเข้าบริษัท` : `จัดเตรียมเงินสด ${formatTHB(vatNet)} สำหรับยื่น ภ.พ.30 ภายในวันที่ 15`}`;
+            }
+        }
+
+        function openAIEmergencyPlanModal() {
+            const today = parseDDMMYYYY(TODAY_DATE_STR);
+            const pendingInc = transactions.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = transactions.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+
+            const container = document.getElementById('ai-emergency-plan-content');
+            if (!container) return;
+
+            let html = `
+                <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; padding: 12px; border-radius: 8px;">
+                    <div style="font-weight: 700; color: #34d399; font-size: 13px;">1. เร่งรัดทวงถามลูกหนี้ 3 รายแรก (เพิ่มเงินสดทันที)</div>
+                    <ul style="margin-top: 6px; padding-left: 18px; line-height: 1.6;">
+            `;
+
+            if (pendingInc.length > 0) {
+                pendingInc.slice(0, 3).forEach(t => {
+                    html += `<li><strong>${t.vendor}</strong> (ยอด ${formatTHB(t.net)}) — กำหนดชำระ: ${t.due_date}</li>`;
+                });
+            } else {
+                html += `<li>ไม่มีรายการลูกหนี้ค้างชำระ</li>`;
+            }
+
+            html += `
+                    </ul>
+                </div>
+
+                <div style="background: rgba(244, 63, 94, 0.1); border-left: 4px solid #f43f5e; padding: 12px; border-radius: 8px;">
+                    <div style="font-weight: 700; color: #fb7185; font-size: 13px;">2. เจรจาชะลอหรือแบ่งจ่ายเจ้าหนี้ 3 รายแรก (สงวนเงินสด)</div>
+                    <ul style="margin-top: 6px; padding-left: 18px; line-height: 1.6;">
+            `;
+
+            if (pendingExp.length > 0) {
+                pendingExp.slice(0, 3).forEach(t => {
+                    html += `<li><strong>${t.vendor}</strong> (ยอด ${formatTHB(t.net)}) — ขอขยายเครดิตเพิ่ม 15 วัน</li>`;
+                });
+            } else {
+                html += `<li>ไม่มีภาระเจ้าหนี้ค้างจ่าย</li>`;
+            }
+
+            html += `
+                    </ul>
+                </div>
+
+                <div style="background: rgba(217, 119, 6, 0.1); border-left: 4px solid #f59e0b; padding: 12px; border-radius: 8px;">
+                    <div style="font-weight: 700; color: #fbbf24; font-size: 13px;">3. สรุปผลลัพธ์สภาพคล่องหลังปฏิบัติตามแผน</div>
+                    <div style="margin-top: 4px; line-height: 1.6;">
+                        กระแสเงินสดหมุนเวียนจะเพิ่มขึ้นสูงสุด <strong>${formatTHB(pendingInc.slice(0,3).reduce((a,b)=>a+(b.net||0),0))}</strong> และชะลอรายจ่ายออกไปได้ <strong>${formatTHB(pendingExp.slice(0,3).reduce((a,b)=>a+(b.net||0),0))}</strong> ส่งผลให้สภาพคล่องปลอดภัย 100%!
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            openModal('ai-emergency-plan-modal');
+        }
+
+        function copyAIReportToClipboard() {
+            const initCash = parseFloat(document.getElementById('forecast-init-cash')?.value) || 100000;
+            const minReserve = parseFloat(document.getElementById('forecast-min-reserve')?.value) || 50000;
+            const pendingInc = transactions.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = transactions.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+            
+            const incTotal = pendingInc.reduce((a,b) => a + (b.net || 0), 0);
+            const expTotal = pendingExp.reduce((a,b) => a + (b.net || 0), 0);
+
+            const reportStr = `🧠 [รายงานการประมวลผลสภาพคล่อง & คำแนะนำ AI SPS V2]\nวันที่: ${TODAY_DATE_STR}\n------------------------------\n💰 เงินสดเริ่มต้น: ${formatTHB(initCash)}\n🟢 ยอดรอรับเงินรวม: ${formatTHB(incTotal)} (${pendingInc.length} รายการ)\n🔴 ยอดรอจ่ายเงินรวม: ${formatTHB(expTotal)} (${pendingExp.length} รายการ)\n🛡️ เกณฑ์เงินสดสำรองขั้นต่ำ: ${formatTHB(minReserve)}\n------------------------------\n💡 คำแนะนำ AI:\n1. เร่งรัดลูกหนี้ค้างชำระเพื่อเพิ่มกระแสเงินสดรับเข้า\n2. จัดลำดับความสำคัญจ่ายชำระเจ้าหนี้ตามวันครบกำหนด\n3. รักษาระดับเงินสดสำรองให้ปลอดภัยเสมอ!`;
+
+            navigator.clipboard.writeText(reportStr).then(() => {
+                alert("📋 คัดลอกรายงานคำแนะนำ AI สภาพคล่องเรียบร้อยแล้ว!\nนำไปกดวางส่งในแชท Line ผู้บริหารได้เลยครับ!");
+            }).catch(e => {
+                prompt("📋 คัดลอกรายงานคำแนะนำ AI ด้านล่างนี้:", reportStr);
+            });
+        }
+
+        function copyAIEmergencyPlanToClipboard() {
+            const pendingInc = transactions.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = transactions.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+            
+            let planText = `⚡ [แผนปฏิบัติการแก้สภาพคล่องฉุกเฉิน AI SPS V2]\nวันที่: ${TODAY_DATE_STR}\n------------------------------\n1. เร่งรัดทวงถามลูกหนี้ 3 รายแรก:\n`;
+            if (pendingInc.length > 0) {
+                pendingInc.slice(0, 3).forEach(t => { planText += `- ${t.vendor} (${formatTHB(t.net)})\n`; });
+            } else { planText += `- ไม่มีลูกหนี้ค้างชำระ\n`; }
+
+            planText += `\n2. เจรจาชะลอหรือขยายเครดิตเจ้าหนี้ 3 รายแรก:\n`;
+            if (pendingExp.length > 0) {
+                pendingExp.slice(0, 3).forEach(t => { planText += `- ${t.vendor} (${formatTHB(t.net)})\n`; });
+            } else { planText += `- ไม่มีเจ้าหนี้ค้างจ่าย\n`; }
+
+            planText += `------------------------------\n🎯 เป้าหมาย: ดึงเงินสดเข้าทันทีและชะลอรายจ่ายเพื่อรักษาสภาพคล่อง 100%!`;
+
+            navigator.clipboard.writeText(planText).then(() => {
+                alert("📋 คัดลอกแผนฉุกเฉินเรียบร้อยแล้ว!\nนำไปส่งในแชท Line บริหารได้เลยครับ!");
+            }).catch(e => {
+                prompt("📋 คัดลอกแผนฉุกเฉินด้านล่างนี้:", planText);
+            });
         }
 
         function renderSupplierLedger() {
@@ -1197,12 +1594,10 @@
             const tbodyCustomer = document.getElementById('supplier-inc-table-body');
             if (!tbodyCreditor && !tbodyCustomer) return;
 
-            // Filter Expense items & sort chronologically from past to present and onwards
             const expTxs = transactions.filter(t => t.type === 'Expense').sort((a, b) => {
                 return parseDDMMYYYY(a.date || a.due_date) - parseDDMMYYYY(b.date || b.due_date);
             });
 
-            // Filter Income items & sort chronologically from past to present and onwards
             const incTxs = transactions.filter(t => t.type === 'Income').sort((a, b) => {
                 return parseDDMMYYYY(a.date || a.due_date) - parseDDMMYYYY(b.date || b.due_date);
             });
@@ -1215,7 +1610,6 @@
             const paidCount = transactions.filter(t => t.status === 'Paid').length;
             const settleRate = transactions.length > 0 ? ((paidCount / transactions.length) * 100).toFixed(1) : "0.0";
 
-            // Populate Supplier/Customer Reconciliation Summary Box
             if (document.getElementById('recon-supp-cust-total')) document.getElementById('recon-supp-cust-total').innerText = formatTHB(custTotal);
             if (document.getElementById('recon-supp-cust-unpaid')) document.getElementById('recon-supp-cust-unpaid').innerText = `ค้างรับ: ${formatTHB(custUnpaid)}`;
             if (document.getElementById('recon-supp-cred-total')) document.getElementById('recon-supp-cred-total').innerText = formatTHB(credTotal);
@@ -1297,7 +1691,6 @@
             const tbodyExp = document.getElementById('inout-exp-table-body');
             if (!tbodyInc && !tbodyExp) return;
 
-            // Only Paid transactions, sorted chronologically from past to present and onwards
             const paidIncomes = transactions.filter(t => t.status === 'Paid' && t.type === 'Income').sort((a, b) => {
                 return parseDDMMYYYY(a.date || a.pay_date) - parseDDMMYYYY(b.date || b.pay_date);
             });
@@ -1315,13 +1708,12 @@
             const vatNet = vatSales - vatBuys;
             const margin = totalIncNet > 0 ? ((cashProfit / totalIncNet) * 100).toFixed(1) : "0.0";
 
-            // Populate InOut Cash & Tax Reconciliation Summary Box
             if (document.getElementById('recon-inout-inc-net')) document.getElementById('recon-inout-inc-net').innerText = formatTHB(totalIncNet);
             if (document.getElementById('recon-inout-vat-sale')) document.getElementById('recon-inout-vat-sale').innerText = `ภาษีขาย 7%: ${formatTHB(vatSales)}`;
             if (document.getElementById('recon-inout-exp-net')) document.getElementById('recon-inout-exp-net').innerText = formatTHB(totalExpNet);
             if (document.getElementById('recon-inout-vat-buy')) document.getElementById('recon-inout-vat-buy').innerText = `ภาษีซื้อ 7%: ${formatTHB(vatBuys)}`;
             if (document.getElementById('recon-inout-cash-profit')) document.getElementById('recon-inout-cash-profit').innerText = (cashProfit >= 0 ? '+' : '') + formatTHB(cashProfit);
-            if (document.getElementById('recon-inout-margin')) document.getElementById('recon-inout-margin').innerText = `Net Profit Margin: ${margin}%`;
+            if (document.getElementById('recon-inout-margin')) document.getElementById('recon-inout-margin').innerText = `Net Margin: ${margin}%`;
             if (document.getElementById('recon-inout-vat-net')) document.getElementById('recon-inout-vat-net').innerText = vatNet >= 0 ? `นำส่งภาษี ${formatTHB(vatNet)}` : `ขอคืนภาษี ${formatTHB(Math.abs(vatNet))}`;
             if (document.getElementById('recon-inout-wht-total')) document.getElementById('recon-inout-wht-total').innerText = `หัก ณ ที่จ่าย 3% รวม: ${formatTHB(whtTotal)}`;
 
@@ -1552,7 +1944,6 @@
         function renderDashboardCharts() {
             if (typeof Chart === 'undefined') return;
 
-            // 1. Doughnut Expense Chart
             const expTxs = transactions.filter(t => t.type === 'Expense');
             const catMap = {};
             expTxs.forEach(t => { catMap[t.desc || "ทั่วไป"] = (catMap[t.desc || "ทั่วไป"] || 0) + (t.before_vat || t.net); });
@@ -1569,7 +1960,6 @@
                 });
             }
 
-            // 2. Bar Revenue vs Expense Chart
             const ctxRev = document.getElementById('revenueExpenseChart');
             if (ctxRev) {
                 if (revenueExpenseChartObj) revenueExpenseChartObj.destroy();
@@ -1583,20 +1973,138 @@
             }
         }
 
+        /* TAB 6: DYNAMIC CASHFLOW WITH FULL LINE CHARTS & CUSTOMIZABLE INITIAL CASH */
         function renderCashflowChart() {
             if (typeof Chart === 'undefined') return;
             const ctx = document.getElementById('cashflowChart');
             if (!ctx) return;
-            if (cashflowChartObj) cashflowChartObj.destroy();
 
-            const weeks = ['สัปดาห์ 1', 'สัปดาห์ 2', 'สัปดาห์ 3', 'สัปดาห์ 4', 'สัปดาห์ 5', 'สัปดาห์ 6', 'สัปดาห์ 7', 'สัปดาห์ 8', 'สัปดาห์ 9', 'สัปดาห์ 10', 'สัปดาห์ 11', 'สัปดาห์ 12'];
-            const cashData = transactions.length > 0 ? [250000, 220000, 195000, 310000, 280000, 260000, 240000, 380000, 350000, 330000, 310000, 450000] : [0,0,0,0,0,0,0,0,0,0,0,0];
+            const initCash = parseFloat(document.getElementById('forecast-init-cash').value) || 0;
+            const minReserve = parseFloat(document.getElementById('forecast-min-reserve').value) || 0;
+
+            const today = parseDDMMYYYY(TODAY_DATE_STR);
+            const dateLabels = [];
+            const incAmounts = [];
+            const expAmounts = [];
+            const netBalanceSeries = [];
+            const minReserveSeries = [];
+
+            let runningCash = initCash;
+
+            const pendingInc = transactions.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = transactions.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+
+            for (let i = 0; i < 8; i++) {
+                const pStart = new Date(today);
+                pStart.setDate(pStart.getDate() + (i * 5));
+                const pEnd = new Date(today);
+                pEnd.setDate(pEnd.getDate() + ((i + 1) * 5) - 1);
+
+                const dateStr = `${String(pStart.getDate()).padStart(2,'0')}/${String(pStart.getMonth()+1).padStart(2,'0')}/${pStart.getFullYear()}`;
+                dateLabels.push(dateStr);
+
+                const periodInc = pendingInc.filter(t => {
+                    const d = parseDDMMYYYY(t.due_date || t.date);
+                    return d >= pStart && d <= pEnd;
+                }).reduce((a,b) => a + (b.net || 0), 0);
+
+                const periodExp = pendingExp.filter(t => {
+                    const d = parseDDMMYYYY(t.due_date || t.date);
+                    return d >= pStart && d <= pEnd;
+                }).reduce((a,b) => a + (b.net || 0), 0);
+
+                incAmounts.push(periodInc);
+                expAmounts.push(periodExp);
+
+                runningCash += (periodInc - periodExp);
+                netBalanceSeries.push(runningCash);
+                minReserveSeries.push(minReserve);
+            }
+
+            if (document.getElementById('forecast-end-balance')) {
+                document.getElementById('forecast-end-balance').innerText = formatTHB(runningCash);
+            }
+
+            const statusBox = document.getElementById('forecast-reserve-status');
+            const lowestBal = Math.min(...netBalanceSeries);
+            if (statusBox) {
+                if (lowestBal >= minReserve) {
+                    statusBox.className = 'badge-status badge-paid';
+                    statusBox.innerText = `🟢 สภาพคล่องปลอดภัย (เงินสดต่ำสุด ${formatTHB(lowestBal)})`;
+                } else {
+                    statusBox.className = 'badge-status badge-overdue';
+                    statusBox.innerText = `⚠️ ต่ำกว่าเกณฑ์สำรอง! (เงินสดต่ำสุด ${formatTHB(lowestBal)})`;
+                }
+            }
+
+            if (cashflowChartObj) cashflowChartObj.destroy();
 
             cashflowChartObj = new Chart(ctx, {
                 type: 'line',
-                data: { labels: weeks, datasets: [{ label: 'เงินสดคงเหลือล่วงหน้า (บาท)', data: cashData, borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, tension: 0.3 }] },
-                options: { responsive: true, maintainAspectRatio: false }
+                data: {
+                    labels: dateLabels,
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: '🟢 ยอดรอรับ (Receivables Line)',
+                            data: incAmounts,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            tension: 0.2,
+                            fill: false
+                        },
+                        {
+                            type: 'line',
+                            label: '🔴 ยอดรอจ่าย (Payables Line)',
+                            data: expAmounts,
+                            borderColor: '#f43f5e',
+                            backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            tension: 0.2,
+                            fill: false
+                        },
+                        {
+                            type: 'line',
+                            label: '📈 ยอดคาดการณ์เงินสดคงเหลือ',
+                            data: netBalanceSeries,
+                            borderColor: '#4f46e5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.15)',
+                            fill: true,
+                            tension: 0.3,
+                            borderWidth: 3,
+                            pointRadius: 5
+                        },
+                        {
+                            type: 'line',
+                            label: '🛡️ เกณฑ์สำรองขั้นต่ำ (ปรับแต่งได้)',
+                            data: minReserveSeries,
+                            borderColor: '#d97706',
+                            borderDash: [6, 6],
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) { return '฿' + value.toLocaleString(); }
+                            }
+                        }
+                    }
+                }
             });
+
+            updateAILiquidityAlertsAndRecommendations();
         }
 
         function saveManualEntryToLedger() {
@@ -1746,7 +2254,6 @@
                     transactions = [];
                 }
             } else {
-                // First time setup -> start clean with 0 items!
                 transactions = [];
                 saveState();
             }
