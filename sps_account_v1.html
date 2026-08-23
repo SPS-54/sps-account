@@ -104,7 +104,7 @@
         <div class="app-brand">
             <div class="brand-badge">SPS</div>
             <div>
-                <div class="brand-title">SPS บัญชี-การเงิน V2 <span class="mode-badge">Clean Mode</span></div>
+                <div class="brand-title">SPS บัญชี-การเงิน V2 <span class="mode-badge">Chronological Mode</span></div>
                 <div class="brand-subtitle">ระบบบัญชี-การเงินอิสระ SPS V2 (Cloud & Multi-Device Sync)</div>
             </div>
         </div>
@@ -123,15 +123,15 @@
 
         <!-- STATUS BANNER -->
         <div class="banner">
-            <i class="fa-solid fa-shield-check text-amber-400" style="font-size: 16px;"></i>
-            <span><strong>ระบบ SPS บัญชี-การเงิน V2 (Clean Mode):</strong> ข้อมูลสะอาด พร้อมสำหรับการนำเข้าไฟล์แบ็กอัพ หรือบันทึกรายการใหม่ของคุณ 100%</span>
+            <i class="fa-solid fa-arrow-down-short-wide text-amber-400" style="font-size: 16px;"></i>
+            <span><strong>ระบบจัดเรียงรายการรอรับ-รอจ่ายอัตโนมัติ (Chronological Due Date Sorting):</strong> รายการรอรับและรอจ่ายถูกเรียงลำดับจากวันใกล้สุดเรียงต่อไปเรื่อยๆ เพื่อความสะดวกในการบริหารกระแสเงินสด</span>
         </div>
 
         <!-- NAVIGATION TABS -->
         <div class="nav-tabs">
             <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-link active"><i class="fa-solid fa-chart-pie"></i> ภาพรวมการเงิน SPS</button>
             <button onclick="switchTab('ocr')" id="nav-ocr" class="nav-link"><i class="fa-solid fa-brain text-emerald-600"></i> 🧠 สแกนเอกสาร AI เรียนรู้อัตโนมัติ</button>
-            <button onclick="switchTab('pending')" id="nav-pending" class="nav-link"><i class="fa-solid fa-hourglass-half"></i> รอรับ-รอจ่าย (Pending)</button>
+            <button onclick="switchTab('pending')" id="nav-pending" class="nav-link"><i class="fa-solid fa-hourglass-half"></i> รอรับ-รอจ่าย (เรียงจากวันปัจจุบัน)</button>
             <button onclick="switchTab('supplier')" id="nav-supplier" class="nav-link"><i class="fa-solid fa-truck-field"></i> แยกตามซัพพลายเออร์</button>
             <button onclick="switchTab('inout')" id="nav-inout" class="nav-link"><i class="fa-solid fa-scale-balanced"></i> รายรับ-รายจ่าย</button>
             <button onclick="switchTab('forecast')" id="nav-forecast" class="nav-link"><i class="fa-solid fa-chart-line"></i> พยากรณ์เงินสด SPS</button>
@@ -322,18 +322,19 @@
         <div id="view-pending" class="tab-view" style="display: none;">
             <div class="content-box">
                 <div class="box-header">
-                    <div class="box-title"><i class="fa-solid fa-hourglass-half"></i> รายการค้างชำระเจ้าหนี้การค้า (Pending Payables)</div>
+                    <div class="box-title"><i class="fa-solid fa-hourglass-half"></i> รายการค้างชำระ (เรียงจากวันปัจจุบันไปอนาคต)</div>
                 </div>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
+                                <th>ประเภท</th>
                                 <th>เลขที่เอกสาร</th>
                                 <th>วันครบกำหนด</th>
                                 <th>นับถอยหลัง</th>
                                 <th>วันที่จัดส่ง</th>
                                 <th>เครดิต</th>
-                                <th>ซัพพลายเออร์</th>
+                                <th>คู่ค้า / ซัพพลายเออร์</th>
                                 <th>รายละเอียด</th>
                                 <th style="text-align: right;">ยอดเงินสุทธิ</th>
                                 <th style="text-align: center;">การดำเนินการ</th>
@@ -638,7 +639,7 @@
                 transactions = [];
                 saveState();
                 renderLedger();
-                alert("🗑️ ล้างข้อมูลตัวอย่างและข้อมูลในระบบเรียบร้อยแล้ว! ระบบเป็น 0 รายการพร้อมให้นำเข้าแบ็กอัพของคุณครับ");
+                alert("🗑️ ล้างข้อมูลเรียบร้อยแล้ว! ระบบเป็น 0 รายการพร้อมสำหรับการใช้งานของคุณครับ");
             }
         }
 
@@ -657,7 +658,14 @@
             let exp = transactions.filter(t => t.type === 'Expense').reduce((a,b) => a + (b.before_vat || b.net || 0), 0);
             let profit = inc - exp;
             let profitMargin = inc > 0 ? ((profit / inc) * 100).toFixed(1) : "0.0";
-            let pendingItems = transactions.filter(t => t.status !== 'Paid');
+            
+            // Sort Pending items by due_date ascending (closest due date from current date onwards)
+            let pendingItems = transactions.filter(t => t.status !== 'Paid').sort((a, b) => {
+                const dateA = parseDDMMYYYY(a.due_date || a.date);
+                const dateB = parseDDMMYYYY(b.due_date || b.date);
+                return dateA - dateB;
+            });
+
             let pendingTotal = pendingItems.reduce((a,b) => a + (b.net || 0), 0);
 
             if (document.getElementById('kpi-income')) document.getElementById('kpi-income').innerText = formatTHB(inc);
@@ -694,18 +702,19 @@
                 }
             }
 
-            // 3. Render Pending Table
+            // 3. Render Pending Table (Sorted from current date onwards)
             const tbodyPending = document.getElementById('pending-table-body');
             if (tbodyPending) {
                 const today = parseDDMMYYYY(TODAY_DATE_STR);
                 if (pendingItems.length === 0) {
-                    tbodyPending.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px; color:#64748b;">🎉 ไม่มีรายการค้างชำระในขณะนี้</td></tr>`;
+                    tbodyPending.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:30px; color:#64748b;">🎉 ไม่มีรายการค้างชำระในขณะนี้</td></tr>`;
                 } else {
                     tbodyPending.innerHTML = pendingItems.map(t => {
                         const diffDays = Math.ceil((parseDDMMYYYY(t.due_date).getTime() - today.getTime()) / (1000 * 3600 * 24));
-                        let countdown = diffDays > 0 ? `<span class="badge-status badge-pending">เหลือ ${diffDays} วัน</span>` : `<span class="badge-status badge-overdue">เกินกำหนด</span>`;
+                        let countdown = diffDays > 0 ? `<span class="badge-status badge-pending">เหลือ ${diffDays} วัน</span>` : `<span class="badge-status badge-overdue">เกินกำหนด ${Math.abs(diffDays)} วัน</span>`;
                         return `
                             <tr>
+                                <td>${t.type === 'Income' ? '🟢 รอรับ' : '🔴 รอจ่าย'}</td>
                                 <td style="font-family:monospace; font-weight:bold; color:#4f46e5;">${t.id}</td>
                                 <td style="font-family:monospace; font-weight:bold; color:#e11d48; background:#ffe4e6;">${t.due_date}</td>
                                 <td style="text-align:center;">${countdown}</td>
@@ -714,7 +723,7 @@
                                 <td style="font-weight:600;">${t.vendor}</td>
                                 <td>${t.desc}</td>
                                 <td style="text-align:right; font-family:monospace; font-weight:bold; color:#e11d48;">${formatTHB(t.net)}</td>
-                                <td style="text-align:center;"><button onclick="openPaymentModal('${t.id}')" class="btn btn-rose btn-sm">💳 แจ้งชำระ</button></td>
+                                <td style="text-align:center;"><button onclick="openPaymentModal('${t.id}')" class="btn btn-rose btn-sm">💳 แจ้งชำระ</button>
                             </tr>
                         `;
                     }).join('');
