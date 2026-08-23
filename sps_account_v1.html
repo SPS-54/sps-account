@@ -56,11 +56,15 @@
 
             <!-- HEADER CONTROLS -->
             <div class="flex flex-wrap items-center gap-2">
-                <button onclick="openQuickSyncModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all border border-emerald-400 shadow-md flex items-center gap-1.5 animate-pulse">
+                <button onclick="restoreStandardDataset()" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all border border-amber-400 shadow-md flex items-center gap-1.5 cursor-pointer animate-bounce">
+                    <i class="fa-solid fa-rotate-left text-amber-200"></i> ⚡ ดึงข้อมูล 27 รายการ
+                </button>
+
+                <button onclick="openQuickSyncModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all border border-emerald-400 shadow-md flex items-center gap-1.5">
                     <i class="fa-solid fa-key text-amber-300 text-sm"></i> 📱 ซิงก์ด่วน / ย้ายข้อมูล
                 </button>
 
-                <button onclick="triggerInstantLiveSync()" id="cloud-status-btn" class="bg-purple-900/90 hover:bg-purple-800 text-purple-200 text-xs font-bold px-3 py-2 rounded-xl transition-all border border-purple-600 shadow-md flex items-center gap-1.5 animate-pulse">
+                <button onclick="triggerInstantLiveSync()" id="cloud-status-btn" class="bg-purple-900/90 hover:bg-purple-800 text-purple-200 text-xs font-bold px-3 py-2 rounded-xl transition-all border border-purple-600 shadow-md flex items-center gap-1.5">
                     <i class="fa-solid fa-cloud-arrow-up text-amber-300 text-sm"></i> ☁️ ซิงก์คลาวด์สด
                 </button>
 
@@ -1698,19 +1702,16 @@
                 }
             }
 
-            if (cloudDataObj && cloudDataObj.transactions && cloudDataObj.transactions.length > 0) {
+            if (cloudDataObj && cloudDataObj.transactions && Array.isArray(cloudDataObj.transactions) && cloudDataObj.transactions.length > 0) {
                 const localCount = transactions.length;
                 const cloudCount = cloudDataObj.transactions.length;
                 const localUpdated = parseInt(localStorage.getItem(STORAGE_PREFIX + 'LAST_UPDATED') || '0');
                 const cloudUpdated = cloudDataObj.lastUpdated || 0;
 
-                // Sync if manual OR cloud has more transactions OR cloud timestamp is newer
-                if (isManual || cloudCount > localCount || cloudUpdated > localUpdated || transactions.length === 0) {
+                if (isManual || cloudCount > localCount || (cloudUpdated > localUpdated && cloudCount > 0) || transactions.length === 0) {
                     transactions = cloudDataObj.transactions || [];
                     vendorMemory = cloudDataObj.vendorMemory || vendorMemory;
-                    localStorage.setItem(STORAGE_PREFIX + 'TRANSACTIONS', JSON.stringify(transactions));
-                    localStorage.setItem(STORAGE_PREFIX + 'AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
-                    localStorage.setItem(STORAGE_PREFIX + 'LAST_UPDATED', (cloudUpdated || Date.now()).toString());
+                    saveState();
                     renderLedger();
 
                     const badge = document.getElementById('cloud-sync-status-badge');
@@ -1724,10 +1725,18 @@
                 }
             } else if (isManual) {
                 await syncPushToCloud();
-                alert(`☁️ ส่งข้อมูลปัจจุบัน (${transactions.length} รายการ) ขึ้นระบบคลาวด์สดสำเร็จ!\nอุปกรณ์เครื่องอื่นกด 'ซิงก์คลาวด์สด' เพื่อดึงข้อมูลนี้ไปใช้ได้ทันทีครับ`);
-                return true;
+                alert(`⚠️ ยังไม่พบข้อมูลชุดหลักบนคลาวด์ อัปโหลดข้อมูลชุดหลักเข้าคลาวด์เรียบร้อยแล้วครับ!`);
+                return false;
             }
-            return false;
+        }
+
+        function restoreStandardDataset() {
+            transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+            vendorMemory = JSON.parse(JSON.stringify(INITIAL_VENDOR_MEMORY));
+            saveState();
+            renderLedger();
+            syncPushToCloud();
+            alert('⚡ ดึงข้อมูลมาตรฐาน 27 รายการ (ยอดรวม ฿318,250.00) กลับคืนสู่ระบบเรียบร้อยแล้วครับ!');
         }
 
         // Global Date Helpers
