@@ -104,7 +104,7 @@
         <div class="app-brand">
             <div class="brand-badge">SPS</div>
             <div>
-                <div class="brand-title">SPS บัญชี-การเงิน V2 <span class="mode-badge">Split Table Mode</span></div>
+                <div class="brand-title">SPS บัญชี-การเงิน V2 <span class="mode-badge">Split Ledger Mode</span></div>
                 <div class="brand-subtitle">ระบบบัญชี-การเงินอิสระ SPS V2 (Cloud & Multi-Device Sync)</div>
             </div>
         </div>
@@ -124,7 +124,7 @@
         <!-- STATUS BANNER -->
         <div class="banner">
             <i class="fa-solid fa-table-cells-large text-amber-400" style="font-size: 16px;"></i>
-            <span><strong>แยกตารางรายการรอรับเงิน และรายการรอจ่ายเงิน ชัดเจน:</strong> จัดเรียงเรียงตามลำดับวันครบกำหนดจากวันปัจจุบันไปอนาคตทั้ง 2 ตาราง</span>
+            <span><strong>แยกตารางคู่ค้าเป็น 2 ตาราง (เจ้าหนี้/รายจ่าย และ ลูกค้า/รายรับ):</strong> จัดเรียงข้อมูลตามลำดับเวลาจากอดีตมาปัจจุบันและต่อเนื่องไปอนาคต</span>
         </div>
 
         <!-- NAVIGATION TABS -->
@@ -132,7 +132,7 @@
             <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-link active"><i class="fa-solid fa-chart-pie"></i> ภาพรวมการเงิน SPS</button>
             <button onclick="switchTab('ocr')" id="nav-ocr" class="nav-link"><i class="fa-solid fa-brain text-emerald-600"></i> 🧠 สแกนเอกสาร AI เรียนรู้อัตโนมัติ</button>
             <button onclick="switchTab('pending')" id="nav-pending" class="nav-link"><i class="fa-solid fa-hourglass-half"></i> แยกตาราง รอรับ / รอจ่าย</button>
-            <button onclick="switchTab('supplier')" id="nav-supplier" class="nav-link"><i class="fa-solid fa-truck-field"></i> แยกตามซัพพลายเออร์</button>
+            <button onclick="switchTab('supplier')" id="nav-supplier" class="nav-link"><i class="fa-solid fa-truck-field"></i> แยกตาราง เจ้าหนี้ / ลูกค้า</button>
             <button onclick="switchTab('inout')" id="nav-inout" class="nav-link"><i class="fa-solid fa-scale-balanced"></i> รายรับ-รายจ่าย</button>
             <button onclick="switchTab('forecast')" id="nav-forecast" class="nav-link"><i class="fa-solid fa-chart-line"></i> พยากรณ์เงินสด SPS</button>
             <button onclick="switchTab('advisor')" id="nav-advisor" class="nav-link"><i class="fa-solid fa-comments"></i> ผู้ช่วย AI ภาษี (Advisor)</button>
@@ -318,7 +318,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: PENDING VIEW (SPLIT INTO RECEIVABLE & PAYABLE TABLES) -->
+        <!-- TAB 3: PENDING VIEW -->
         <div id="view-pending" class="tab-view" style="display: none;">
             
             <!-- TABLE 1: PENDING RECEIVABLES -->
@@ -383,27 +383,63 @@
 
         </div>
 
-        <!-- TAB 4: SUPPLIER VIEW -->
+        <!-- TAB 4: SUPPLIER VIEW (SPLIT INTO CREDITOR & CUSTOMER TABLES) -->
         <div id="view-supplier" class="tab-view" style="display: none;">
+            
+            <!-- TABLE 1: CREDITORS / PAYABLES -->
             <div class="content-box">
                 <div class="box-header">
-                    <div class="box-title"><i class="fa-solid fa-truck-field"></i> สรุปยอดบัญชีแยกตามซัพพลายเออร์ / คู่ค้า</div>
+                    <div class="box-title" style="color: #be123c;">
+                        <i class="fa-solid fa-truck-field text-rose-600"></i> 🔴 ตารางสรุปยอดแยกตามเจ้าหนี้ / ซัพพลายเออร์ (เรียงจากอดีตมาปัจจุบัน)
+                    </div>
+                    <div id="supplier-exp-summary" style="font-weight: 700; font-size: 13px; color: #be123c; background: #ffe4e6; padding: 4px 12px; border-radius: 12px;">
+                        รวม 0 เจ้าหนี้ (ค้างชำระ: ฿0.00)
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
-                                <th>ชื่อคู่ค้า / ซัพพลายเออร์</th>
-                                <th>ประเภท</th>
+                                <th>ชื่อเจ้าหนี้ / ซัพพลายเออร์</th>
+                                <th>วันที่ทำรายการแรก</th>
                                 <th>จำนวนรายการ</th>
-                                <th style="text-align: right;">ยอดรวมชำระแล้ว</th>
-                                <th style="text-align: right;">ยอดรวมค้างชำระ</th>
+                                <th style="text-align: right;">ชำระแล้ว</th>
+                                <th style="text-align: right;">ค้างชำระ</th>
+                                <th style="text-align: right;">ยอดรวมสุทธิ</th>
                             </tr>
                         </thead>
-                        <tbody id="supplier-table-body"></tbody>
+                        <tbody id="supplier-exp-table-body"></tbody>
                     </table>
                 </div>
             </div>
+
+            <!-- TABLE 2: CUSTOMERS / RECEIVABLES -->
+            <div class="content-box">
+                <div class="box-header">
+                    <div class="box-title" style="color: #047857;">
+                        <i class="fa-solid fa-users text-emerald-600"></i> 🟢 ตารางสรุปยอดแยกตามลูกค้า / รายรับ (เรียงจากอดีตมาปัจจุบัน)
+                    </div>
+                    <div id="supplier-inc-summary" style="font-weight: 700; font-size: 13px; color: #047857; background: #d1fae5; padding: 4px 12px; border-radius: 12px;">
+                        รวม 0 ลูกค้า (ค้างรับ: ฿0.00)
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ชื่อลูกค้า / ลูกหนี้</th>
+                                <th>วันที่ทำรายการแรก</th>
+                                <th>จำนวนรายการ</th>
+                                <th style="text-align: right;">รับชำระแล้ว</th>
+                                <th style="text-align: right;">ค้างรับ</th>
+                                <th style="text-align: right;">ยอดรวมสุทธิ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="supplier-inc-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
 
         <!-- TAB 5: INOUT VIEW -->
@@ -809,27 +845,84 @@
         }
 
         function renderSupplierLedger() {
-            const tbody = document.getElementById('supplier-table-body');
-            if (!tbody) return;
-            const suppMap = {};
+            const tbodyCreditor = document.getElementById('supplier-exp-table-body');
+            const tbodyCustomer = document.getElementById('supplier-inc-table-body');
+            if (!tbodyCreditor && !tbodyCustomer) return;
+
+            const suppMapExp = {};
+            const suppMapInc = {};
+
             transactions.forEach(t => {
-                if (!suppMap[t.vendor]) suppMap[t.vendor] = { name: t.vendor, type: t.type, count: 0, paid: 0, unpaid: 0 };
-                suppMap[t.vendor].count++;
-                if (t.status === 'Paid') suppMap[t.vendor].paid += t.net;
-                else suppMap[t.vendor].unpaid += t.net;
+                const targetMap = t.type === 'Income' ? suppMapInc : suppMapExp;
+                if (!targetMap[t.vendor]) {
+                    targetMap[t.vendor] = {
+                        name: t.vendor,
+                        earliestDate: parseDDMMYYYY(t.date || t.due_date),
+                        latestDate: parseDDMMYYYY(t.date || t.due_date),
+                        dateStr: t.date || t.due_date,
+                        count: 0,
+                        paid: 0,
+                        unpaid: 0,
+                        total: 0
+                    };
+                }
+                const s = targetMap[t.vendor];
+                s.count++;
+                const dObj = parseDDMMYYYY(t.date || t.due_date);
+                if (dObj < s.earliestDate) { s.earliestDate = dObj; s.dateStr = t.date; }
+                if (dObj > s.latestDate) { s.latestDate = dObj; }
+                
+                if (t.status === 'Paid') s.paid += (t.net || 0);
+                else s.unpaid += (t.net || 0);
+                s.total += (t.net || 0);
             });
-            if (Object.keys(suppMap).length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#64748b;">📭 ยังไม่มีข้อมูลซัพพลายเออร์</td></tr>`;
-            } else {
-                tbody.innerHTML = Object.values(suppMap).map(s => `
-                    <tr>
-                        <td style="font-weight:700;">${s.name}</td>
-                        <td>${s.type === 'Income' ? '🟢 ลูกค้า/รายรับ' : '🔴 เจ้าหนี้/รายจ่าย'}</td>
-                        <td>${s.count} รายการ</td>
-                        <td style="text-align:right; font-family:monospace; font-weight:700; color:#047857;">${formatTHB(s.paid)}</td>
-                        <td style="text-align:right; font-family:monospace; font-weight:700; color:#be123c;">${formatTHB(s.unpaid)}</td>
-                    </tr>
-                `).join('');
+
+            // Sort chronologically from past to present onwards (earliest date first)
+            const listExp = Object.values(suppMapExp).sort((a,b) => a.earliestDate - b.earliestDate);
+            const listInc = Object.values(suppMapInc).sort((a,b) => a.earliestDate - b.earliestDate);
+
+            if (document.getElementById('supplier-exp-summary')) {
+                const totalUnpaidExp = listExp.reduce((a,b) => a + b.unpaid, 0);
+                document.getElementById('supplier-exp-summary').innerText = `รวม ${listExp.length} เจ้าหนี้ (ค้างชำระ: ${formatTHB(totalUnpaidExp)})`;
+            }
+
+            if (document.getElementById('supplier-inc-summary')) {
+                const totalUnpaidInc = listInc.reduce((a,b) => a + b.unpaid, 0);
+                document.getElementById('supplier-inc-summary').innerText = `รวม ${listInc.length} ลูกค้า (ค้างรับ: ${formatTHB(totalUnpaidInc)})`;
+            }
+
+            if (tbodyCreditor) {
+                if (listExp.length === 0) {
+                    tbodyCreditor.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#64748b;">📭 ยังไม่มีข้อมูลเจ้าหนี้ / รายจ่าย</td></tr>`;
+                } else {
+                    tbodyCreditor.innerHTML = listExp.map(s => `
+                        <tr>
+                            <td style="font-weight:700; color:#0f172a;">${s.name}</td>
+                            <td style="font-family:monospace;">${s.dateStr}</td>
+                            <td>${s.count} รายการ</td>
+                            <td style="text-align:right; font-family:monospace; font-weight:700; color:#047857;">${formatTHB(s.paid)}</td>
+                            <td style="text-align:right; font-family:monospace; font-weight:700; color:#be123c;">${formatTHB(s.unpaid)}</td>
+                            <td style="text-align:right; font-family:monospace; font-weight:700;">${formatTHB(s.total)}</td>
+                        </tr>
+                    `).join('');
+                }
+            }
+
+            if (tbodyCustomer) {
+                if (listInc.length === 0) {
+                    tbodyCustomer.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#64748b;">📭 ยังไม่มีข้อมูลลูกค้า / รายรับ</td></tr>`;
+                } else {
+                    tbodyCustomer.innerHTML = listInc.map(s => `
+                        <tr>
+                            <td style="font-weight:700; color:#0f172a;">${s.name}</td>
+                            <td style="font-family:monospace;">${s.dateStr}</td>
+                            <td>${s.count} รายการ</td>
+                            <td style="text-align:right; font-family:monospace; font-weight:700; color:#047857;">${formatTHB(s.paid)}</td>
+                            <td style="text-align:right; font-family:monospace; font-weight:700; color:#d97706;">${formatTHB(s.unpaid)}</td>
+                            <td style="text-align:right; font-family:monospace; font-weight:700;">${formatTHB(s.total)}</td>
+                        </tr>
+                    `).join('');
+                }
             }
         }
 
