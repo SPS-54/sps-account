@@ -2206,6 +2206,11 @@
             updateMonthBanner();
             const tbody = document.getElementById('ledger-table-body');
             const pendingTbody = document.getElementById('pending-table-body');
+
+            if (!transactions || !Array.isArray(transactions) || transactions.length === 0) {
+                transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+            }
+
             const filteredAllTx = filterTxByMonth(transactions, 'date');
 
             if (transactions.length === 0) {
@@ -3202,7 +3207,7 @@
             let loadedTx = false;
             let loadedMem = false;
 
-            // Try IndexedDB first (No 5MB quota limit on Mobile Safari)
+            // Try IndexedDB first
             try {
                 const idbTx = await loadFromIndexedDB(STORAGE_PREFIX + 'TRANSACTIONS');
                 if (idbTx && Array.isArray(idbTx) && idbTx.length > 0) {
@@ -3210,7 +3215,7 @@
                     loadedTx = true;
                 }
                 const idbMem = await loadFromIndexedDB(STORAGE_PREFIX + 'AI_VENDOR_MEMORY');
-                if (idbMem) {
+                if (idbMem && Object.keys(idbMem).length > 0) {
                     vendorMemory = idbMem;
                     loadedMem = true;
                 }
@@ -3221,27 +3226,31 @@
                 const savedTx = localStorage.getItem(STORAGE_PREFIX + 'TRANSACTIONS');
                 if (savedTx) {
                     try {
-                        transactions = JSON.parse(savedTx);
-                        if (!Array.isArray(transactions) || transactions.length === 0) {
-                            transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+                        const parsed = JSON.parse(savedTx);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            transactions = parsed;
+                            loadedTx = true;
                         }
-                    } catch(e) {
-                        transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
-                    }
-                } else {
-                    transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+                    } catch(e) {}
                 }
+            }
+
+            if (!loadedTx || !transactions || !Array.isArray(transactions) || transactions.length === 0) {
+                transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
             }
 
             if (!loadedMem) {
                 const savedMem = localStorage.getItem(STORAGE_PREFIX + 'AI_VENDOR_MEMORY');
                 if (savedMem) {
-                    try { vendorMemory = JSON.parse(savedMem); } catch(e) { vendorMemory = JSON.parse(JSON.stringify(INITIAL_VENDOR_MEMORY)); }
-                } else {
-                    vendorMemory = JSON.parse(JSON.stringify(INITIAL_VENDOR_MEMORY));
+                    try { vendorMemory = JSON.parse(savedMem); } catch(e) {}
                 }
             }
 
+            if (!vendorMemory || Object.keys(vendorMemory).length === 0) {
+                vendorMemory = JSON.parse(JSON.stringify(INITIAL_VENDOR_MEMORY));
+            }
+
+            saveState();
             migrateRetroactiveDocumentCropping();
             populateOCRSelectOptions();
             renderLedger();

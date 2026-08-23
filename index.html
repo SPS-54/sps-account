@@ -2618,7 +2618,30 @@
                     `;
                 }
             }
-        }old">${t.id}</td>
+        }
+
+        function renderLedger() {
+            populateMonthDropdown();
+            updateMonthBanner();
+            const tbody = document.getElementById('ledger-table-body');
+            const pendingTbody = document.getElementById('pending-table-body');
+
+            if (!transactions || !Array.isArray(transactions) || transactions.length === 0) {
+                transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+            }
+
+            const filteredAllTx = filterTxByMonth(transactions, 'date');
+
+            if (transactions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-slate-400 font-medium">✨ ระบบ SPS V1 พร้อมใช้งานจริง - สามารถสแกนหรือกดเพิ่มรายการใหม่ได้ทันที</td></tr>`;
+                pendingTbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-emerald-600 font-bold">🎉 ไม่มีรายการค้างชำระในระบบ SPS V1</td></tr>`;
+            } else if (filteredAllTx.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-amber-700 bg-amber-50/50">🔍 ไม่พบรายการบัญชี SPS V1 ในเดือนที่เลือก</td></tr>`;
+            } else {
+                const sortedByDateDesc = [...filteredAllTx].sort((a, b) => parseDDMMYYYY(b.date || b.delivery_date) - parseDDMMYYYY(a.date || a.delivery_date));
+                tbody.innerHTML = sortedByDateDesc.map(t => `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-mono text-indigo-600 font-bold">${t.id}</td>
                         <td class="p-3 text-slate-800 font-mono font-bold">${formatDateDDMMYYYY(t.date)}</td>
                         <td class="p-3 font-mono">${formatDateDDMMYYYY(t.delivery_date || t.date)}</td>
                         <td class="p-3 font-mono font-bold text-amber-700">${t.credit_days || 30} วัน</td>
@@ -3583,7 +3606,7 @@
             let loadedTx = false;
             let loadedMem = false;
 
-            // Try IndexedDB first (No 5MB quota limit on Mobile Safari)
+            // Try IndexedDB first
             try {
                 const idbTx = await loadFromIndexedDB(STORAGE_PREFIX + 'TRANSACTIONS');
                 if (idbTx && Array.isArray(idbTx) && idbTx.length > 0) {
@@ -3591,7 +3614,7 @@
                     loadedTx = true;
                 }
                 const idbMem = await loadFromIndexedDB(STORAGE_PREFIX + 'AI_VENDOR_MEMORY');
-                if (idbMem) {
+                if (idbMem && Object.keys(idbMem).length > 0) {
                     vendorMemory = idbMem;
                     loadedMem = true;
                 }
@@ -3602,27 +3625,31 @@
                 const savedTx = localStorage.getItem(STORAGE_PREFIX + 'TRANSACTIONS');
                 if (savedTx) {
                     try {
-                        transactions = JSON.parse(savedTx);
-                        if (!Array.isArray(transactions) || transactions.length === 0) {
-                            transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+                        const parsed = JSON.parse(savedTx);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            transactions = parsed;
+                            loadedTx = true;
                         }
-                    } catch(e) {
-                        transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
-                    }
-                } else {
-                    transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+                    } catch(e) {}
                 }
+            }
+
+            if (!loadedTx || !transactions || !Array.isArray(transactions) || transactions.length === 0) {
+                transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
             }
 
             if (!loadedMem) {
                 const savedMem = localStorage.getItem(STORAGE_PREFIX + 'AI_VENDOR_MEMORY');
                 if (savedMem) {
-                    try { vendorMemory = JSON.parse(savedMem); } catch(e) { vendorMemory = JSON.parse(JSON.stringify(INITIAL_VENDOR_MEMORY)); }
-                } else {
-                    vendorMemory = JSON.parse(JSON.stringify(INITIAL_VENDOR_MEMORY));
+                    try { vendorMemory = JSON.parse(savedMem); } catch(e) {}
                 }
             }
 
+            if (!vendorMemory || Object.keys(vendorMemory).length === 0) {
+                vendorMemory = JSON.parse(JSON.stringify(INITIAL_VENDOR_MEMORY));
+            }
+
+            saveState();
             migrateRetroactiveDocumentCropping();
             populateOCRSelectOptions();
             renderLedger();
