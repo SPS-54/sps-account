@@ -1996,6 +1996,47 @@
         let transactions = [];
         let vendorMemory = {};
 
+        function getDB() {
+            return new Promise((resolve, reject) => {
+                if (!window.indexedDB) { reject('No IndexedDB'); return; }
+                const req = indexedDB.open('SPS_ACCOUNT_DB', 1);
+                req.onupgradeneeded = function(e) {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('sps_store')) {
+                        db.createObjectStore('sps_store');
+                    }
+                };
+                req.onsuccess = function(e) { resolve(e.target.result); };
+                req.onerror = function(e) { reject(e.target.error); };
+            });
+        }
+
+        async function saveToIndexedDB(key, val) {
+            try {
+                const db = await getDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction('sps_store', 'readwrite');
+                    const store = tx.objectStore('sps_store');
+                    const req = store.put(val, key);
+                    req.onsuccess = () => resolve(true);
+                    req.onerror = () => reject(req.error);
+                });
+            } catch(e) { return false; }
+        }
+
+        async function loadFromIndexedDB(key) {
+            try {
+                const db = await getDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction('sps_store', 'readonly');
+                    const store = tx.objectStore('sps_store');
+                    const req = store.get(key);
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            } catch(e) { return null; }
+        }
+
         function saveState() {
             saveToIndexedDB(STORAGE_PREFIX + 'TRANSACTIONS', transactions);
             saveToIndexedDB(STORAGE_PREFIX + 'AI_VENDOR_MEMORY', vendorMemory);
