@@ -29,7 +29,7 @@
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
     <!-- 6-DIGIT PIN SECURITY LOCK OVERLAY MODAL -->
-    <div id="pin-lock-modal" class="fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center p-4">
+    <div id="pin-lock-modal" class="hidden fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-8 max-w-md w-full text-center text-white space-y-6">
             <div class="flex flex-col items-center gap-2">
                 <div class="bg-indigo-600/20 p-4 rounded-2xl border border-indigo-500/30 text-indigo-400">
@@ -1283,7 +1283,96 @@
             { id: "SPS-PD/010", date: "14/08/2026", delivery_date: "14/08/2026", credit_days: 30, due_date: "13/09/2026", type: "Expense", desc: "ค่าอินเทอร์เน็ตความเร็วสูงสำนักงาน", vendor: "บริษัท ทรู คอร์ปอเรชั่น จำกัด", before_vat: 4672.90, vat: 327.10, wht: 0.00, net: 5000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
             { id: "SPS-PD/011", date: "15/08/2026", delivery_date: "15/08/2026", credit_days: 30, due_date: "14/09/2026", type: "Expense", desc: "ค่าไฟฟ้าและน้ำประปาประจำเดือน", vendor: "การไฟฟ้านครหลวง", before_vat: 14018.69, vat: 981.31, wht: 0.00, net: 15000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
             { id: "SPS-PD/012", date: "16/08/2026", delivery_date: "16/08/2026", credit_days: 30, due_date: "15/09/2026", type: "Expense", desc: "ค่าจ้างที่ปรึกษาด้านบัญชีและภาษี", vendor: "บริษัท บัญชีคุณภาพ จำกัด", before_vat: 18691.59, vat: 1308.41, wht: 0.00, net: 20000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/01        const PUBLIC_CLOUD_RELAY_URL = "https://jsonblob.com/api/jsonBlob/1271501178652434432";
+            { id: "SPS-PD/013", date: "17/08/2026", delivery_date: "17/08/2026", credit_days: 30, due_date: "16/09/2026", type: "Expense", desc: "ค่าเบี้ยประกันภัยทรัพย์สินสำนักงาน", vendor: "บริษัท ประกันภัยไทย จำกัด", before_vat: 11214.95, vat: 785.05, wht: 0.00, net: 12000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "SPS-PD/014", date: "20/08/2026", delivery_date: "20/08/2026", credit_days: 30, due_date: "19/09/2026", type: "Expense", desc: "ค่าจัดอบรมสัมมนาบุคลากรประจำปี", vendor: "สถาบันฝึกอบรมไทย จำกัด", before_vat: 14018.69, vat: 981.31, wht: 0.00, net: 15000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "SPS-PD/015", date: "21/08/2026", delivery_date: "21/08/2026", credit_days: 30, due_date: "20/09/2026", type: "Expense", desc: "ค่าบริการซ่อมบำรุงเครื่องปรับอากาศ", vendor: "บริษัท แอร์เย็น จำกัด", before_vat: 7476.64, vat: 523.36, wht: 0.00, net: 8000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "SPS-PD/016", date: "22/08/2026", delivery_date: "22/08/2026", credit_days: 30, due_date: "21/09/2026", type: "Expense", desc: "ค่าจัดส่งเอกสารและพัสดุด่วน", vendor: "บริษัท ไปรษณีย์ไทย จำกัด", before_vat: 2803.74, vat: 196.26, wht: 0.00, net: 3000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "SPS-PD/017", date: "23/08/2026", delivery_date: "23/08/2026", credit_days: 30, due_date: "22/09/2026", type: "Expense", desc: "ค่าบริการกำจัดขยะและสิ่งแวดล้อม", vendor: "สำนักงานเขตกรุงเทพมหานคร", before_vat: 1869.16, vat: 130.84, wht: 0.00, net: 2000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "SPS-PD/018", date: "24/08/2026", delivery_date: "24/08/2026", credit_days: 30, due_date: "23/09/2026", type: "Expense", desc: "ค่าเครื่องดื่มและสวัสดิการพนักงาน", vendor: "บริษัท สินค้าเครื่องดื่ม จำกัด", before_vat: 5607.48, vat: 392.52, wht: 0.00, net: 6000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "SPS-PD/019", date: "25/08/2026", delivery_date: "25/08/2026", credit_days: 30, due_date: "24/09/2026", type: "Expense", desc: "ค่าพิมพ์เอกสารและโบร์ชัวร์ประชาสัมพันธ์", vendor: "โรงพิมพ์คุณภาพ จำกัด", before_vat: 8411.21, vat: 588.79, wht: 0.00, net: 9000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "SPS-PD/020", date: "26/08/2026", delivery_date: "26/08/2026", credit_days: 30, due_date: "25/09/2026", type: "Expense", desc: "ค่าเช่าเครื่องถ่ายเอกสารประจำเดือน", vendor: "บริษัท ฟูจิฟิล์ม จำกัด", before_vat: 6542.06, vat: 457.94, wht: 0.00, net: 7000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "SPS-PD/021", date: "27/08/2026", delivery_date: "27/08/2026", credit_days: 30, due_date: "26/09/2026", type: "Expense", desc: "ค่าเติมน้ำมันรถยนต์ส่วนกลางบริษัท", vendor: "บริษัท ปตท. จำกัด (มหาชน)", before_vat: 7420.56, vat: 519.44, wht: 0.00, net: 7940.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null }
+        ];
+
+        const INITIAL_VENDOR_MEMORY = {
+            "บริษัท ตราดาวบางใหญ่ จำกัด": { tax_id: "0105558012345", credit_days: 7, wht_rate: 3, category: "Expense", last_desc: "ซื้อวัตถุดิบและอุปกรณ์ผลิตสินค้าแปรรูป SPS", count: 14 },
+            "บริษัท ปตท. จำกัด (มหาชน)": { tax_id: "0107536000010", credit_days: 30, wht_rate: 0, category: "Expense", last_desc: "ค่าเติมน้ำมันรถยนต์ส่วนกลางบริษัท", count: 9 },
+            "บริษัท สาทร เรียลเอสเตท จำกัด": { tax_id: "0105544987654", credit_days: 15, wht_rate: 5, category: "Expense", last_desc: "ค่าเช่าพื้นที่สำนักงาน SPS ประจำเดือน", count: 8 },
+            "บริษัท เอพีซีไอ จำกัด": { tax_id: "0107537000888", credit_days: 30, wht_rate: 3, category: "Income", last_desc: "ขายสินค้าเกษตรแปรรูปส่งมอบล็อตใหญ่ SPS", count: 12 },
+            "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด": { tax_id: "0105562001199", credit_days: 30, wht_rate: 2, category: "Expense", last_desc: "ค่าบริการทำการตลาดออนไลน์โฆษณา SPS", count: 5 }
+        };
+
+        const OCR_SAMPLE_DOCS = [
+            {
+                id: "IN69000160",
+                label: "📄 IN69000160 - บริษัท ตราดาวบางใหญ่ จำกัด (ยอดสุทธิ 475,000 บาท)",
+                doc_no: "IN69000160",
+                vendor: "บริษัท ตราดาวบางใหญ่ จำกัด",
+                tax_id: "0105558012345",
+                delivery_date: "17/08/2026",
+                credit_days: 7,
+                due_date: "24/08/2026",
+                type: "Expense",
+                desc: "ซื้อวัตถุดิบและอุปกรณ์ผลิตสินค้าแปรรูป SPS",
+                amount: 443925.23,
+                vat_mode: "VAT7"
+            },
+            {
+                id: "SPS-PD/021",
+                label: "⛽ SPS-PD/021 - บริษัท ปตท. จำกัด (มหาชน) (ยอดสุทธิ 7,940 บาท)",
+                doc_no: "SPS-PD/021",
+                vendor: "บริษัท ปตท. จำกัด (มหาชน)",
+                tax_id: "0107536000010",
+                delivery_date: "27/08/2026",
+                credit_days: 30,
+                due_date: "26/09/2026",
+                type: "Expense",
+                desc: "ค่าเติมน้ำมันรถยนต์ส่วนกลางบริษัท",
+                amount: 7420.56,
+                vat_mode: "VAT7"
+            },
+            {
+                id: "SPS-INV/104",
+                label: "🏢 SPS-INV/104 - บริษัท สาทร เรียลเอสเตท จำกัด (ยอดสุทธิ 125,000 บาท)",
+                doc_no: "SPS-INV/104",
+                vendor: "บริษัท สาทร เรียลเอสเตท จำกัด",
+                tax_id: "0105544987654",
+                delivery_date: "15/08/2026",
+                credit_days: 15,
+                due_date: "30/08/2026",
+                type: "Expense",
+                desc: "ค่าเช่าพื้นที่สำนักงาน SPS ประจำเดือน",
+                amount: 116822.43,
+                vat_mode: "VAT7"
+            },
+            {
+                id: "APCI-INV/099",
+                label: "💼 APCI-INV/099 - บริษัท เอพีซีไอ จำกัด (ยอดสุทธิ 250,000 บาท)",
+                doc_no: "APCI-INV/099",
+                vendor: "บริษัท เอพีซีไอ จำกัด",
+                tax_id: "0107537000888",
+                delivery_date: "01/08/2026",
+                credit_days: 30,
+                due_date: "31/08/2026",
+                type: "Income",
+                desc: "ขายสินค้าเกษตรแปรรูปส่งมอบล็อตใหญ่ SPS",
+                amount: 233644.86,
+                vat_mode: "VAT7"
+            }
+        ];
+
+        function populateOCRSelectOptions() {
+            const selectEl = document.getElementById('ocr-sample-select');
+            if (!selectEl) return;
+            selectEl.innerHTML = `<option value="upload">-- ใช้ไฟล์ภาพที่อัปโหลดด้านบน --</option>` + OCR_SAMPLE_DOCS.map(s => `
+                <option value="${s.id}">${s.label}</option>
+            `).join('');
+        }
+
+        let systemPin = localStorage.getItem(STORAGE_PREFIX + 'PIN') || "123456";
+        let enteredPin = "";
+
+        const PUBLIC_CLOUD_RELAY_URL = "https://jsonblob.com/api/jsonBlob/1271501178652434432";
 
         function copySystemDataCode() {
             const dataObj = {
