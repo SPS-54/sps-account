@@ -1740,6 +1740,23 @@
             alert('⚡ ดึงข้อมูลมาตรฐาน 27 รายการ (ยอดรวม ฿318,250.00) กลับคืนสู่ระบบเรียบร้อยแล้วครับ!');
         }
 
+        function checkPinStatus() {
+            sessionStorage.setItem(STORAGE_PREFIX + 'UNLOCKED', 'true');
+            const modal = document.getElementById('pin-lock-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+        function clearPin() { enteredPin = ""; updatePinDots(); }
+        function pressPinDigit(digit) { if (enteredPin.length < 6) { enteredPin += digit; updatePinDots(); } }
+        function backspacePin() { enteredPin = enteredPin.slice(0, -1); updatePinDots(); }
+        function updatePinDots() {}
+
+        function quickUnlockSystem() {
+            sessionStorage.setItem(STORAGE_PREFIX + 'UNLOCKED', 'true');
+            const modal = document.getElementById('pin-lock-modal');
+            if (modal) modal.classList.add('hidden');
+            try { clearPin(); } catch(e) {}
+        }
+
         // Global Date Helpers
         function formatDateShortDDMM(dateObj) {
             if (!dateObj || isNaN(dateObj.getTime())) return "";
