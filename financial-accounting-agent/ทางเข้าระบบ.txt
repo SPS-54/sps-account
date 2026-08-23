@@ -1,0 +1,29 @@
+ระบบบัญชี-การเงิน
+SPS
+https://sps-bank-account.netlify.app/sps_account_v1.html
+รหัสเข้าระบบ 190119
+
+Bank
+https://sps-bank-account.netlify.app/bank_account.html
+รหัสเข้าระบบ 787138
+
+
+https://supabase.com/dashboard/new/lnnxwpllkhafmrtfjmoi?projectName=SPS-54%27s%20Project
+
+Database password : C0oDoWhyDyYYWQAx
+
+
+วิธีตั้งค่าซิงก์คลาวด์ของทุกเครื่อง
+กดปุ่ม ตั้งค่าซิงก์คลาวด์ (บริเวณมุมขวาบนของระบบ)
+
+ช่องCloud Endpoint / Supabase URL: นำค่า
+https://jdrergoswrkjnfpkwigh.supabase.co/rest/v1/
+มาวาง
+
+
+ช่อง Cloud API Key: นำค่า
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkcmVyZ29zd3Jram5mcGt3aWdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MDU3MTgsImV4cCI6MjEwMjk4MTcxOH0.4Eyf5fhqULI0ANk5BKPLv3fkYynNxkaSpLtMCcPF8rI
+มาวาง
+
+กดปุ่ม 💾 บันทึกการตั้งค่า
+กดปุ่ม 🔄 ซิงก์คลาวด์สด (Sync Now)

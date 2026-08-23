@@ -1,0 +1,20 @@
+{
+  "1000": {"name": "เงินสดและเงินฝากธนาคาร", "type": "Asset", "category": "Current Asset"},
+  "1100": {"name": "ลูกหนี้การค้า", "type": "Asset", "category": "Current Asset"},
+  "1150": {"name": "ภาษีมูลค่าเพิ่มรอเรียกคืน (Input VAT)", "type": "Asset", "category": "Current Asset"},
+  "1160": {"name": "ภาษีถูกหัก ณ ที่จ่ายจ่ายล่วงหน้า (Withholding Tax Asset)", "type": "Asset", "category": "Current Asset"},
+  "2000": {"name": "เจ้าหนี้การค้า", "type": "Liability", "category": "Current Liability"},
+  "2150": {"name": "ภาษีมูลค่าเพิ่มค้างจ่าย (Output VAT)", "type": "Liability", "category": "Current Liability"},
+  "2160": {"name": "ภาษีหัก ณ ที่จ่ายค้างนำส่ง (Withholding Tax Payable)", "type": "Liability", "category": "Current Liability"},
+  "3000": {"name": "ทุนเรือนหุ้น / ส่วนของผู้ถือหุ้น", "type": "Equity", "category": "Equity"},
+  "3100": {"name": "กำไรสะสม", "type": "Equity", "category": "Equity"},
+  "4000": {"name": "รายได้จากการขายและบริการ", "type": "Income", "category": "Revenue"},
+  "4100": {"name": "รายได้อื่น ๆ", "type": "Income", "category": "Revenue"},
+  "5000": {"name": "ต้นทุนขายและบริการ", "type": "Expense", "category": "Cost of Goods Sold"},
+  "5100": {"name": "ค่าใช้จ่ายเงินเดือนและสวัสดิการ", "type": "Expense", "category": "Operating Expense"},
+  "5200": {"name": "ค่าเช่าสำนักงานและสถานที่", "type": "Expense", "category": "Operating Expense"},
+  "5300": {"name": "ค่าบริการวิชาชีพและที่ปรึกษา", "type": "Expense", "category": "Operating Expense"},
+  "5400": {"name": "ค่าสาธารณูปโภค (น้ำ/ไฟ/อินเทอร์เน็ต)", "type": "Expense", "category": "Operating Expense"},
+  "5500": {"name": "ค่าการตลาดและโฆษณา", "type": "Expense", "category": "Operating Expense"},
+  "5600": {"name": "ค่าวัสดุอุปกรณ์สำนักงาน", "type": "Expense", "category": "Operating Expense"}
+}
