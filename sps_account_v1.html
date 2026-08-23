@@ -122,7 +122,7 @@
     <div class="main-container">
 
         <!-- DYNAMIC AUTOMATIC LIQUIDITY ALERT BANNER -->
-        <div id="liquidity-alert-banner" class="banner" style="background: #065f46; border: 1px solid #047857; color: #ecfdf5; margin-bottom: 20px; transition: all 0.3s ease-in-out;">
+        <div id="liquidity-alert-banner" class="banner" style="background: #065f46; border: 1px solid #047857; color: #ecfdf5; margin-bottom: 16px; transition: all 0.3s ease-in-out;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <i id="liquidity-banner-icon" class="fa-solid fa-shield-halved text-emerald-300" style="font-size: 22px;"></i>
                 <div>
@@ -133,6 +133,55 @@
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <button onclick="openAIEmergencyPlanModal()" class="btn btn-amber btn-sm"><i class="fa-solid fa-bolt"></i> ⚡ แผนแก้สภาพคล่องฉุกเฉิน</button>
                 <button onclick="switchTab('forecast')" class="btn btn-outline btn-sm" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);"><i class="fa-solid fa-chart-line"></i> ดูพยากรณ์เงินสด 3 เดือน</button>
+            </div>
+        </div>
+
+        <!-- GLOBAL DATE & TIME FILTER CONTROL BAR -->
+        <div class="content-box" style="background: #ffffff; border-left: 6px solid #4f46e5; margin-bottom: 20px; padding: 16px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-filter text-indigo-600" style="font-size: 18px;"></i>
+                    <div>
+                        <div style="font-weight: 700; font-size: 14px; color: #0f172a;">📅 ตัวกรองข้อมูลภาพรวมทั้งระบบ (Global Date Filter)</div>
+                        <div style="font-size: 11px; color: #64748b;">เลือกดูข้อมูลบัญชีแยกตามรายเดือน รายปี หรือดูข้อมูลรวมทั้งหมด (แสดงผลย้อนหลัง/ล่วงหน้าอัตโนมัติ)</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <div>
+                        <select id="global-filter-month" onchange="renderLedger()" class="form-control" style="padding: 7px 12px; font-size: 12px; font-weight: 600; color: #4f46e5; border-color: #cbd5e1; min-width: 150px;">
+                            <option value="ALL">🗓️ ทุกเดือน (All Months)</option>
+                            <option value="01">มกราคม (Jan)</option>
+                            <option value="02">กุมภาพันธ์ (Feb)</option>
+                            <option value="03">มีนาคม (Mar)</option>
+                            <option value="04">เมษายน (Apr)</option>
+                            <option value="05">พฤษภาคม (May)</option>
+                            <option value="06">มิถุนายน (Jun)</option>
+                            <option value="07">กรกฎาคม (Jul)</option>
+                            <option value="08">สิงหาคม (Aug)</option>
+                            <option value="09">กันยายน (Sep)</option>
+                            <option value="10">ตุลาคม (Oct)</option>
+                            <option value="11">พฤศจิกายน (Nov)</option>
+                            <option value="12">ธันวาคม (Dec)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <select id="global-filter-year" onchange="renderLedger()" class="form-control" style="padding: 7px 12px; font-size: 12px; font-weight: 600; color: #4f46e5; border-color: #cbd5e1; min-width: 130px;">
+                            <option value="ALL">📅 ทุกปี (All Years)</option>
+                            <option value="2026">ปี 2026</option>
+                            <option value="2025">ปี 2025</option>
+                            <option value="2027">ปี 2027</option>
+                        </select>
+                    </div>
+
+                    <button onclick="resetGlobalDateFilter()" class="btn btn-indigo btn-sm" style="padding: 8px 14px;"><i class="fa-solid fa-arrows-rotate"></i> ⚡ ข้อมูลรวมทั้งหมด (All Data)</button>
+                </div>
+            </div>
+            
+            <div id="global-filter-status-bar" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e2e8f0; font-size: 11px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <span id="global-filter-badge" class="badge-status badge-paid">🟢 แสดงข้อมูลรวมทั้งหมด (27 รายการ)</span>
+                <span id="global-filter-summary-text" style="color: #64748b; font-weight: 500;">แสดงผลรายการทั้งหมดที่มีในสมุดบัญชี</span>
             </div>
         </div>
 
@@ -981,6 +1030,61 @@
             return new Date(0);
         }
 
+        /* GLOBAL DATE FILTER ENGINE */
+        function getFilteredTransactions() {
+            const monthVal = document.getElementById('global-filter-month')?.value || 'ALL';
+            const yearVal = document.getElementById('global-filter-year')?.value || 'ALL';
+
+            return transactions.filter(t => {
+                const dateStr = t.date || t.due_date || '';
+                if (!dateStr || !dateStr.includes('/')) return true;
+                const parts = dateStr.split('/');
+                if (parts.length < 3) return true;
+
+                const month = parts[1].padStart(2, '0');
+                const year = parts[2];
+
+                if (monthVal !== 'ALL' && month !== monthVal) return false;
+                if (yearVal !== 'ALL' && year !== yearVal) return false;
+
+                return true;
+            });
+        }
+
+        function resetGlobalDateFilter() {
+            if (document.getElementById('global-filter-month')) document.getElementById('global-filter-month').value = 'ALL';
+            if (document.getElementById('global-filter-year')) document.getElementById('global-filter-year').value = 'ALL';
+            renderLedger();
+        }
+
+        function updateGlobalYearOptions() {
+            const yearSelect = document.getElementById('global-filter-year');
+            if (!yearSelect) return;
+            const currentVal = yearSelect.value || 'ALL';
+
+            const yearsSet = new Set(['2026', '2025', '2027']);
+            transactions.forEach(t => {
+                const dStr = t.date || t.due_date || '';
+                if (dStr.includes('/')) {
+                    const parts = dStr.split('/');
+                    if (parts.length === 3 && parts[2].length === 4) {
+                        yearsSet.add(parts[2]);
+                    }
+                }
+            });
+
+            const sortedYears = Array.from(yearsSet).sort((a, b) => parseInt(a) - parseInt(b));
+            let optionsHtml = `<option value="ALL">📅 ทุกปี (All Years)</option>`;
+            sortedYears.forEach(y => {
+                optionsHtml += `<option value="${y}">ปี ${y}</option>`;
+            });
+
+            yearSelect.innerHTML = optionsHtml;
+            if (sortedYears.includes(currentVal) || currentVal === 'ALL') {
+                yearSelect.value = currentVal;
+            }
+        }
+
         function switchTab(tabId) {
             const tabs = ['dashboard', 'ocr', 'pending', 'supplier', 'inout', 'forecast', 'advisor', 'backup'];
             tabs.forEach(t => {
@@ -1014,6 +1118,7 @@
                 localStorage.setItem(STORAGE_PREFIX + 'VENDOR_MEMORY', JSON.stringify(vendorMemory));
                 localStorage.setItem(STORAGE_PREFIX + 'HAS_INITIALIZED', 'true');
             } catch(e) {}
+            updateGlobalYearOptions();
         }
 
         function clearAllTransactions() {
@@ -1207,12 +1312,39 @@
         }
 
         function renderLedger() {
-            let inc = transactions.filter(t => t.type === 'Income').reduce((a,b) => a + (b.before_vat || b.net || 0), 0);
-            let exp = transactions.filter(t => t.type === 'Expense').reduce((a,b) => a + (b.before_vat || b.net || 0), 0);
+            const monthVal = document.getElementById('global-filter-month')?.value || 'ALL';
+            const yearVal = document.getElementById('global-filter-year')?.value || 'ALL';
+            const activeTxs = getFilteredTransactions();
+
+            // UPDATE STATUS BADGE IN FILTER BAR
+            const badge = document.getElementById('global-filter-badge');
+            const summaryText = document.getElementById('global-filter-summary-text');
+            const monthNames = {
+                "01": "มกราคม", "02": "กุมภาพันธ์", "03": "มีนาคม", "04": "เมษายน",
+                "05": "พฤษภาคม", "06": "มิถุนายน", "07": "กรกฎาคม", "08": "สิงหาคม",
+                "09": "กันยายน", "10": "ตุลาคม", "11": "พฤศจิกายน", "12": "ธันวาคม"
+            };
+
+            if (badge && summaryText) {
+                if (monthVal === 'ALL' && yearVal === 'ALL') {
+                    badge.className = 'badge-status badge-paid';
+                    badge.innerText = `🟢 แสดงข้อมูลรวมทั้งหมด (${activeTxs.length} รายการ)`;
+                    summaryText.innerText = `แสดงรายการบัญชีทั้งหมดในระบบ (ไม่จำกัดช่วงเวลา)`;
+                } else {
+                    const mLabel = monthVal !== 'ALL' ? (monthNames[monthVal] || `เดือน ${monthVal}`) : 'ทุกเดือน';
+                    const yLabel = yearVal !== 'ALL' ? `ปี ${yearVal}` : 'ทุกปี';
+                    badge.className = 'badge-status badge-pending';
+                    badge.innerText = `🔍 กรองเฉพาะ: ${mLabel} ${yLabel} (พบ ${activeTxs.length}/${transactions.length} รายการ)`;
+                    summaryText.innerText = `กำลังแสดงผลเฉพาะรายการบัญชีประจำ ${mLabel} ${yLabel}`;
+                }
+            }
+
+            let inc = activeTxs.filter(t => t.type === 'Income').reduce((a,b) => a + (b.before_vat || b.net || 0), 0);
+            let exp = activeTxs.filter(t => t.type === 'Expense').reduce((a,b) => a + (b.before_vat || b.net || 0), 0);
             let profit = inc - exp;
             let profitMargin = inc > 0 ? ((profit / inc) * 100).toFixed(1) : "0.0";
             
-            let allPending = transactions.filter(t => t.status !== 'Paid');
+            let allPending = activeTxs.filter(t => t.status !== 'Paid');
             let pendingTotal = allPending.reduce((a,b) => a + (b.net || 0), 0);
 
             if (document.getElementById('kpi-income')) document.getElementById('kpi-income').innerText = formatTHB(inc);
@@ -1224,10 +1356,10 @@
 
             const tbodyDash = document.getElementById('ledger-table-body');
             if (tbodyDash) {
-                if (transactions.length === 0) {
-                    tbodyDash.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:30px; color:#64748b;">📭 ยังไม่มีข้อมูลในระบบ (กดปุ่ม "📥 นำเข้า/สำรองข้อมูล" หรือ "➕ เพิ่มรายการใหม่" ได้เลยครับ)</td></tr>`;
+                if (activeTxs.length === 0) {
+                    tbodyDash.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:30px; color:#64748b;">📭 ไม่พบรายการบัญชีตรงตามเงื่อนไขตัวกรอง (ลองปรับเลือกเดือน/ปี หรือกดปุ่ม "⚡ ข้อมูลรวมทั้งหมด")</td></tr>`;
                 } else {
-                    tbodyDash.innerHTML = transactions.map(t => `
+                    tbodyDash.innerHTML = activeTxs.map(t => `
                         <tr>
                             <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:bold; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
                             <td style="font-family:monospace;">${t.date}</td>
@@ -1251,11 +1383,11 @@
             const tbodyPendingInc = document.getElementById('pending-inc-table-body');
             const tbodyPendingExp = document.getElementById('pending-exp-table-body');
 
-            const pendingIncomes = transactions.filter(t => t.status !== 'Paid' && t.type === 'Income').sort((a, b) => {
+            const pendingIncomes = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Income').sort((a, b) => {
                 return parseDDMMYYYY(a.due_date || a.date) - parseDDMMYYYY(b.due_date || b.date);
             });
 
-            const pendingExpenses = transactions.filter(t => t.status !== 'Paid' && t.type === 'Expense').sort((a, b) => {
+            const pendingExpenses = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense').sort((a, b) => {
                 return parseDDMMYYYY(a.due_date || a.date) - parseDDMMYYYY(b.due_date || b.date);
             });
 
@@ -1283,7 +1415,7 @@
 
             if (tbodyPendingInc) {
                 if (pendingIncomes.length === 0) {
-                    tbodyPendingInc.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอรับเงินในขณะนี้</td></tr>`;
+                    tbodyPendingInc.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอรับเงินในขณะนี้ (หรือไม่มีตรงตามตัวกรอง)</td></tr>`;
                 } else {
                     tbodyPendingInc.innerHTML = pendingIncomes.map(t => {
                         const diffDays = Math.ceil((parseDDMMYYYY(t.due_date).getTime() - today.getTime()) / (1000 * 3600 * 24));
@@ -1307,7 +1439,7 @@
 
             if (tbodyPendingExp) {
                 if (pendingExpenses.length === 0) {
-                    tbodyPendingExp.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอจ่ายเงินในขณะนี้</td></tr>`;
+                    tbodyPendingExp.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอจ่ายเงินในขณะนี้ (หรือไม่มีตรงตามตัวกรอง)</td></tr>`;
                 } else {
                     tbodyPendingExp.innerHTML = pendingExpenses.map(t => {
                         const diffDays = Math.ceil((parseDDMMYYYY(t.due_date).getTime() - today.getTime()) / (1000 * 3600 * 24));
@@ -1337,7 +1469,7 @@
             try { renderCashflowChart(); } catch(e) {}
         }
 
-        /* DYNAMIC AI LIQUIDITY ALERT & RECOMMENDATIONS ENGINE (3-MONTH FORECAST) */
+        /* DYNAMIC AI LIQUIDITY ALERT & RECOMMENDATIONS ENGINE (WITH DATE FILTER INTEGRATION) */
         function updateAILiquidityAlertsAndRecommendations() {
             const initCashInput = document.getElementById('forecast-init-cash');
             const minReserveInput = document.getElementById('forecast-min-reserve');
@@ -1349,9 +1481,10 @@
             const totalPeriods = months * 6; // 6 periods per month (5-day steps) = 90 days total for 3 months
 
             const today = parseDDMMYYYY(TODAY_DATE_STR);
+            const activeTxs = getFilteredTransactions();
 
-            const pendingInc = transactions.filter(t => t.status !== 'Paid' && t.type === 'Income');
-            const pendingExp = transactions.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+            const pendingInc = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
 
             const overdueInc = pendingInc.filter(t => parseDDMMYYYY(t.due_date).getTime() < today.getTime());
             const overdueExp = pendingExp.filter(t => parseDDMMYYYY(t.due_date).getTime() < today.getTime());
@@ -1433,7 +1566,7 @@
                 if (score >= 75) {
                     scoreBar.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
                     scoreBadge.className = 'badge-status badge-paid';
-                    scoreBadge.innerText = '🟢 แข็งแกร่ง';
+                    scoreBadge.innerText = '🟢 ดีเยี่ยม';
                 } else if (score >= 50) {
                     scoreBar.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
                     scoreBadge.className = 'badge-status badge-pending';
@@ -1496,10 +1629,10 @@
 
             const recTax = document.getElementById('ai-rec-tax');
             if (recTax) {
-                const vatSales = transactions.filter(t => t.status === 'Paid' && t.type === 'Income').reduce((a,b) => a + (b.vat||0), 0);
-                const vatBuys = transactions.filter(t => t.status === 'Paid' && t.type === 'Expense').reduce((a,b) => a + (b.vat||0), 0);
+                const vatSales = activeTxs.filter(t => t.status === 'Paid' && t.type === 'Income').reduce((a,b) => a + (b.vat||0), 0);
+                const vatBuys = activeTxs.filter(t => t.status === 'Paid' && t.type === 'Expense').reduce((a,b) => a + (b.vat||0), 0);
                 const vatNet = vatSales - vatBuys;
-                const whtTotal = transactions.filter(t => t.status === 'Paid').reduce((a,b) => a + (b.wht||0), 0);
+                const whtTotal = activeTxs.filter(t => t.status === 'Paid').reduce((a,b) => a + (b.wht||0), 0);
 
                 recTax.innerHTML = `📌 <strong>กระทบยอดภาษีสะสม:</strong> ภาษีซื้อ ${formatTHB(vatBuys)} | หัก ณ ที่จ่ายสะสม ${formatTHB(whtTotal)}<br>💡 <strong>คำแนะนำ AI:</strong> ${vatNet < 0 ? `ยื่นขอคืนภาษีซื้อ ภ.พ.30 จำนวน <strong>${formatTHB(Math.abs(vatNet))}</strong> เพื่อเปลี่ยนเป็นกระแสเงินสดรับกลับเข้าบริษัท` : `จัดเตรียมเงินสด ${formatTHB(vatNet)} สำหรับยื่น ภ.พ.30 ภายในวันที่ 15`}`;
             }
@@ -1507,8 +1640,9 @@
 
         function openAIEmergencyPlanModal() {
             const today = parseDDMMYYYY(TODAY_DATE_STR);
-            const pendingInc = transactions.filter(t => t.status !== 'Paid' && t.type === 'Income');
-            const pendingExp = transactions.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+            const activeTxs = getFilteredTransactions();
+            const pendingInc = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
 
             const container = document.getElementById('ai-emergency-plan-content');
             if (!container) return;
@@ -1563,8 +1697,9 @@
         function copyAIReportToClipboard() {
             const initCash = parseFloat(document.getElementById('forecast-init-cash')?.value) || 100000;
             const minReserve = parseFloat(document.getElementById('forecast-min-reserve')?.value) || 50000;
-            const pendingInc = transactions.filter(t => t.status !== 'Paid' && t.type === 'Income');
-            const pendingExp = transactions.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+            const activeTxs = getFilteredTransactions();
+            const pendingInc = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
             
             const incTotal = pendingInc.reduce((a,b) => a + (b.net || 0), 0);
             const expTotal = pendingExp.reduce((a,b) => a + (b.net || 0), 0);
@@ -1579,8 +1714,9 @@
         }
 
         function copyAIEmergencyPlanToClipboard() {
-            const pendingInc = transactions.filter(t => t.status !== 'Paid' && t.type === 'Income');
-            const pendingExp = transactions.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+            const activeTxs = getFilteredTransactions();
+            const pendingInc = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
             
             let planText = `⚡ [แผนปฏิบัติการแก้สภาพคล่องฉุกเฉิน AI SPS V2 (3 เดือน)]\nวันที่: ${TODAY_DATE_STR}\n------------------------------\n1. เร่งรัดทวงถามลูกหนี้ 3 รายแรก:\n`;
             if (pendingInc.length > 0) {
@@ -1606,11 +1742,13 @@
             const tbodyCustomer = document.getElementById('supplier-inc-table-body');
             if (!tbodyCreditor && !tbodyCustomer) return;
 
-            const expTxs = transactions.filter(t => t.type === 'Expense').sort((a, b) => {
+            const activeTxs = getFilteredTransactions();
+
+            const expTxs = activeTxs.filter(t => t.type === 'Expense').sort((a, b) => {
                 return parseDDMMYYYY(a.date || a.due_date) - parseDDMMYYYY(b.date || b.due_date);
             });
 
-            const incTxs = transactions.filter(t => t.type === 'Income').sort((a, b) => {
+            const incTxs = activeTxs.filter(t => t.type === 'Income').sort((a, b) => {
                 return parseDDMMYYYY(a.date || a.due_date) - parseDDMMYYYY(b.date || b.due_date);
             });
 
@@ -1619,8 +1757,8 @@
             const custUnpaid = incTxs.filter(t => t.status !== 'Paid').reduce((a,b) => a + (b.net || 0), 0);
             const credUnpaid = expTxs.filter(t => t.status !== 'Paid').reduce((a,b) => a + (b.net || 0), 0);
             const netUnpaidDiff = custUnpaid - credUnpaid;
-            const paidCount = transactions.filter(t => t.status === 'Paid').length;
-            const settleRate = transactions.length > 0 ? ((paidCount / transactions.length) * 100).toFixed(1) : "0.0";
+            const paidCount = activeTxs.filter(t => t.status === 'Paid').length;
+            const settleRate = activeTxs.length > 0 ? ((paidCount / activeTxs.length) * 100).toFixed(1) : "0.0";
 
             if (document.getElementById('recon-supp-cust-total')) document.getElementById('recon-supp-cust-total').innerText = formatTHB(custTotal);
             if (document.getElementById('recon-supp-cust-unpaid')) document.getElementById('recon-supp-cust-unpaid').innerText = `ค้างรับ: ${formatTHB(custUnpaid)}`;
@@ -1629,7 +1767,7 @@
             if (document.getElementById('recon-supp-net-unpaid')) document.getElementById('recon-supp-net-unpaid').innerText = (netUnpaidDiff >= 0 ? '+' : '') + formatTHB(netUnpaidDiff);
             if (document.getElementById('recon-supp-unpaid-desc')) document.getElementById('recon-supp-unpaid-desc').innerText = netUnpaidDiff >= 0 ? '🟢 ลูกหนี้ค้างรับมากกว่า' : '🔴 เจ้าหนี้ค้างจ่ายมากกว่า';
             if (document.getElementById('recon-supp-settle-rate')) document.getElementById('recon-supp-settle-rate').innerText = `${settleRate}%`;
-            if (document.getElementById('recon-supp-tx-count')) document.getElementById('recon-supp-tx-count').innerText = `รวม ${transactions.length} รายการ`;
+            if (document.getElementById('recon-supp-tx-count')) document.getElementById('recon-supp-tx-count').innerText = `รวม ${activeTxs.length} รายการ`;
 
             if (document.getElementById('supplier-exp-summary')) {
                 document.getElementById('supplier-exp-summary').innerText = `รวม ${expTxs.length} รายการ (ยอดค้างจ่าย: ${formatTHB(credUnpaid)})`;
@@ -1641,7 +1779,7 @@
 
             if (tbodyCreditor) {
                 if (expTxs.length === 0) {
-                    tbodyCreditor.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">📭 ยังไม่มีข้อมูลรายการเจ้าหนี้ / รายจ่าย</td></tr>`;
+                    tbodyCreditor.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">📭 ยังไม่มีข้อมูลรายการเจ้าหนี้ / รายจ่าย (ตามเงื่อนไขตัวกรอง)</td></tr>`;
                 } else {
                     tbodyCreditor.innerHTML = expTxs.map(t => {
                         const isPaid = t.status === 'Paid';
@@ -1670,7 +1808,7 @@
 
             if (tbodyCustomer) {
                 if (incTxs.length === 0) {
-                    tbodyCustomer.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">📭 ยังไม่มีข้อมูลรายการลูกค้า / รายรับ</td></tr>`;
+                    tbodyCustomer.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">📭 ยังไม่มีข้อมูลรายการลูกค้า / รายรับ (ตามเงื่อนไขตัวกรอง)</td></tr>`;
                 } else {
                     tbodyCustomer.innerHTML = incTxs.map(t => {
                         const isPaid = t.status === 'Paid';
@@ -1703,11 +1841,13 @@
             const tbodyExp = document.getElementById('inout-exp-table-body');
             if (!tbodyInc && !tbodyExp) return;
 
-            const paidIncomes = transactions.filter(t => t.status === 'Paid' && t.type === 'Income').sort((a, b) => {
+            const activeTxs = getFilteredTransactions();
+
+            const paidIncomes = activeTxs.filter(t => t.status === 'Paid' && t.type === 'Income').sort((a, b) => {
                 return parseDDMMYYYY(a.date || a.pay_date) - parseDDMMYYYY(b.date || b.pay_date);
             });
 
-            const paidExpenses = transactions.filter(t => t.status === 'Paid' && t.type === 'Expense').sort((a, b) => {
+            const paidExpenses = activeTxs.filter(t => t.status === 'Paid' && t.type === 'Expense').sort((a, b) => {
                 return parseDDMMYYYY(a.date || a.pay_date) - parseDDMMYYYY(b.date || b.pay_date);
             });
 
@@ -1738,7 +1878,7 @@
 
             if (tbodyInc) {
                 if (paidIncomes.length === 0) {
-                    tbodyInc.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายรับที่ชำระแล้ว</td></tr>`;
+                    tbodyInc.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายรับที่ชำระแล้ว (ตามเงื่อนไขตัวกรอง)</td></tr>`;
                 } else {
                     tbodyInc.innerHTML = paidIncomes.map(t => {
                         const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
@@ -1767,7 +1907,7 @@
 
             if (tbodyExp) {
                 if (paidExpenses.length === 0) {
-                    tbodyExp.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายจ่ายที่จ่ายแล้ว</td></tr>`;
+                    tbodyExp.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายจ่ายที่จ่ายแล้ว (ตามเงื่อนไขตัวกรอง)</td></tr>`;
                 } else {
                     tbodyExp.innerHTML = paidExpenses.map(t => {
                         const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
@@ -1956,7 +2096,9 @@
         function renderDashboardCharts() {
             if (typeof Chart === 'undefined') return;
 
-            const expTxs = transactions.filter(t => t.type === 'Expense');
+            const activeTxs = getFilteredTransactions();
+
+            const expTxs = activeTxs.filter(t => t.type === 'Expense');
             const catMap = {};
             expTxs.forEach(t => { catMap[t.desc || "ทั่วไป"] = (catMap[t.desc || "ทั่วไป"] || 0) + (t.before_vat || t.net); });
             const expLabels = Object.keys(catMap).length > 0 ? Object.keys(catMap) : ['ไม่มีค่าใช้จ่าย'];
@@ -1975,11 +2117,11 @@
             const ctxRev = document.getElementById('revenueExpenseChart');
             if (ctxRev) {
                 if (revenueExpenseChartObj) revenueExpenseChartObj.destroy();
-                let incAmt = transactions.filter(t => t.type === 'Income').reduce((a,b) => a + (b.before_vat || b.net), 0);
-                let expAmt = transactions.filter(t => t.type === 'Expense').reduce((a,b) => a + (b.before_vat || b.net), 0);
+                let incAmt = activeTxs.filter(t => t.type === 'Income').reduce((a,b) => a + (b.before_vat || b.net), 0);
+                let expAmt = activeTxs.filter(t => t.type === 'Expense').reduce((a,b) => a + (b.before_vat || b.net), 0);
                 revenueExpenseChartObj = new Chart(ctxRev, {
                     type: 'bar',
-                    data: { labels: ['สิงหาคม 2026'], datasets: [{ label: 'รายรับ', data: [incAmt], backgroundColor: '#10b981' }, { label: 'รายจ่าย', data: [expAmt], backgroundColor: '#f43f5e' }] },
+                    data: { labels: ['ยอดรวมตามตัวกรอง'], datasets: [{ label: 'รายรับ', data: [incAmt], backgroundColor: '#10b981' }, { label: 'รายจ่าย', data: [expAmt], backgroundColor: '#f43f5e' }] },
                     options: { responsive: true, maintainAspectRatio: false }
                 });
             }
@@ -1997,6 +2139,8 @@
             const totalPeriods = months * 6; // 6 periods per month = 18 periods for 3 months (90 days)
 
             const today = parseDDMMYYYY(TODAY_DATE_STR);
+            const activeTxs = getFilteredTransactions();
+
             const dateLabels = [];
             const incAmounts = [];
             const expAmounts = [];
@@ -2005,8 +2149,8 @@
 
             let runningCash = initCash;
 
-            const pendingInc = transactions.filter(t => t.status !== 'Paid' && t.type === 'Income');
-            const pendingExp = transactions.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+            const pendingInc = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
 
             for (let i = 0; i < totalPeriods; i++) {
                 const pStart = new Date(today);
@@ -2284,6 +2428,7 @@
             }
 
             initOCRDragAndDrop();
+            updateGlobalYearOptions();
             renderLedger();
         };
     </script>
