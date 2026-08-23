@@ -1668,21 +1668,7 @@
                 }
             } catch(e) {}
 
-            // 2. Try Netlify Function Sync
-            if (!cloudDataObj) {
-                try {
-                    const res = await fetch(`/.netlify/functions/sync?namespace=${STORAGE_PREFIX}`);
-                    if (res.ok) {
-                        const jsonRes = await res.json();
-                        if (jsonRes && jsonRes.data && jsonRes.data.transactions) {
-                            cloudDataObj = jsonRes.data;
-                            sourceUsed = "Netlify Sync Engine";
-                        }
-                    }
-                } catch(e) {}
-            }
-
-            // 3. Try Supabase REST API
+            // 2. Try Supabase REST API
             if (!cloudDataObj) {
                 const cfg = await getCloudConfig();
                 const storeKey = STORAGE_PREFIX.toLowerCase().replace(/_/g, '');
@@ -3300,13 +3286,6 @@
             populateOCRSelectOptions();
             renderLedger();
 
-            // Perform cloud sync check
-            syncPullFromCloud(false);
-
-            // Auto poll cloud every 5 seconds
-            setInterval(() => {
-                syncPullFromCloud(false);
-            }, 5000);
         };
     </script>
 </body>
