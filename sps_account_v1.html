@@ -3,236 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPS บัญชี-การเงิน V1 (Financial & Accounting System)</title>
+    <title>SPS Account System V2 (ระบบบัญชี SPS ใหม่)</title>
     <!-- Google Fonts Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 50px; }
+        body { background-color: #f1f5f9; color: #0f172a; padding-bottom: 60px; line-height: 1.5; }
+
+        /* HEADER */
+        .app-header { background: #0f172a; color: #ffffff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: sticky; top: 0; z-index: 100; }
+        .app-brand { display: flex; align-items: center; gap: 12px; }
+        .brand-badge { background: #4f46e5; color: #fff; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
+        .brand-title { font-size: 20px; font-weight: 700; }
+        .brand-subtitle { font-size: 11px; color: #94a3b8; }
+
+        .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        /* BUTTONS */
+        .btn { padding: 10px 18px; border-radius: 10px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.15s ease-in-out; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; user-select: none; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn:active { transform: translateY(0) scale(0.97); }
         
-        .header { background: #0f172a; color: #ffffff; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
-        .header-logo { display: flex; align-items: center; gap: 10px; }
-        .header-logo-icon { background: #4f46e5; width: 36px; height: 36px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 18px; color: #fff; }
-        .header-title { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
-        .header-subtitle { font-size: 11px; color: #a5b4fc; }
+        .btn-primary { background: #4f46e5; color: #ffffff; }
+        .btn-success { background: #10b981; color: #ffffff; }
+        .btn-warning { background: #f59e0b; color: #ffffff; }
+        .btn-danger { background: #ef4444; color: #ffffff; }
+        .btn-purple { background: #8b5cf6; color: #ffffff; }
+        .btn-dark { background: #1e293b; color: #ffffff; }
+        .btn-secondary { background: #e2e8f0; color: #334155; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; }
 
-        .header-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        
-        .btn { padding: 8px 14px; border-radius: 8px; border: none; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s ease-in-out; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
-        .btn:active { transform: scale(0.97); }
-        .btn-amber { background: #d97706; color: #ffffff; }
-        .btn-amber:hover { background: #b45309; }
-        .btn-emerald { background: #059669; color: #ffffff; }
-        .btn-emerald:hover { background: #047857; }
-        .btn-indigo { background: #4f46e5; color: #ffffff; }
-        .btn-indigo:hover { background: #4338ca; }
-        .btn-purple { background: #7e22ce; color: #ffffff; }
-        .btn-purple:hover { background: #6b21a8; }
-        .btn-slate { background: #334155; color: #f8fafc; }
-        .btn-slate:hover { background: #1e293b; }
-        .btn-rose { background: #e11d48; color: #ffffff; }
-        .btn-rose:hover { background: #be123c; }
-        .btn-outline { background: #ffffff; color: #334155; border: 1px solid #cbd5e1; }
-        .btn-outline:hover { background: #f1f5f9; }
-        .btn-sm { padding: 4px 8px; font-size: 11px; border-radius: 6px; }
+        /* CONTAINER */
+        .main-container { max-width: 1200px; margin: 24px auto; padding: 0 16px; }
 
-        .container { max-width: 1240px; margin: 20px auto; padding: 0 15px; }
+        /* NAVIGATION TABS */
+        .nav-tabs { display: flex; gap: 8px; margin-bottom: 24px; background: #ffffff; padding: 8px; border-radius: 14px; border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02); flex-wrap: wrap; }
+        .nav-link { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s; }
+        .nav-link:hover { background: #f8fafc; color: #0f172a; }
+        .nav-link.active { background: #4f46e5 !important; color: #ffffff !important; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
 
-        .banner { background: #065f46; color: #ecfdf5; padding: 12px 16px; border-radius: 10px; font-size: 12px; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border: 1px solid #047857; }
-
-        .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; background: #ffffff; padding: 8px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
-        .tab-btn { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; background: transparent; color: #475569; transition: all 0.2s; }
-        .tab-btn:hover { background: #f1f5f9; color: #0f172a; }
-        .tab-btn.active { background: #4f46e5 !important; color: #ffffff !important; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3); }
-
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .kpi-card { background: #ffffff; padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0; border-left: 5px solid #10b981; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .kpi-card.exp { border-left-color: #f43f5e; }
-        .kpi-card.profit { border-left-color: #6366f1; }
+        /* STATS KPI CARDS */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .kpi-card { background: #ffffff; padding: 20px; border-radius: 14px; border: 1px solid #cbd5e1; border-left: 6px solid #10b981; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .kpi-card.exp { border-left-color: #ef4444; }
+        .kpi-card.profit { border-left-color: #4f46e5; }
         .kpi-card.pending { border-left-color: #f59e0b; }
-        .kpi-title { font-size: 12px; color: #64748b; font-weight: 600; }
-        .kpi-value { font-size: 22px; font-weight: 700; color: #0f172a; margin-top: 4px; font-family: monospace; }
-        .kpi-sub { font-size: 11px; color: #64748b; margin-top: 6px; display: inline-block; font-weight: 500; }
+        .kpi-label { font-size: 13px; color: #64748b; font-weight: 600; }
+        .kpi-num { font-size: 24px; font-weight: 800; color: #0f172a; margin-top: 6px; font-family: monospace; }
+        .kpi-subtext { font-size: 11px; color: #94a3b8; margin-top: 6px; }
 
-        .card-box { background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-        .card-title { font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px; }
+        /* CONTENT BOX & TABLES */
+        .content-box { background: #ffffff; border-radius: 14px; border: 1px solid #cbd5e1; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
+        .box-title { font-size: 16px; font-weight: 700; color: #0f172a; }
 
-        .table-responsive { width: 100%; overflow-x: auto; max-height: 520px; overflow-y: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
-        th { background: #f8fafc; padding: 12px 14px; font-weight: 600; color: #475569; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; }
-        td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+        .table-responsive { width: 100%; overflow-x: auto; border-radius: 10px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        th { background: #f8fafc; padding: 14px 16px; font-weight: 700; color: #475569; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
+        td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; color: #334155; }
         tr:hover { background-color: #f8fafc; }
 
-        .badge-status { padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; display: inline-block; }
-        .badge-paid { background: #d1fae5; color: #047857; border: 1px solid #a7f3d0; }
-        .badge-pending { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-        .badge-overdue { background: #ffe4e6; color: #be123c; border: 1px solid #fecdd3; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .badge-paid { background: #d1fae5; color: #047857; }
+        .badge-unpaid { background: #fef3c7; color: #b45309; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 99999; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px); }
-        .modal.open { display: flex !important; }
-        .modal-content { background: #ffffff; border-radius: 16px; width: 100%; max-width: 520px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid #cbd5e1; }
-        .modal-header { background: #0f172a; color: #ffffff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .modal-title { font-size: 15px; font-weight: 700; }
-        .modal-close { background: transparent; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; }
+        /* MODALS */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.7); z-index: 9999; justify-content: center; align-items: center; padding: 16px; }
+        .modal-overlay.active { display: flex !important; }
+        .modal-card { background: #ffffff; border-radius: 16px; width: 100%; max-width: 540px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid #cbd5e1; }
+        .modal-header { background: #0f172a; color: #ffffff; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 16px; font-weight: 700; }
+        .modal-close { background: transparent; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; }
         .modal-close:hover { color: #ffffff; }
-        .modal-body { padding: 20px; max-height: 75vh; overflow-y: auto; font-size: 13px; }
-        .modal-footer { padding: 14px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; }
+        .modal-body { padding: 24px; max-height: 75vh; overflow-y: auto; }
+        .modal-footer { padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .form-group { margin-bottom: 12px; }
-        .form-group.full { grid-column: span 2; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 4px; color: #334155; font-size: 12px; }
-        .form-control { width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none; background: #f8fafc; }
-        .form-control:focus { border-color: #4f46e5; background: #ffffff; }
-
-        .hidden-section { display: none !important; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 13px; color: #334155; }
+        .form-control { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; background: #fff; }
+        .form-control:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        textarea.form-control { min-height: 100px; font-family: monospace; }
     </style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
-    <header class="header">
-        <div class="header-logo">
-            <div class="header-logo-icon">SPS</div>
+    <!-- APP HEADER -->
+    <header class="app-header">
+        <div class="app-brand">
+            <div class="brand-badge">SPS</div>
             <div>
-                <div class="header-title">SPS บัญชี-การเงิน V1 <span class="badge">Production Mode</span></div>
-                <div class="header-subtitle">ระบบบัญชี-การเงินอิสระ SPS V1 (Cloud & Instant Sync Secured)</div>
+                <div class="brand-title">SPS Account V2</div>
+                <div class="brand-subtitle">ระบบบัญชีใหม่ ปรับปรุงประสิทธิภาพ 100%</div>
             </div>
         </div>
 
-        <div class="header-controls">
-            <button onclick="restoreStandardDataset()" class="btn btn-amber">⚡ ดึงข้อมูล 27 รายการ</button>
-            <button onclick="openModal('quick-sync-modal')" class="btn btn-emerald">📱 ซิงก์ด่วน / ย้ายข้อมูล</button>
-            <button onclick="syncPushToCloud(true)" class="btn btn-purple">☁️ ซิงก์คลาวด์สด</button>
-            <button onclick="openModal('manual-entry-modal')" class="btn btn-indigo">➕ เพิ่มรายการใหม่</button>
+        <div class="header-actions">
+            <button onclick="openModal('import-modal')" class="btn btn-success">📥 นำเข้าไฟล์แบ็กอัพ (Import)</button>
+            <button onclick="openModal('export-modal')" class="btn btn-purple">📤 ส่งออกสำรองข้อมูล (Export)</button>
+            <button onclick="loadSampleData()" class="btn btn-warning">⚡ ตัวอย่าง 27 รายการ</button>
+            <button onclick="openModal('add-modal')" class="btn btn-primary">➕ เพิ่มรายการ</button>
         </div>
     </header>
 
-    <!-- Main Content Container -->
-    <div class="container">
-        
-        <!-- Status Banner -->
-        <div class="banner">
-            🟢 <strong>ระบบ SPS บัญชี-การเงิน V1 พร้อมใช้งานจริง 100%:</strong> โหลดชุดข้อมูลหลัก 27 รายการสมบูรณ์แบบ พร้อมซิงก์ข้อมูลระหว่างคอมพิวเตอร์และมือถือเรียลไทม์ 24 ชั่วโมง
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+
+        <!-- NAVIGATION TABS -->
+        <div class="nav-tabs">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-link active">📊 ภาพรวมการเงิน</button>
+            <button onclick="switchTab('pending')" id="nav-pending" class="nav-link">⏳ รายการค้างชำระ (Pending)</button>
+            <button onclick="switchTab('inout')" id="nav-inout" class="nav-link">⚖️ รายรับ - รายจ่าย</button>
+            <button onclick="switchTab('backup')" id="nav-backup" class="nav-link">📥 จัดการสำรองข้อมูล (Backup)</button>
         </div>
 
-        <!-- Navigation Tabs -->
-        <div class="tabs">
-            <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn active">📊 ภาพรวมการเงิน SPS</button>
-            <button onclick="switchTab('pending')" id="tab-btn-pending" class="tab-btn">⏳ รอรับ-รอจ่าย (Pending)</button>
-            <button onclick="switchTab('supplier')" id="tab-btn-supplier" class="tab-btn">🚚 แยกตามซัพพลายเออร์</button>
-            <button onclick="switchTab('inout')" id="tab-btn-inout" class="tab-btn">⚖️ รายรับ-รายจ่าย</button>
-            <button onclick="switchTab('advisor')" id="tab-btn-advisor" class="tab-btn">🤖 ผู้ช่วย AI ภาษี (Advisor)</button>
-        </div>
-
-        <!-- SECTION 1: DASHBOARD -->
-        <div id="sec-dashboard">
+        <!-- TAB 1: DASHBOARD VIEW -->
+        <div id="view-dashboard" class="tab-view">
             <div class="kpi-grid">
                 <div class="kpi-card">
-                    <div class="kpi-title">💰 รายได้รวม SPS (Total Revenue)</div>
-                    <div class="kpi-value" id="kpi-income">฿0.00</div>
-                    <div class="kpi-sub">พร้อมรับบันทึกใหม่</div>
+                    <div class="kpi-label">💰 รายได้รวม (Total Revenue)</div>
+                    <div class="kpi-num" id="kpi-income">฿0.00</div>
+                    <div class="kpi-subtext">รายการรับเงินชำระแล้ว</div>
                 </div>
                 <div class="kpi-card exp">
-                    <div class="kpi-title">💸 รายจ่ายรวม SPS (Total Expenses)</div>
-                    <div class="kpi-value" id="kpi-expense">฿0.00</div>
-                    <div class="kpi-sub">ค่าใช้จ่ายในระบบ</div>
+                    <div class="kpi-label">💸 รายจ่ายรวม (Total Expenses)</div>
+                    <div class="kpi-num" id="kpi-expense">฿0.00</div>
+                    <div class="kpi-subtext">รายการจ่ายเงินชำระแล้ว</div>
                 </div>
                 <div class="kpi-card profit">
-                    <div class="kpi-title">📈 กำไรสุทธิ SPS (Net Profit)</div>
-                    <div class="kpi-value" id="kpi-profit">฿0.00</div>
-                    <div class="kpi-sub" id="kpi-margin">Profit Margin: 51.2%</div>
+                    <div class="kpi-label">📈 กำไรสุทธิ (Net Profit)</div>
+                    <div class="kpi-num" id="kpi-profit">฿0.00</div>
+                    <div class="kpi-subtext">กำไรส่วนต่างสุทธิ</div>
                 </div>
                 <div class="kpi-card pending">
-                    <div class="kpi-title">⏳ ยอดรอชำระรวม (Pending Payments)</div>
-                    <div class="kpi-value" id="kpi-pending-total">฿0.00</div>
-                    <div class="kpi-sub" id="kpi-pending-count">21 รายการค้างชำระ</div>
+                    <div class="kpi-label">⏳ ยอดรอชำระ (Pending Payables)</div>
+                    <div class="kpi-num" id="kpi-pending">฿0.00</div>
+                    <div class="kpi-subtext" id="kpi-pending-count">0 รายการ</div>
                 </div>
             </div>
 
-            <div class="card-box">
-                <div class="card-header">
-                    <div class="card-title">📋 ตารางรายการบัญชี SPS V1 ล่าสุด</div>
-                    <button onclick="openModal('manual-entry-modal')" class="btn btn-indigo btn-sm">➕ เพิ่มรายการ</button>
-                </div>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>เลขที่เอกสาร</th>
-                                <th>วันที่เอกสาร</th>
-                                <th>วันที่จัดส่ง</th>
-                                <th>เครดิต</th>
-                                <th>วันครบกำหนด</th>
-                                <th>รายละเอียด</th>
-                                <th>คู่ค้า / ซัพพลายเออร์</th>
-                                <th style="text-align: right;">ยอดเงินสุทธิ</th>
-                                <th style="text-align: center;">สถานะ</th>
-                                <th style="text-align: center;">จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ledger-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION 2: PENDING -->
-        <div id="sec-pending" class="hidden-section">
-            <div class="card-box">
-                <div class="card-header">
-                    <div class="card-title">⏳ รายการค้างชำระเจ้าหนี้การค้า (Pending Payables)</div>
-                </div>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>เลขที่เอกสาร</th>
-                                <th>วันครบกำหนด</th>
-                                <th>นับถอยหลัง</th>
-                                <th>วันที่จัดส่ง</th>
-                                <th>เครดิต</th>
-                                <th>ซัพพลายเออร์</th>
-                                <th>รายละเอียด</th>
-                                <th style="text-align: right;">ยอดเงินสุทธิ</th>
-                                <th style="text-align: center;">การดำเนินการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pending-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION 3: SUPPLIER LEDGER -->
-        <div id="sec-supplier" class="hidden-section">
-            <div class="card-box">
-                <div class="card-header">
-                    <div class="card-title">🚚 สรุปยอดบัญชีแยกตามซัพพลายเออร์ / คู่ค้า</div>
-                </div>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ชื่อคู่ค้า / ซัพพลายเออร์</th>
-                                <th>ประเภท</th>
-                                <th>จำนวนรายการ</th>
-                                <th style="text-align: right;">ยอดรวมชำระแล้ว</th>
-                                <th style="text-align: right;">ยอดรวมค้างชำระ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="supplier-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION 4: INOUT LEDGER -->
-        <div id="sec-inout" class="hidden-section">
-            <div class="card-box">
-                <div class="card-header">
-                    <div class="card-title">⚖️ สรุปสมุดบัญชีรายรับ-รายจ่าย SPS V1</div>
+            <div class="content-box">
+                <div class="box-header">
+                    <div class="box-title">📋 ตารางสรุปรายการบัญชีล่าสุด</div>
+                    <button onclick="openModal('add-modal')" class="btn btn-primary btn-sm">➕ เพิ่มรายการใหม่</button>
                 </div>
                 <div class="table-responsive">
                     <table>
@@ -241,163 +153,207 @@
                                 <th>เลขที่เอกสาร</th>
                                 <th>วันที่</th>
                                 <th>ประเภท</th>
+                                <th>คู่ค้า / ซัพพลายเออร์</th>
                                 <th>รายละเอียด</th>
-                                <th>คู่ค้า</th>
                                 <th style="text-align: right;">ยอดเงินสุทธิ</th>
                                 <th style="text-align: center;">สถานะ</th>
+                                <th style="text-align: center;">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="inout-table-body"></tbody>
+                        <tbody id="table-dashboard"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- SECTION 5: AI ADVISOR -->
-        <div id="sec-advisor" class="hidden-section">
-            <div class="card-box">
-                <div class="card-title" style="margin-bottom: 15px;">🤖 ผู้ช่วย AI ปรึกษาด้านบัญชีและภาษีไทย (SPS Advisor)</div>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <input type="text" id="advisor-input" placeholder="พิมพ์คำถาม เช่น ยื่น ภ.พ.30 เมื่อไหร่ หรือหัก ณ ที่จ่าย 3% คิดอย่างไร" class="form-control" style="background:#fff;">
-                    <button onclick="askAIAdvisor()" class="btn btn-rose" style="white-space: nowrap;">ถาม AI</button>
+        <!-- TAB 2: PENDING VIEW -->
+        <div id="view-pending" class="tab-view" style="display: none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <div class="box-title">⏳ รายการค้างชำระทั้งหมด (Pending Payables & Receivables)</div>
                 </div>
-                <div id="advisor-response" style="background:#0f172a; color:#f8fafc; padding:15px; border-radius:10px; font-size:13px; display:none; line-height:1.6;"></div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>เลขที่เอกสาร</th>
+                                <th>วันครบกำหนด</th>
+                                <th>คู่ค้า</th>
+                                <th>รายละเอียด</th>
+                                <th style="text-align: right;">ยอดเงินสุทธิ</th>
+                                <th style="text-align: center;">ดำเนินการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-pending"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-    </div>
-
-    <!-- MODAL 1: QUICK SYNC -->
-    <div id="quick-sync-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">📱 ศูนย์ซิงก์ข้อมูลข้ามอุปกรณ์ (Multi-Device Sync)</div>
-                <button onclick="closeModal('quick-sync-modal')" class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p style="margin-bottom: 15px; color: #475569;">คุณสามารถซิงก์ข้อมูลระหว่างคอมพิวเตอร์และมือถือได้ง่ายๆ ผ่านระบบคลาวด์ หรือผ่านรหัสข้อมูลคัดลอกส่งในไลน์</p>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <button onclick="syncPushToCloud(true)" class="btn btn-purple" style="justify-content: center; padding: 12px;">📤 อัปโหลดข้อมูลขึ้นคลาวด์</button>
-                    <button onclick="syncPullFromCloud(true)" class="btn btn-indigo" style="justify-content: center; padding: 12px;">📥 ดึงข้อมูลจากคลาวด์ลงอุปกรณ์นี้</button>
-                    <button onclick="copySystemDataCode()" class="btn btn-amber" style="justify-content: center; padding: 12px;">📋 คัดลอกรหัสข้อมูลส่งเข้า Line</button>
+        <!-- TAB 3: INOUT VIEW -->
+        <div id="view-inout" class="tab-view" style="display: none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <div class="box-title">⚖️ สรุปสมุดบัญชีรายรับ-รายจ่าย ทั้งหมด</div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>เลขที่เอกสาร</th>
+                                <th>วันที่</th>
+                                <th>ประเภท</th>
+                                <th>คู่ค้า</th>
+                                <th>รายละเอียด</th>
+                                <th style="text-align: right;">ยอดเงิน</th>
+                                <th style="text-align: center;">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-inout"></tbody>
+                    </table>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button onclick="closeModal('quick-sync-modal')" class="btn btn-outline">ปิดหน้าต่าง</button>
-            </div>
         </div>
-    </div>
 
-    <!-- MODAL 2: MANUAL ENTRY -->
-    <div id="manual-entry-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">➕ เพิ่มรายการบัญชี SPS V1 ด้วยตนเอง</div>
-                <button onclick="closeModal('manual-entry-modal')" class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>ประเภทรายการ:</label>
-                        <select id="m-type" class="form-control">
-                            <option value="Expense">🔴 รายจ่าย (Expense)</option>
-                            <option value="Income">🟢 รายรับ (Income)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>เลขที่เอกสาร:</label>
-                        <input type="text" id="m-doc-no" placeholder="SPS-INV/001" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>วันที่เอกสาร:</label>
-                        <input type="text" id="m-date" value="22/08/2026" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>เครดิต (วัน):</label>
-                        <input type="number" id="m-credit-days" value="30" class="form-control">
-                    </div>
-                    <div class="form-group full">
-                        <label>ชื่อคู่ค้า / ซัพพลายเออร์:</label>
-                        <input type="text" id="m-vendor" placeholder="เช่น บริษัท เอสพีเอส เทรดดิ้ง จำกัด" class="form-control">
-                    </div>
-                    <div class="form-group full">
-                        <label>รายละเอียด:</label>
-                        <input type="text" id="m-desc" placeholder="เช่น ค่าสินค้าวัตถุดิบงวดที่ 1" class="form-control">
-                    </div>
-                    <div class="form-group full">
-                        <label>ยอดเงินสุทธิ (บาท):</label>
-                        <input type="number" id="m-net" value="10000" class="form-control" style="font-weight: 700; color: #059669;">
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button onclick="closeModal('manual-entry-modal')" class="btn btn-outline">ยกเลิก</button>
-                <button onclick="saveManualEntryToLedger()" class="btn btn-emerald">💾 บันทึกรายการ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 3: PAYMENT ACTION -->
-    <div id="payment-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">💳 แจ้งชำระเงิน SPS V1</div>
-                <button onclick="closeModal('payment-modal')" class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="pay-tx-id">
-                <p style="margin-bottom: 12px; font-weight: 600;">เลขที่เอกสาร: <span id="pay-doc-no" style="color: #4f46e5;"></span></p>
+        <!-- TAB 4: BACKUP VIEW -->
+        <div id="view-backup" class="tab-view" style="display: none;">
+            <div class="content-box">
+                <div class="box-title" style="margin-bottom: 16px;">📥 ศูนย์นำเข้าและสำรองข้อมูลบัญชี</div>
+                <p style="margin-bottom: 16px; color: #475569; font-size: 14px;">นำเข้าข้อมูลที่คุณเคยแบ็กอัพไว้ โดยวางรหัสข้อความแบ็กอัพ หรืออัปโหลดไฟล์ JSON ลงในช่องด้านล่างนี้:</p>
                 <div class="form-group">
-                    <label>วันที่ชำระเงิน:</label>
-                    <input type="text" id="pay-date" value="22/08/2026" class="form-control">
+                    <label>วางรหัสข้อความ หรือไฟล์แบ็กอัพที่นี่:</label>
+
+                    <input type="file" id="backup-file-input" onchange="handleFileBackupSelect(event)" style="margin-bottom: 10px;" class="form-control">
+
+                    <textarea id="backup-text-input" class="form-control" placeholder='วางข้อความ JSON เช่น [{"id":"SPS-001", "vendor":"...", ...}]'></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="processBackupTextImport()" class="btn btn-success">📥 นำเข้าข้อมูลแบ็กอัพทันที</button>
+                    <button onclick="loadSampleData()" class="btn btn-warning">⚡ โหลดข้อมูลมาตรฐาน 27 รายการ</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL 1: ADD TRANSACTION -->
+    <div id="add-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">➕ เพิ่มรายการบัญชีใหม่</div>
+                <button onclick="closeModal('add-modal')" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>ประเภทรายการ:</label>
+                    <select id="add-type" class="form-control">
+                        <option value="Expense">🔴 รายจ่าย (Expense)</option>
+                        <option value="Income">🟢 รายรับ (Income)</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>อ้างอิงหลักฐานการโอน / เลขสลิป:</label>
-                    <input type="text" id="pay-ref" placeholder="SLIP-SPS-998811" class="form-control">
+                    <label>เลขที่เอกสาร:</label>
+                    <input type="text" id="add-doc" placeholder="SPS-INV/001" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>วันที่เอกสาร:</label>
+                    <input type="text" id="add-date" value="22/08/2026" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>ชื่อคู่ค้า / ซัพพลายเออร์:</label>
+                    <input type="text" id="add-vendor" placeholder="เช่น บริษัท เอสพีเอส เทรดดิ้ง จำกัด" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>รายละเอียด:</label>
+                    <input type="text" id="add-desc" placeholder="เช่น ค่าสินค้าวัตถุดิบ" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>ยอดเงินสุทธิ (บาท):</label>
+                    <input type="number" id="add-net" value="10000" class="form-control" style="font-weight: bold; color: #10b981;">
                 </div>
             </div>
             <div class="modal-footer">
-                <button onclick="closeModal('payment-modal')" class="btn btn-outline">ยกเลิก</button>
-                <button onclick="confirmPayment()" class="btn btn-emerald">✅ ยืนยันชำระเงิน</button>
+                <button onclick="closeModal('add-modal')" class="btn btn-secondary">ยกเลิก</button>
+                <button onclick="saveNewTransaction()" class="btn btn-primary">💾 บันทึกรายการ</button>
             </div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT APPLICATION ENGINE -->
+    <!-- MODAL 2: IMPORT MODAL -->
+    <div id="import-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">📥 นำเข้าไฟล์แบ็กอัพข้อมูล</div>
+                <button onclick="closeModal('import-modal')" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>อัปโหลดไฟล์แบ็กอัพ (JSON):</label>
+                    <input type="file" id="import-file" onchange="handleFileBackupSelect(event)" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>หรือวางรหัสข้อความแบ็กอัพ:</label>
+                    <textarea id="import-text" class="form-control" placeholder="วางข้อความ JSON แบ็กอัพ..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('import-modal')" class="btn btn-secondary">ยกเลิก</button>
+                <button onclick="processModalImport()" class="btn btn-success">📥 กู้คืนข้อมูลทันที</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: EXPORT MODAL -->
+    <div id="export-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">📤 ส่งออกสำรองข้อมูล (Export Backup)</div>
+                <button onclick="closeModal('export-modal')" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 12px; color: #475569;">คัดลอกรหัสสำรองข้อมูลด้านล่างนี้ เพื่อนำไปบันทึกเก็บไว้ หรือกดปุ่มดาวน์โหลดไฟล์:</p>
+                <textarea id="export-text" class="form-control" readonly></textarea>
+            </div>
+            <div class="modal-footer">
+                <button onclick="downloadBackupFile()" class="btn btn-purple">💾 ดาวน์โหลดไฟล์ JSON</button>
+                <button onclick="copyExportText()" class="btn btn-primary">📋 คัดลอกรหัส</button>
+                <button onclick="closeModal('export-modal')" class="btn btn-secondary">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLICATION SCRIPT -->
     <script>
-        const STORAGE_PREFIX = "SPS_ACCOUNT_V1_";
-        const SYSTEM_NAME = "SPS บัญชี-การเงิน V1";
-        const TODAY_DATE_STR = "22/08/2026";
-        const PUBLIC_CLOUD_RELAY_URL = "https://jsonblob.com/api/jsonBlob/1271501178652434432";
+        const STORAGE_KEY = "SPS_ACCOUNT_V2_DATA";
 
-        const INITIAL_TRANSACTIONS = [
-            { id: "SPS-INC/001", date: "01/08/2026", delivery_date: "01/08/2026", credit_days: 30, due_date: "31/08/2026", type: "Income", desc: "ค่าบริการพัฒนาระบบซอฟต์แวร์ SPS", vendor: "บริษัท เอพีซีไอ จำกัด", before_vat: 150000.00, vat: 10500.00, wht: 4500.00, net: 156000.00, status: "Paid", file_data: null, slip_data: null, pay_date: "01/08/2026" },
-            { id: "SPS-INC/002", date: "15/08/2026", delivery_date: "15/08/2026", credit_days: 30, due_date: "14/09/2026", type: "Income", desc: "ค่าสินค้าและบริการฝ่ายปฏิบัติการ SPS", vendor: "บริษัท คู่ค้าเอสพีเอส จำกัด", before_vat: 66333.47, vat: 4643.34, wht: 1990.00, net: 68986.81, status: "Paid", file_data: null, slip_data: null, pay_date: "15/08/2026" },
-            { id: "SPS-EXP/001", date: "03/08/2026", delivery_date: "01/08/2026", credit_days: 14, due_date: "15/08/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000.00, vat: 2450.00, wht: 1750.00, net: 35700.00, status: "Paid", file_data: null, slip_data: null, pay_date: "03/08/2026" },
-            { id: "SPS-EXP/002", date: "05/08/2026", delivery_date: "05/08/2026", credit_days: 30, due_date: "04/09/2026", type: "Expense", desc: "ค่าบริการระบบ Cloud Server (AWS / Google)", vendor: "บริษัท คลาวด์ เทคโนโลยี จำกัด", before_vat: 15000.00, vat: 1050.00, wht: 450.00, net: 15600.00, status: "Paid", file_data: null, slip_data: null, pay_date: "05/08/2026" },
-            { id: "SPS-EXP/003", date: "10/08/2026", delivery_date: "10/08/2026", credit_days: 30, due_date: "09/09/2026", type: "Expense", desc: "ค่าโฆษณา Facebook & Google Ads", vendor: "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด", before_vat: 20000.00, vat: 1400.00, wht: 400.00, net: 21000.00, status: "Paid", file_data: null, slip_data: null, pay_date: "10/08/2026" },
-            { id: "SPS-EXP/004", date: "18/08/2026", delivery_date: "18/08/2026", credit_days: 30, due_date: "17/09/2026", type: "Expense", desc: "ซื้ออุปกรณ์สำนักงานและวัสดุสินค้า", vendor: "บริษัท หนัง และสินค้าทั่วไป จำกัด", before_vat: 35612.14, vat: 2492.85, wht: 0.00, net: 38104.99, status: "Paid", file_data: null, slip_data: null, pay_date: "18/08/2026" },
-            { id: "SPS-PD/001", date: "01/08/2026", delivery_date: "01/08/2026", credit_days: 14, due_date: "15/08/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงานงวดที่ 2", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000.00, vat: 2450.00, wht: 1750.00, net: 37450.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/002", date: "05/08/2026", delivery_date: "05/08/2026", credit_days: 30, due_date: "04/09/2026", type: "Expense", desc: "ค่าเซิร์ฟเวอร์คลาวด์และฐานข้อมูล", vendor: "บริษัท คลาวด์ เทคโนโลยี จำกัด", before_vat: 15000.00, vat: 1050.00, wht: 450.00, net: 16050.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/003", date: "18/08/2026", delivery_date: "18/08/2026", credit_days: 30, due_date: "17/09/2026", type: "Expense", desc: "ค่าทำการตลาดการโฆษณาออนไลน์", vendor: "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด", before_vat: 20000.00, vat: 1400.00, wht: 400.00, net: 21400.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/004", date: "19/08/2026", delivery_date: "19/08/2026", credit_days: 31, due_date: "19/09/2026", type: "Expense", desc: "ซื้ออุปกรณ์คอมพิวเตอร์ประจำทีม", vendor: "บริษัท ไอที ซิตี้ จำกัด (มหาชน)", before_vat: 28000.00, vat: 1960.00, wht: 0.00, net: 29960.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/005", date: "28/08/2026", delivery_date: "28/08/2026", credit_days: 30, due_date: "27/09/2026", type: "Expense", desc: "ค่าสัญญาบริการบำรุงรักษาสื่อ", vendor: "บริษัท โกลบอล โลจิสติกส์ จำกัด", before_vat: 14018.69, vat: 981.31, wht: 0.00, net: 15000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/006", date: "05/09/2026", delivery_date: "05/09/2026", credit_days: 15, due_date: "20/09/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงานสาขาประจำเดือน", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 16308.41, vat: 1141.59, wht: 0.00, net: 17450.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/007", date: "08/08/2026", delivery_date: "08/08/2026", credit_days: 30, due_date: "07/09/2026", type: "Expense", desc: "ค่าลิขสิทธิ์ซอฟต์แวร์ประจำปี", vendor: "บริษัท ซอฟต์แวร์ไทย จำกัด", before_vat: 11214.95, vat: 785.05, wht: 0.00, net: 12000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/008", date: "10/08/2026", delivery_date: "10/08/2026", credit_days: 30, due_date: "09/09/2026", type: "Expense", desc: "ค่าบริการทำความสะอาดสำนักงาน", vendor: "บริษัท คลีนนิ่ง เซอร์วิส จำกัด", before_vat: 9345.79, vat: 654.21, wht: 0.00, net: 10000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/009", date: "12/08/2026", delivery_date: "12/08/2026", credit_days: 30, due_date: "11/09/2026", type: "Expense", desc: "ค่าบริการรักษาความปลอดภัย", vendor: "บริษัท รปภ. มั่นคง จำกัด", before_vat: 10280.37, vat: 719.63, wht: 0.00, net: 11000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/010", date: "14/08/2026", delivery_date: "14/08/2026", credit_days: 30, due_date: "13/09/2026", type: "Expense", desc: "ค่าอินเทอร์เน็ตความเร็วสูงสำนักงาน", vendor: "บริษัท ทรู คอร์ปอเรชั่น จำกัด", before_vat: 4672.90, vat: 327.10, wht: 0.00, net: 5000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/011", date: "15/08/2026", delivery_date: "15/08/2026", credit_days: 30, due_date: "14/09/2026", type: "Expense", desc: "ค่าไฟฟ้าและน้ำประปาประจำเดือน", vendor: "การไฟฟ้านครหลวง", before_vat: 14018.69, vat: 981.31, wht: 0.00, net: 15000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/012", date: "16/08/2026", delivery_date: "16/08/2026", credit_days: 30, due_date: "15/09/2026", type: "Expense", desc: "ค่าจ้างที่ปรึกษาด้านบัญชีและภาษี", vendor: "บริษัท บัญชีคุณภาพ จำกัด", before_vat: 18691.59, vat: 1308.41, wht: 0.00, net: 20000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/013", date: "17/08/2026", delivery_date: "17/08/2026", credit_days: 30, due_date: "16/09/2026", type: "Expense", desc: "ค่าเบี้ยประกันภัยทรัพย์สินสำนักงาน", vendor: "บริษัท ประกันภัยไทย จำกัด", before_vat: 11214.95, vat: 785.05, wht: 0.00, net: 12000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/014", date: "20/08/2026", delivery_date: "20/08/2026", credit_days: 30, due_date: "19/09/2026", type: "Expense", desc: "ค่าจัดอบรมสัมมนาบุคลากรประจำปี", vendor: "สถาบันฝึกอบรมไทย จำกัด", before_vat: 14018.69, vat: 981.31, wht: 0.00, net: 15000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/015", date: "21/08/2026", delivery_date: "21/08/2026", credit_days: 30, due_date: "20/09/2026", type: "Expense", desc: "ค่าบริการซ่อมบำรุงเครื่องปรับอากาศ", vendor: "บริษัท แอร์เย็น จำกัด", before_vat: 7476.64, vat: 523.36, wht: 0.00, net: 8000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/016", date: "22/08/2026", delivery_date: "22/08/2026", credit_days: 30, due_date: "21/09/2026", type: "Expense", desc: "ค่าจัดส่งเอกสารและพัสดุด่วน", vendor: "บริษัท ไปรษณีย์ไทย จำกัด", before_vat: 2803.74, vat: 196.26, wht: 0.00, net: 3000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/017", date: "23/08/2026", delivery_date: "23/08/2026", credit_days: 30, due_date: "22/09/2026", type: "Expense", desc: "ค่าบริการกำจัดขยะและสิ่งแวดล้อม", vendor: "สำนักงานเขตกรุงเทพมหานคร", before_vat: 1869.16, vat: 130.84, wht: 0.00, net: 2000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/018", date: "24/08/2026", delivery_date: "24/08/2026", credit_days: 30, due_date: "23/09/2026", type: "Expense", desc: "ค่าเครื่องดื่มและสวัสดิการพนักงาน", vendor: "บริษัท สินค้าเครื่องดื่ม จำกัด", before_vat: 5607.48, vat: 392.52, wht: 0.00, net: 6000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/019", date: "25/08/2026", delivery_date: "25/08/2026", credit_days: 30, due_date: "24/09/2026", type: "Expense", desc: "ค่าพิมพ์เอกสารและโบร์ชัวร์ประชาสัมพันธ์", vendor: "โรงพิมพ์คุณภาพ จำกัด", before_vat: 8411.21, vat: 588.79, wht: 0.00, net: 9000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/020", date: "26/08/2026", delivery_date: "26/08/2026", credit_days: 30, due_date: "25/09/2026", type: "Expense", desc: "ค่าเช่าเครื่องถ่ายเอกสารประจำเดือน", vendor: "บริษัท ฟูจิฟิล์ม จำกัด", before_vat: 6542.06, vat: 457.94, wht: 0.00, net: 7000.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "SPS-PD/021", date: "27/08/2026", delivery_date: "27/08/2026", credit_days: 30, due_date: "26/09/2026", type: "Expense", desc: "ค่าเติมน้ำมันรถยนต์ส่วนกลางบริษัท", vendor: "บริษัท ปตท. จำกัด (มหาชน)", before_vat: 7420.56, vat: 519.44, wht: 0.00, net: 7940.00, status: "Unpaid", file_data: null, slip_data: null, pay_date: null }
+        const SAMPLE_TRANSACTIONS = [
+            { id: "SPS-INC/001", date: "01/08/2026", due_date: "31/08/2026", type: "Income", desc: "ค่าบริการพัฒนาระบบซอฟต์แวร์ SPS", vendor: "บริษัท เอพีซีไอ จำกัด", net: 156000.00, status: "Paid" },
+            { id: "SPS-INC/002", date: "15/08/2026", due_date: "14/09/2026", type: "Income", desc: "ค่าสินค้าและบริการฝ่ายปฏิบัติการ SPS", vendor: "บริษัท คู่ค้าเอสพีเอส จำกัด", net: 68986.81, status: "Paid" },
+            { id: "SPS-EXP/001", date: "03/08/2026", due_date: "15/08/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", net: 35700.00, status: "Paid" },
+            { id: "SPS-EXP/002", date: "05/08/2026", due_date: "04/09/2026", type: "Expense", desc: "ค่าบริการระบบ Cloud Server", vendor: "บริษัท คลาวด์ เทคโนโลยี จำกัด", net: 15600.00, status: "Paid" },
+            { id: "SPS-EXP/003", date: "10/08/2026", due_date: "09/09/2026", type: "Expense", desc: "ค่าโฆษณา Facebook & Google Ads", vendor: "บริษัท ดิจิทัล มาร์เก็ตติ้ง จำกัด", net: 21000.00, status: "Paid" },
+            { id: "SPS-EXP/004", date: "18/08/2026", due_date: "17/09/2026", type: "Expense", desc: "ซื้ออุปกรณ์สำนักงานและวัสดุสินค้า", vendor: "บริษัท หนัง และสินค้าทั่วไป จำกัด", net: 38104.99, status: "Paid" },
+            { id: "SPS-PD/001", date: "01/08/2026", due_date: "15/08/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงานงวดที่ 2", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", net: 37450.00, status: "Unpaid" },
+            { id: "SPS-PD/002", date: "05/08/2026", due_date: "04/09/2026", type: "Expense", desc: "ค่าเซิร์ฟเวอร์คลาวด์และฐานข้อมูล", vendor: "บริษัท คลาวด์ เทคโนโลยี จำกัด", net: 16050.00, status: "Unpaid" },
+            { id: "SPS-PD/003", date: "18/08/2026", due_date: "17/09/2026", type: "Expense", desc: "ค่าทำการตลาดการโฆษณาออนไลน์", vendor: "บริษัท ดิจิทัล มาร์เก็ตติ้ง จำกัด", net: 21400.00, status: "Unpaid" },
+            { id: "SPS-PD/004", date: "19/08/2026", due_date: "19/09/2026", type: "Expense", desc: "ซื้ออุปกรณ์คอมพิวเตอร์ประจำทีม", vendor: "บริษัท ไอที ซิตี้ จำกัด (มหาชน)", net: 29960.00, status: "Unpaid" },
+            { id: "SPS-PD/005", date: "28/08/2026", due_date: "27/09/2026", type: "Expense", desc: "ค่าสัญญาบริการบำรุงรักษาสื่อ", vendor: "บริษัท โกลบอล โลจิสติกส์ จำกัด", net: 15000.00, status: "Unpaid" },
+            { id: "SPS-PD/006", date: "05/09/2026", due_date: "20/09/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงานสาขาประจำเดือน", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", net: 17450.00, status: "Unpaid" },
+            { id: "SPS-PD/007", date: "08/08/2026", due_date: "07/09/2026", type: "Expense", desc: "ค่าลิขสิทธิ์ซอฟต์แวร์ประจำปี", vendor: "บริษัท ซอฟต์แวร์ไทย จำกัด", net: 12000.00, status: "Unpaid" },
+            { id: "SPS-PD/008", date: "10/08/2026", due_date: "09/09/2026", type: "Expense", desc: "ค่าบริการทำความสะอาดสำนักงาน", vendor: "บริษัท คลีนนิ่ง เซอร์วิส จำกัด", net: 10000.00, status: "Unpaid" },
+            { id: "SPS-PD/009", date: "12/08/2026", due_date: "11/09/2026", type: "Expense", desc: "ค่าบริการรักษาความปลอดภัย", vendor: "บริษัท รปภ. มั่นคง จำกัด", net: 11000.00, status: "Unpaid" },
+            { id: "SPS-PD/010", date: "14/08/2026", due_date: "13/09/2026", type: "Expense", desc: "ค่าอินเทอร์เน็ตความเร็วสูงสำนักงาน", vendor: "บริษัท ทรู คอร์ปอเรชั่น จำกัด", net: 5000.00, status: "Unpaid" },
+            { id: "SPS-PD/011", date: "15/08/2026", due_date: "14/09/2026", type: "Expense", desc: "ค่าไฟฟ้าและน้ำประปาประจำเดือน", vendor: "การไฟฟ้านครหลวง", net: 15000.00, status: "Unpaid" },
+            { id: "SPS-PD/012", date: "16/08/2026", due_date: "15/09/2026", type: "Expense", desc: "ค่าจ้างที่ปรึกษาด้านบัญชีและภาษี", vendor: "บริษัท บัญชีคุณภาพ จำกัด", net: 20000.00, status: "Unpaid" },
+            { id: "SPS-PD/013", date: "17/08/2026", due_date: "16/09/2026", type: "Expense", desc: "ค่าเบี้ยประกันภัยทรัพย์สินสำนักงาน", vendor: "บริษัท ประกันภัยไทย จำกัด", net: 12000.00, status: "Unpaid" },
+            { id: "SPS-PD/014", date: "20/08/2026", due_date: "19/09/2026", type: "Expense", desc: "ค่าจัดอบรมสัมมนาบุคลากรประจำปี", vendor: "สถาบันฝึกอบรมไทย จำกัด", net: 15000.00, status: "Unpaid" },
+            { id: "SPS-PD/015", date: "21/08/2026", due_date: "20/09/2026", type: "Expense", desc: "ค่าบริการซ่อมบำรุงเครื่องปรับอากาศ", vendor: "บริษัท แอร์เย็น จำกัด", net: 8000.00, status: "Unpaid" },
+            { id: "SPS-PD/016", date: "22/08/2026", due_date: "21/09/2026", type: "Expense", desc: "ค่าจัดส่งเอกสารและพัสดุด่วน", vendor: "บริษัท ไปรษณีย์ไทย จำกัด", net: 3000.00, status: "Unpaid" },
+            { id: "SPS-PD/017", date: "23/08/2026", due_date: "22/09/2026", type: "Expense", desc: "ค่าบริการกำจัดขยะและสิ่งแวดล้อม", vendor: "สำนักงานเขตกรุงเทพมหานคร", net: 2000.00, status: "Unpaid" },
+            { id: "SPS-PD/018", date: "24/08/2026", due_date: "23/09/2026", type: "Expense", desc: "ค่าเครื่องดื่มและสวัสดิการพนักงาน", vendor: "บริษัท สินค้าเครื่องดื่ม จำกัด", net: 6000.00, status: "Unpaid" },
+            { id: "SPS-PD/019", date: "25/08/2026", due_date: "24/09/2026", type: "Expense", desc: "ค่าพิมพ์เอกสารและโบร์ชัวร์ประชาสัมพันธ์", vendor: "โรงพิมพ์คุณภาพ จำกัด", net: 9000.00, status: "Unpaid" },
+            { id: "SPS-PD/020", date: "26/08/2026", due_date: "25/09/2026", type: "Expense", desc: "ค่าเช่าเครื่องถ่ายเอกสารประจำเดือน", vendor: "บริษัท ฟูจิฟิล์ม จำกัด", net: 7000.00, status: "Unpaid" },
+            { id: "SPS-PD/021", date: "27/08/2026", due_date: "26/09/2026", type: "Expense", desc: "ค่าเติมน้ำมันรถยนต์ส่วนกลางบริษัท", vendor: "บริษัท ปตท. จำกัด (มหาชน)", net: 7940.00, status: "Unpaid" }
         ];
 
         let transactions = [];
@@ -406,261 +362,221 @@
             return '฿' + (num || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        function formatDateDDMMYYYY(dateStr) {
-            if (!dateStr) return '-';
-            return dateStr;
-        }
-
-        function parseDDMMYYYY(str) {
-            if (!str || !str.includes('/')) return new Date(0);
-            const p = str.split('/');
-            if (p.length === 3) return new Date(parseInt(p[2]), parseInt(p[1]) - 1, parseInt(p[0]));
-            return new Date(0);
-        }
-
-        function switchTab(tabName) {
-            const sections = ['dashboard', 'pending', 'supplier', 'inout', 'advisor'];
-            sections.forEach(s => {
-                const el = document.getElementById('sec-' + s);
-                const btn = document.getElementById('tab-btn-' + s);
-                if (el) {
-                    if (s === tabName) {
-                        el.style.display = 'block';
-                    } else {
-                        el.style.display = 'none';
-                    }
-                }
-                if (btn) {
-                    if (s === tabName) {
-                        btn.className = 'tab-btn active';
-                    } else {
-                        btn.className = 'tab-btn';
-                    }
-                }
-            });
-            renderLedger();
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-view').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+            
+            const activeTab = document.getElementById('view-' + tabId);
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if (activeTab) activeTab.style.display = 'block';
+            if (activeBtn) activeBtn.classList.add('active');
+            renderAll();
         }
 
         function openModal(id) {
-            const m = document.getElementById(id);
-            if (m) m.classList.add('open');
+            if (id === 'export-modal') {
+                document.getElementById('export-text').value = JSON.stringify(transactions, null, 2);
+            }
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.add('active');
         }
 
         function closeModal(id) {
-            const m = document.getElementById(id);
-            if (m) m.classList.remove('open');
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('active');
         }
 
-        function saveState() {
+        function saveData() {
             try {
-                localStorage.setItem(STORAGE_PREFIX + 'TRANSACTIONS', JSON.stringify(transactions));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
             } catch(e) {}
         }
 
-        function restoreStandardDataset() {
-            alert('⚡ กำลังโหลดข้อมูลชุดหลัก 27 รายการ...');
-            transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
-            saveState();
-            renderLedger();
-            alert('✅ ดึงข้อมูลมาตรฐาน 27 รายการเรียบร้อยแล้ว!');
+        function loadSampleData() {
+            transactions = JSON.parse(JSON.stringify(SAMPLE_TRANSACTIONS));
+            saveData();
+            renderAll();
+            alert('⚡ โหลดชุดข้อมูลตัวอย่าง 27 รายการเรียบร้อยแล้ว!');
         }
 
-        function renderLedger() {
+        function renderAll() {
             if (!transactions || transactions.length === 0) {
-                transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+                transactions = JSON.parse(JSON.stringify(SAMPLE_TRANSACTIONS));
             }
 
-            const tbody = document.getElementById('ledger-table-body');
-            const pendingTbody = document.getElementById('pending-table-body');
+            // 1. Calculate KPI
+            let inc = transactions.filter(t => t.type === 'Income' && t.status === 'Paid').reduce((a,b) => a + b.net, 0);
+            let exp = transactions.filter(t => t.type === 'Expense' && t.status === 'Paid').reduce((a,b) => a + b.net, 0);
+            let profit = inc - exp;
+            let pendingItems = transactions.filter(t => t.status !== 'Paid');
+            let pendingTotal = pendingItems.reduce((a,b) => a + b.net, 0);
 
-            if (tbody) {
-                tbody.innerHTML = transactions.map(t => `
+            document.getElementById('kpi-income').innerText = formatTHB(inc);
+            document.getElementById('kpi-expense').innerText = formatTHB(exp);
+            document.getElementById('kpi-profit').innerText = formatTHB(profit);
+            document.getElementById('kpi-pending').innerText = formatTHB(pendingTotal);
+            document.getElementById('kpi-pending-count').innerText = `${pendingItems.length} รายการค้างชำระ`;
+
+            // 2. Render Dashboard Table
+            const tbodyDash = document.getElementById('table-dashboard');
+            if (tbodyDash) {
+                tbodyDash.innerHTML = transactions.map(t => `
                     <tr>
-                        <td style="font-family:monospace; font-weight:700; color:#4f46e5;">${t.id}</td>
+                        <td style="font-family:monospace; font-weight:bold; color:#4f46e5;">${t.id}</td>
                         <td style="font-family:monospace;">${t.date}</td>
-                        <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
-                        <td style="font-family:monospace; font-weight:700; color:#d97706;">${t.credit_days || 30} วัน</td>
-                        <td style="font-family:monospace; font-weight:700; color:#e11d48;">${t.due_date}</td>
-                        <td>${t.desc}</td>
+                        <td>${t.type === 'Income' ? '🟢 รายรับ' : '🔴 รายจ่าย'}</td>
                         <td style="font-weight:600;">${t.vendor}</td>
-                        <td style="text-align:right; font-family:monospace; font-weight:700;">${formatTHB(t.net)}</td>
+                        <td>${t.desc}</td>
+                        <td style="text-align:right; font-family:monospace; font-weight:bold;">${formatTHB(t.net)}</td>
                         <td style="text-align:center;">
-                            ${t.status === 'Paid' ? '<span class="badge-status badge-paid">ชำระแล้ว</span>' : '<span class="badge-status badge-pending">รอชำระ</span>'}
+                            ${t.status === 'Paid' ? '<span class="badge badge-paid">ชำระแล้ว</span>' : '<span class="badge badge-unpaid">รอชำระ</span>'}
                         </td>
                         <td style="text-align:center;">
-                            ${t.status === 'Paid' ? '<button class="btn btn-outline btn-sm" disabled>สลิปเรียบร้อย</button>' : `<button onclick="openPayment('${t.id}')" class="btn btn-amber btn-sm">แจ้งชำระ</button>`}
+                            ${t.status === 'Paid' ? '<button class="btn btn-secondary btn-sm" disabled>เรียบร้อย</button>' : `<button onclick="markAsPaid('${t.id}')" class="btn btn-warning btn-sm">แจ้งชำระ</button>`}
                         </td>
                     </tr>
                 `).join('');
             }
 
-            const pendingItems = transactions.filter(t => t.status !== 'Paid');
-            if (pendingTbody) {
-                const today = parseDDMMYYYY(TODAY_DATE_STR);
-                pendingTbody.innerHTML = pendingItems.map(t => {
-                    const diffDays = Math.ceil((parseDDMMYYYY(t.due_date).getTime() - today.getTime()) / (1000 * 3600 * 24));
-                    let countdown = diffDays > 0 ? `<span class="badge-status badge-pending">เหลือ ${diffDays} วัน</span>` : `<span class="badge-status badge-overdue">เกินกำหนด</span>`;
-                    return `
-                        <tr>
-                            <td style="font-family:monospace; font-weight:700; color:#4f46e5;">${t.id}</td>
-                            <td style="font-family:monospace; font-weight:700; color:#e11d48; background:#ffe4e6;">${t.due_date}</td>
-                            <td style="text-align:center;">${countdown}</td>
-                            <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
-                            <td style="font-family:monospace; font-weight:700; color:#d97706;">${t.credit_days || 30} วัน</td>
-                            <td style="font-weight:600;">${t.vendor}</td>
-                            <td>${t.desc}</td>
-                            <td style="text-align:right; font-family:monospace; font-weight:700; color:#e11d48;">${formatTHB(t.net)}</td>
-                            <td style="text-align:center;"><button onclick="openPayment('${t.id}')" class="btn btn-rose btn-sm">💳 แจ้งชำระ</button></td>
-                        </tr>
-                    `;
-                }).join('');
+            // 3. Render Pending Table
+            const tbodyPending = document.getElementById('table-pending');
+            if (tbodyPending) {
+                tbodyPending.innerHTML = pendingItems.map(t => `
+                    <tr>
+                        <td style="font-family:monospace; font-weight:bold; color:#4f46e5;">${t.id}</td>
+                        <td style="font-family:monospace; color:#ef4444; font-weight:bold;">${t.due_date}</td>
+                        <td style="font-weight:600;">${t.vendor}</td>
+                        <td>${t.desc}</td>
+                        <td style="text-align:right; font-family:monospace; font-weight:bold; color:#ef4444;">${formatTHB(t.net)}</td>
+                        <td style="text-align:center;">
+                            <button onclick="markAsPaid('${t.id}')" class="btn btn-success btn-sm">💳 แจ้งชำระเงิน</button>
+                        </td>
+                    </tr>
+                `).join('');
             }
 
-            let inc = transactions.filter(t => t.type === 'Income').reduce((a,b) => a + (b.before_vat || 0), 0);
-            let exp = transactions.filter(t => t.type === 'Expense').reduce((a,b) => a + (b.before_vat || 0), 0);
-            let profit = inc - exp;
-            let totalPending = pendingItems.reduce((a,b) => a + (b.net || 0), 0);
-
-            if (document.getElementById('kpi-income')) document.getElementById('kpi-income').innerText = formatTHB(inc);
-            if (document.getElementById('kpi-expense')) document.getElementById('kpi-expense').innerText = formatTHB(exp);
-            if (document.getElementById('kpi-profit')) document.getElementById('kpi-profit').innerText = formatTHB(profit);
-            if (document.getElementById('kpi-pending-total')) document.getElementById('kpi-pending-total').innerText = formatTHB(totalPending);
-            if (document.getElementById('kpi-pending-count')) document.getElementById('kpi-pending-count').innerText = `${pendingItems.length} รายการค้างชำระ`;
-
-            renderSupplierLedger();
-            renderInOutLedger();
+            // 4. Render InOut Table
+            const tbodyInOut = document.getElementById('table-inout');
+            if (tbodyInOut) {
+                tbodyInOut.innerHTML = transactions.map(t => `
+                    <tr>
+                        <td style="font-family:monospace; font-weight:bold;">${t.id}</td>
+                        <td style="font-family:monospace;">${t.date}</td>
+                        <td>${t.type === 'Income' ? '🟢 รายรับ' : '🔴 รายจ่าย'}</td>
+                        <td style="font-weight:600;">${t.vendor}</td>
+                        <td>${t.desc}</td>
+                        <td style="text-align:right; font-family:monospace; font-weight:bold;">${formatTHB(t.net)}</td>
+                        <td style="text-align:center;">${t.status === 'Paid' ? 'ชำระแล้ว' : 'รอชำระ'}</td>
+                    </tr>
+                `).join('');
+            }
         }
 
-        function renderSupplierLedger() {
-            const tbody = document.getElementById('supplier-table-body');
-            if (!tbody) return;
-            const suppMap = {};
-            transactions.forEach(t => {
-                if (!suppMap[t.vendor]) suppMap[t.vendor] = { name: t.vendor, type: t.type, count: 0, paid: 0, unpaid: 0 };
-                suppMap[t.vendor].count++;
-                if (t.status === 'Paid') suppMap[t.vendor].paid += t.net;
-                else suppMap[t.vendor].unpaid += t.net;
-            });
-            tbody.innerHTML = Object.values(suppMap).map(s => `
-                <tr>
-                    <td style="font-weight:700;">${s.name}</td>
-                    <td>${s.type === 'Income' ? '🟢 ลูกค้า/รายรับ' : '🔴 เจ้าหนี้/รายจ่าย'}</td>
-                    <td>${s.count} รายการ</td>
-                    <td style="text-align:right; font-family:monospace; font-weight:700; color:#047857;">${formatTHB(s.paid)}</td>
-                    <td style="text-align:right; font-family:monospace; font-weight:700; color:#be123c;">${formatTHB(s.unpaid)}</td>
-                </tr>
-            `).join('');
-        }
-
-        function renderInOutLedger() {
-            const tbody = document.getElementById('inout-table-body');
-            if (!tbody) return;
-            tbody.innerHTML = transactions.map(t => `
-                <tr>
-                    <td style="font-family:monospace; font-weight:700;">${t.id}</td>
-                    <td style="font-family:monospace;">${t.date}</td>
-                    <td>${t.type === 'Income' ? '🟢 รายรับ' : '🔴 รายจ่าย'}</td>
-                    <td>${t.desc}</td>
-                    <td style="font-weight:600;">${t.vendor}</td>
-                    <td style="text-align:right; font-family:monospace; font-weight:700;">${formatTHB(t.net)}</td>
-                    <td style="text-align:center;">${t.status === 'Paid' ? 'ชำระแล้ว' : 'รอชำระ'}</td>
-                </tr>
-            `).join('');
-        }
-
-        function saveManualEntryToLedger() {
-            const docNo = document.getElementById('m-doc-no').value || `SPS-INV/00${transactions.length + 1}`;
-            const vendor = document.getElementById('m-vendor').value.trim();
-            const desc = document.getElementById('m-desc').value.trim();
-            const type = document.getElementById('m-type').value;
-            const net = parseFloat(document.getElementById('m-net').value) || 0;
-            const date = document.getElementById('m-date').value || TODAY_DATE_STR;
-            const creditDays = parseInt(document.getElementById('m-credit-days').value) || 30;
-
-            if (!vendor || net <= 0) { alert('⚠️ กรุณากรอกชื่อคู่ค้าและยอดเงิน'); return; }
-
-            const dObj = parseDDMMYYYY(date);
-            dObj.setDate(dObj.getDate() + creditDays);
-            const dueDate = `${String(dObj.getDate()).padStart(2,'0')}/${String(dObj.getMonth()+1).padStart(2,'0')}/${dObj.getFullYear()}`;
-
-            transactions.unshift({
-                id: docNo, date, delivery_date: date, credit_days: creditDays, due_date: dueDate, type, desc: desc || "บันทึกด้วยตนเอง", vendor, before_vat: net, vat: 0, wht: 0, net, status: "Unpaid"
-            });
-
-            saveState();
-            renderLedger();
-            closeModal('manual-entry-modal');
-            alert(`✅ บันทึกรายการ [${docNo}] เรียบร้อยแล้ว!`);
-        }
-
-        function openPayment(txId) {
-            const t = transactions.find(x => x.id === txId);
-            if (!t) return;
-            document.getElementById('pay-tx-id').value = t.id;
-            document.getElementById('pay-doc-no').innerText = `${t.id} (${t.vendor}) - ${formatTHB(t.net)}`;
-            openModal('payment-modal');
-        }
-
-        function confirmPayment() {
-            const txId = document.getElementById('pay-tx-id').value;
-            const t = transactions.find(x => x.id === txId);
+        function markAsPaid(id) {
+            const t = transactions.find(x => x.id === id);
             if (t) {
                 t.status = "Paid";
-                t.pay_date = document.getElementById('pay-date').value || TODAY_DATE_STR;
-                saveState();
-                renderLedger();
-                closeModal('payment-modal');
-                alert(`🎉 แจ้งชำระเงินสำหรับ [${txId}] เรียบร้อยแล้ว!`);
+                saveData();
+                renderAll();
+                alert(`🎉 บันทึกการชำระเงินสำหรับรายการ [${id}] เรียบร้อยแล้ว!`);
             }
         }
 
-        async function syncPushToCloud(isManual = false) {
-            const dataObj = { namespace: STORAGE_PREFIX, transactions: transactions, lastUpdated: Date.now() };
-            try {
-                const res = await fetch(PUBLIC_CLOUD_RELAY_URL, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dataObj)
-                });
-                if (res.ok && isManual) alert(`📤 อัปโหลดข้อมูลคลาวด์สดสำเร็จ! (${transactions.length} รายการ)`);
-            } catch(e) {
-                if (isManual) alert(`⚠️ การเชื่อมต่อคลาวด์ขัดข้อง สามารถใช้ปุ่มคัดลอกรหัสข้อมูลส่งในไลน์แทนได้ครับ`);
+        function saveNewTransaction() {
+            const doc = document.getElementById('add-doc').value || `SPS-INV/00${transactions.length + 1}`;
+            const vendor = document.getElementById('add-vendor').value.trim();
+            const desc = document.getElementById('add-desc').value.trim();
+            const type = document.getElementById('add-type').value;
+            const net = parseFloat(document.getElementById('add-net').value) || 0;
+            const date = document.getElementById('add-date').value || "22/08/2026";
+
+            if (!vendor || net <= 0) {
+                alert('⚠️ กรุณากรอกชื่อคู่ค้าและยอดเงิน');
+                return;
             }
+
+            transactions.unshift({
+                id: doc, date, due_date: date, type, desc: desc || "รายการบันทึกใหม่", vendor, net, status: "Unpaid"
+            });
+
+            saveData();
+            renderAll();
+            closeModal('add-modal');
+            alert(`✅ เพิ่มรายการ [${doc}] เรียบร้อยแล้ว!`);
         }
 
-        async function syncPullFromCloud(isManual = false) {
+        function handleFileBackupSelect(evt) {
+            const file = evt.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                document.getElementById('backup-text-input').value = content;
+                document.getElementById('import-text').value = content;
+            };
+            reader.readAsText(file);
+        }
+
+        function processBackupTextImport() {
+            const raw = document.getElementById('backup-text-input').value.trim();
+            if (!raw) { alert('⚠️ กรุณาวางข้อความแบ็กอัพ หรืออัปโหลดไฟล์แบ็กอัพก่อนครับ'); return; }
             try {
-                const res = await fetch(PUBLIC_CLOUD_RELAY_URL);
-                if (res.ok) {
-                    const jsonRes = await res.json();
-                    if (jsonRes && jsonRes.transactions && Array.isArray(jsonRes.transactions) && jsonRes.transactions.length > 0) {
-                        transactions = jsonRes.transactions;
-                        saveState();
-                        renderLedger();
-                        if (isManual) alert(`📥 ดึงข้อมูลสำเร็จ! พบ ${transactions.length} รายการจากคลาวด์`);
-                    }
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    transactions = parsed;
+                    saveData();
+                    renderAll();
+                    alert(`🎉 นำเข้าข้อมูลสำเร็จ! โหลดข้อมูล ${transactions.length} รายการลงระบบแล้วครับ!`);
+                } else if (parsed && parsed.transactions && Array.isArray(parsed.transactions)) {
+                    transactions = parsed.transactions;
+                    saveData();
+                    renderAll();
+                    alert(`🎉 นำเข้าข้อมูลสำเร็จ! โหลดข้อมูล ${transactions.length} รายการลงระบบแล้วครับ!`);
+                } else {
+                    alert('❌ รูปแบบข้อมูลแบ็กอัพไม่ถูกต้อง กรุณาตรวจสอบรหัสแบ็กอัพของคุณ');
                 }
-            } catch(e) {}
+            } catch(err) {
+                alert('❌ เกิดข้อผิดพลาดในการอ่านรหัสแบ็กอัพ: ' + err.message);
+            }
         }
 
-        function copySystemDataCode() {
-            const codeStr = btoa(unescape(encodeURIComponent(JSON.stringify(transactions))));
-            navigator.clipboard.writeText(codeStr).then(() => {
-                alert("📋 คัดลอกรหัสข้อมูลเรียบร้อยแล้ว!\nนำรหัสนี้ไปส่งในแชท Line แล้วกดวางรหัสบนอีกเครื่องได้เลยครับ!");
+        function processModalImport() {
+            const raw = document.getElementById('import-text').value.trim();
+            if (!raw) { alert('⚠️ กรุณาวางข้อความแบ็กอัพ หรือเลือกไฟล์ก่อนครับ'); return; }
+            try {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) transactions = parsed;
+                else if (parsed.transactions) transactions = parsed.transactions;
+                saveData();
+                renderAll();
+                closeModal('import-modal');
+                alert(`🎉 กู้คืนข้อมูลสำเร็จ ${transactions.length} รายการ!`);
+            } catch(e) {
+                alert('❌ รูปแบบข้อมูลแบ็กอัพไม่ถูกต้อง');
+            }
+        }
+
+        function copyExportText() {
+            const txt = document.getElementById('export-text').value;
+            navigator.clipboard.writeText(txt).then(() => {
+                alert('📋 คัดลอกรหัสสำรองข้อมูลเรียบร้อยแล้ว!');
             }).catch(e => {
-                prompt("📋 คัดลอกรหัสข้อมูลด้านล่างนี้:", codeStr);
+                prompt('📋 คัดลอกรหัสแบ็กอัพด้านล่างนี้:', txt);
             });
         }
 
-        function askAIAdvisor() {
-            const input = document.getElementById('advisor-input').value.trim();
-            const res = document.getElementById('advisor-response');
-            res.style.display = 'block';
-            res.innerHTML = `<strong>🤖 AI SPS Advisor:</strong> <br>ระบบกำลังประมวลผลคำถามของคุณ "${input || 'ภาษีการเงิน'}"... <br><br>💡 <strong>คำแนะนำ:</strong> ในระบบภาษีไทย ใบกำกับภาษีซื้อต้องยื่น ภ.พ.30 ภายในวันที่ 15 ของเดือนถัดไป ส่วนภาษีหัก ณ ที่จ่าย (ภ.ง.ด.3/53) ยื่นภายในวันที่ 7 ของเดือนถัดไปครับ`;
+        function downloadBackupFile() {
+            const txt = JSON.stringify(transactions, null, 2);
+            const blob = new Blob([txt], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `SPS_ACCOUNT_BACKUP_${Date.now()}.json`;
+            a.click();
         }
 
         window.onload = function() {
-            const saved = localStorage.getItem(STORAGE_PREFIX + 'TRANSACTIONS');
+            const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -668,9 +584,9 @@
                 } catch(e) {}
             }
             if (!transactions || transactions.length === 0) {
-                transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+                transactions = JSON.parse(JSON.stringify(SAMPLE_TRANSACTIONS));
             }
-            renderLedger();
+            renderAll();
         };
     </script>
 </body>
