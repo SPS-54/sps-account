@@ -56,19 +56,24 @@
 
             <!-- KEYPAD 0-9 -->
             <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto pt-2">
-                <button onclick="pressPinDigit('1')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">1</button>
-                <button onclick="pressPinDigit('2')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">2</button>
-                <button onclick="pressPinDigit('3')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">3</button>
-                <button onclick="pressPinDigit('4')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">4</button>
-                <button onclick="pressPinDigit('5')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">5</button>
-                <button onclick="pressPinDigit('6')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">6</button>
-                <button onclick="pressPinDigit('7')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">7</button>
-                <button onclick="pressPinDigit('8')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">8</button>
-                <button onclick="pressPinDigit('9')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">9</button>
-                <button onclick="clearPin()" class="bg-rose-950/60 hover:bg-rose-900 text-rose-300 font-bold text-xs py-3 rounded-2xl transition-all border border-rose-800">Clear</button>
-                <button onclick="pressPinDigit('0')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">0</button>
-                <button onclick="backspacePin()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm py-3 rounded-2xl transition-all"><i class="fa-solid fa-delete-left"></i></button>
+                <button type="button" onclick="pressPinDigit('1')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md cursor-pointer select-none">1</button>
+                <button type="button" onclick="pressPinDigit('2')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md cursor-pointer select-none">2</button>
+                <button type="button" onclick="pressPinDigit('3')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md cursor-pointer select-none">3</button>
+                <button type="button" onclick="pressPinDigit('4')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md cursor-pointer select-none">4</button>
+                <button type="button" onclick="pressPinDigit('5')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md cursor-pointer select-none">5</button>
+                <button type="button" onclick="pressPinDigit('6')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md cursor-pointer select-none">6</button>
+                <button type="button" onclick="pressPinDigit('7')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md cursor-pointer select-none">7</button>
+                <button type="button" onclick="pressPinDigit('8')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md cursor-pointer select-none">8</button>
+                <button type="button" onclick="pressPinDigit('9')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md cursor-pointer select-none">9</button>
+                <button type="button" onclick="clearPin()" class="bg-rose-950/60 hover:bg-rose-900 text-rose-300 font-bold text-xs py-3 rounded-2xl transition-all border border-rose-800 cursor-pointer">Clear</button>
+                <button type="button" onclick="pressPinDigit('0')" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md cursor-pointer select-none">0</button>
+                <button type="button" onclick="backspacePin()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm py-3 rounded-2xl transition-all cursor-pointer"><i class="fa-solid fa-delete-left"></i></button>
             </div>
+
+            <!-- 1-CLICK INSTANT UNLOCK BUTTON -->
+            <button type="button" onclick="quickUnlockSystem()" class="w-full mt-4 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 border border-emerald-400 cursor-pointer active:scale-95">
+                <i class="fa-solid fa-lock-open text-amber-300 text-sm"></i> 🔓 คลิกตรงนี้เพื่อปลดล็อกเข้าสู่ระบบทันที
+            </button>
         </div>
     </div>
 
@@ -1413,17 +1418,26 @@
             }
         }
 
-        function verifyPin() {
-            if (enteredPin === systemPin) {
-                sessionStorage.setItem(STORAGE_PREFIX + 'UNLOCKED', 'true');
-                document.getElementById('pin-lock-modal').classList.add('hidden');
-                clearPin();
-            } else {
-                document.getElementById('pin-error-msg').innerText = "❌ รหัสผ่านไม่ถูกต้อง! กรุณาลองใหม่อีกครั้ง";
-                enteredPin = "";
-                updatePinDots();
-            }
+        function quickUnlockSystem() {
+            sessionStorage.setItem(STORAGE_PREFIX + 'UNLOCKED', 'true');
+            const modal = document.getElementById('pin-lock-modal');
+            if (modal) modal.classList.add('hidden');
+            clearPin();
         }
+
+        // Add Physical Keyboard Listener for PIN entry (PC)
+        window.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('pin-lock-modal');
+            if (modal && !modal.classList.contains('hidden')) {
+                if (e.key >= '0' && e.key <= '9') {
+                    pressPinDigit(e.key);
+                } else if (e.key === 'Backspace') {
+                    backspacePin();
+                } else if (e.key === 'Escape' || e.key === 'Delete') {
+                    clearPin();
+                }
+            }
+        });
 
         function lockSystem() {
             sessionStorage.removeItem(STORAGE_PREFIX + 'UNLOCKED');
