@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPS บัญชี-การเงิน V2 (AI Active Learning Scanner Engine)</title>
+    <title>SPS บัญชี-การเงิน V2 (Separate Paid Income & Expense Ledger)</title>
     <!-- Google Fonts Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
@@ -123,8 +123,8 @@
 
         <!-- STATUS BANNER -->
         <div class="banner">
-            <i class="fa-solid fa-file-pdf text-amber-400" style="font-size: 16px;"></i>
-            <span><strong>เพิ่มระบบดูและดาวน์โหลดเอกสารในเมนูคู่ค้า:</strong> สามารถคลิกดูเอกสารตัวจริง, ดาวน์โหลดไฟล์ใบเสร็จ/ใบสำคัญจ่าย และแนบไฟล์เอกสารสแกนได้ทันที!</span>
+            <i class="fa-solid fa-scale-balanced text-amber-400" style="font-size: 16px;"></i>
+            <span><strong>ปรับปรุงเมนูรายรับ-รายจ่าย:</strong> แยกตารางแสดงเฉพาะรายการรับชำระแล้วและจ่ายเงินแล้ว โดยเรียงข้อมูลตามลำดับเวลาจากอดีตมาปัจจุบันและอนาคต!</span>
         </div>
 
         <!-- NAVIGATION TABS -->
@@ -401,7 +401,7 @@
                         <thead>
                             <tr>
                                 <th>วันที่เอกสาร</th>
-                                <th>เลขที่เอกสาร</th>
+                                <th>เลขที่เอกสาร (กดเพื่อดู)</th>
                                 <th>ซัพพลายเออร์ / เจ้าหนี้</th>
                                 <th>รายละเอียด</th>
                                 <th>เครดิต (วันครบกำหนด)</th>
@@ -432,7 +432,7 @@
                         <thead>
                             <tr>
                                 <th>วันที่เอกสาร</th>
-                                <th>เลขที่เอกสาร</th>
+                                <th>เลขที่เอกสาร (กดเพื่อดู)</th>
                                 <th>ลูกค้า / ลูกหนี้</th>
                                 <th>รายละเอียด</th>
                                 <th>เครดิต (วันครบกำหนด)</th>
@@ -450,29 +450,73 @@
 
         </div>
 
-        <!-- TAB 5: INOUT VIEW -->
+        <!-- TAB 5: INOUT VIEW (SEPARATED PAID RECEIVABLES & PAYABLES TABLES) -->
         <div id="view-inout" class="tab-view" style="display: none;">
+            
+            <!-- TABLE 1: PAID INCOMES / RECEIVABLES -->
             <div class="content-box">
                 <div class="box-header">
-                    <div class="box-title"><i class="fa-solid fa-scale-balanced"></i> สรุปสมุดบัญชีรายรับ-รายจ่าย SPS V2</div>
+                    <div class="box-title" style="color: #047857;">
+                        <i class="fa-solid fa-circle-down text-emerald-600"></i> 🟢 ตารางรายการรายรับ (เฉพาะรับชำระเงินแล้ว) - เรียงจากอดีตไปปัจจุบันและอนาคต
+                    </div>
+                    <div id="inout-inc-summary" style="font-weight: 700; font-size: 13px; color: #047857; background: #d1fae5; padding: 4px 12px; border-radius: 12px;">
+                        รวม 0 รายการ (ยอดรับชำระแล้ว: ฿0.00)
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
+                                <th>วันที่เอกสาร</th>
                                 <th>เลขที่เอกสาร</th>
-                                <th>วันที่</th>
-                                <th>ประเภท</th>
+                                <th>ลูกค้า / รายรับ</th>
                                 <th>รายละเอียด</th>
-                                <th>คู่ค้า</th>
+                                <th>เครดิต (วันครบกำหนด)</th>
+                                <th style="text-align: right;">ก่อน VAT</th>
+                                <th style="text-align: right;">VAT 7%</th>
+                                <th style="text-align: right;">หัก ณ ที่จ่าย 3%</th>
                                 <th style="text-align: right;">ยอดเงินสุทธิ</th>
                                 <th style="text-align: center;">สถานะ</th>
+                                <th style="text-align: center;">เอกสารตัวจริง</th>
                             </tr>
                         </thead>
-                        <tbody id="inout-table-body"></tbody>
+                        <tbody id="inout-inc-table-body"></tbody>
                     </table>
                 </div>
             </div>
+
+            <!-- TABLE 2: PAID EXPENSES / PAYABLES -->
+            <div class="content-box">
+                <div class="box-header">
+                    <div class="box-title" style="color: #be123c;">
+                        <i class="fa-solid fa-circle-up text-rose-600"></i> 🔴 ตารางรายการรายจ่าย (เฉพาะจ่ายเงินแล้ว) - เรียงจากอดีตไปปัจจุบันและอนาคต
+                    </div>
+                    <div id="inout-exp-summary" style="font-weight: 700; font-size: 13px; color: #be123c; background: #ffe4e6; padding: 4px 12px; border-radius: 12px;">
+                        รวม 0 รายการ (ยอดจ่ายแล้ว: ฿0.00)
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>วันที่เอกสาร</th>
+                                <th>เลขที่เอกสาร</th>
+                                <th>เจ้าหนี้ / ซัพพลายเออร์</th>
+                                <th>รายละเอียด</th>
+                                <th>เครดิต (วันครบกำหนด)</th>
+                                <th style="text-align: right;">ก่อน VAT</th>
+                                <th style="text-align: right;">VAT 7%</th>
+                                <th style="text-align: right;">หัก ณ ที่จ่าย 3%</th>
+                                <th style="text-align: right;">ยอดเงินสุทธิ</th>
+                                <th style="text-align: center;">สถานะ</th>
+                                <th style="text-align: center;">เอกสารตัวจริง</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inout-exp-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
 
         <!-- TAB 6: FORECAST VIEW -->
@@ -776,7 +820,7 @@
                 } else {
                     tbodyDash.innerHTML = transactions.map(t => `
                         <tr>
-                            <td style="font-family:monospace; font-weight:bold; color:#4f46e5;">${t.id}</td>
+                            <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:bold; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
                             <td style="font-family:monospace;">${t.date}</td>
                             <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
                             <td style="font-family:monospace; font-weight:bold; color:#d97706;">${t.credit_days || 30} วัน</td>
@@ -824,7 +868,7 @@
                         let countdown = diffDays > 0 ? `<span class="badge-status badge-pending">เหลือ ${diffDays} วัน</span>` : `<span class="badge-status badge-overdue">เกินกำหนด ${Math.abs(diffDays)} วัน</span>`;
                         return `
                             <tr>
-                                <td style="font-family:monospace; font-weight:bold; color:#4f46e5;">${t.id}</td>
+                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:bold; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
                                 <td style="font-family:monospace; font-weight:bold; color:#047857; background:#d1fae5;">${t.due_date}</td>
                                 <td style="text-align:center;">${countdown}</td>
                                 <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
@@ -848,7 +892,7 @@
                         let countdown = diffDays > 0 ? `<span class="badge-status badge-pending">เหลือ ${diffDays} วัน</span>` : `<span class="badge-status badge-overdue">เกินกำหนด ${Math.abs(diffDays)} วัน</span>`;
                         return `
                             <tr>
-                                <td style="font-family:monospace; font-weight:bold; color:#4f46e5;">${t.id}</td>
+                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:bold; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
                                 <td style="font-family:monospace; font-weight:bold; color:#e11d48; background:#ffe4e6;">${t.due_date}</td>
                                 <td style="text-align:center;">${countdown}</td>
                                 <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
@@ -903,11 +947,11 @@
                         const isPaid = t.status === 'Paid';
                         const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
                         const docBtnIcon = t.file_data ? 'fa-file-lines' : 'fa-file-invoice';
-                        const docBtnLabel = t.file_data ? 'ดู/โหลดเอกสาร' : '📄 ใบสำคัญ/แนบ';
+                        const docBtnLabel = t.file_data ? 'ดู/โหลดเอกสาร' : '📄 ดู/โหลดเอกสาร';
                         return `
                             <tr>
                                 <td style="font-family:monospace; font-weight:600;">${t.date}</td>
-                                <td style="font-family:monospace; font-weight:700; color:#4f46e5;">${t.id}</td>
+                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
                                 <td style="font-weight:700; color:#0f172a;">${t.vendor}</td>
                                 <td>${t.desc}</td>
                                 <td style="font-family:monospace; font-size:11px;">${t.credit_days || 30} วัน (${t.due_date})</td>
@@ -932,11 +976,11 @@
                         const isPaid = t.status === 'Paid';
                         const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
                         const docBtnIcon = t.file_data ? 'fa-file-lines' : 'fa-file-invoice';
-                        const docBtnLabel = t.file_data ? 'ดู/โหลดเอกสาร' : '📄 ใบสำคัญ/แนบ';
+                        const docBtnLabel = t.file_data ? 'ดู/โหลดเอกสาร' : '📄 ดู/โหลดเอกสาร';
                         return `
                             <tr>
                                 <td style="font-family:monospace; font-weight:600;">${t.date}</td>
-                                <td style="font-family:monospace; font-weight:700; color:#4f46e5;">${t.id}</td>
+                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
                                 <td style="font-weight:700; color:#0f172a;">${t.vendor}</td>
                                 <td>${t.desc}</td>
                                 <td style="font-family:monospace; font-size:11px;">${t.credit_days || 30} วัน (${t.due_date})</td>
@@ -944,6 +988,89 @@
                                 <td style="text-align:right; font-family:monospace; font-weight:700; color:#d97706;">${!isPaid ? formatTHB(t.net) : '฿0.00'}</td>
                                 <td style="text-align:right; font-family:monospace; font-weight:700;">${formatTHB(t.net)}</td>
                                 <td style="text-align:center;">${isPaid ? '<span class="badge-status badge-paid">รับชำระแล้ว</span>' : '<span class="badge-status badge-pending">ค้างรับ</span>'}</td>
+                                <td style="text-align:center;">
+                                    <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            }
+        }
+
+        function renderInOutLedger() {
+            const tbodyInc = document.getElementById('inout-inc-table-body');
+            const tbodyExp = document.getElementById('inout-exp-table-body');
+            if (!tbodyInc && !tbodyExp) return;
+
+            // Only Paid transactions, sorted chronologically from past to present and onwards
+            const paidIncomes = transactions.filter(t => t.status === 'Paid' && t.type === 'Income').sort((a, b) => {
+                return parseDDMMYYYY(a.date || a.pay_date) - parseDDMMYYYY(b.date || b.pay_date);
+            });
+
+            const paidExpenses = transactions.filter(t => t.status === 'Paid' && t.type === 'Expense').sort((a, b) => {
+                return parseDDMMYYYY(a.date || a.pay_date) - parseDDMMYYYY(b.date || b.pay_date);
+            });
+
+            const totalIncNet = paidIncomes.reduce((a,b) => a + (b.net || 0), 0);
+            const totalExpNet = paidExpenses.reduce((a,b) => a + (b.net || 0), 0);
+
+            if (document.getElementById('inout-inc-summary')) {
+                document.getElementById('inout-inc-summary').innerText = `รวม ${paidIncomes.length} รายการ (รับชำระแล้ว: ${formatTHB(totalIncNet)})`;
+            }
+            if (document.getElementById('inout-exp-summary')) {
+                document.getElementById('inout-exp-summary').innerText = `รวม ${paidExpenses.length} รายการ (จ่ายเงินแล้ว: ${formatTHB(totalExpNet)})`;
+            }
+
+            if (tbodyInc) {
+                if (paidIncomes.length === 0) {
+                    tbodyInc.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายรับที่ชำระแล้ว</td></tr>`;
+                } else {
+                    tbodyInc.innerHTML = paidIncomes.map(t => {
+                        const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
+                        const docBtnIcon = t.file_data ? 'fa-file-lines' : 'fa-file-invoice';
+                        const docBtnLabel = t.file_data ? 'ดู/โหลดเอกสาร' : '📄 ดู/โหลดเอกสาร';
+                        return `
+                            <tr>
+                                <td style="font-family:monospace; font-weight:600;">${t.date}</td>
+                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
+                                <td style="font-weight:700; color:#0f172a;">${t.vendor}</td>
+                                <td>${t.desc}</td>
+                                <td style="font-family:monospace; font-size:11px;">${t.credit_days || 30} วัน (${t.due_date})</td>
+                                <td style="text-align:right; font-family:monospace;">${formatTHB(t.before_vat || t.net)}</td>
+                                <td style="text-align:right; font-family:monospace;">${formatTHB(t.vat || 0)}</td>
+                                <td style="text-align:right; font-family:monospace; color:#be123c;">-${formatTHB(t.wht || 0)}</td>
+                                <td style="text-align:right; font-family:monospace; font-weight:700; color:#047857;">${formatTHB(t.net)}</td>
+                                <td style="text-align:center;"><span class="badge-status badge-paid">รับชำระแล้ว</span></td>
+                                <td style="text-align:center;">
+                                    <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            }
+
+            if (tbodyExp) {
+                if (paidExpenses.length === 0) {
+                    tbodyExp.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายจ่ายที่จ่ายแล้ว</td></tr>`;
+                } else {
+                    tbodyExp.innerHTML = paidExpenses.map(t => {
+                        const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
+                        const docBtnIcon = t.file_data ? 'fa-file-lines' : 'fa-file-invoice';
+                        const docBtnLabel = t.file_data ? 'ดู/โหลดเอกสาร' : '📄 ดู/โหลดเอกสาร';
+                        return `
+                            <tr>
+                                <td style="font-family:monospace; font-weight:600;">${t.date}</td>
+                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
+                                <td style="font-weight:700; color:#0f172a;">${t.vendor}</td>
+                                <td>${t.desc}</td>
+                                <td style="font-family:monospace; font-size:11px;">${t.credit_days || 30} วัน (${t.due_date})</td>
+                                <td style="text-align:right; font-family:monospace;">${formatTHB(t.before_vat || t.net)}</td>
+                                <td style="text-align:right; font-family:monospace;">${formatTHB(t.vat || 0)}</td>
+                                <td style="text-align:right; font-family:monospace; color:#be123c;">-${formatTHB(t.wht || 0)}</td>
+                                <td style="text-align:right; font-family:monospace; font-weight:700; color:#be123c;">${formatTHB(t.net)}</td>
+                                <td style="text-align:center;"><span class="badge-status badge-paid">ชำระแล้ว</span></td>
                                 <td style="text-align:center;">
                                     <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
                                 </td>
@@ -1094,26 +1221,6 @@
                 }
             };
             reader.readAsDataURL(file);
-        }
-
-        function renderInOutLedger() {
-            const tbody = document.getElementById('inout-table-body');
-            if (!tbody) return;
-            if (transactions.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:#64748b;">📭 ยังไม่มีข้อมูลรายรับ-รายจ่าย</td></tr>`;
-            } else {
-                tbody.innerHTML = transactions.map(t => `
-                    <tr>
-                        <td style="font-family:monospace; font-weight:700;">${t.id}</td>
-                        <td style="font-family:monospace;">${t.date}</td>
-                        <td>${t.type === 'Income' ? '🟢 รายรับ' : '🔴 รายจ่าย'}</td>
-                        <td>${t.desc}</td>
-                        <td style="font-weight:600;">${t.vendor}</td>
-                        <td style="text-align:right; font-family:monospace; font-weight:700;">${formatTHB(t.net)}</td>
-                        <td style="text-align:center;">${t.status === 'Paid' ? 'ชำระแล้ว' : 'รอชำระ'}</td>
-                    </tr>
-                `).join('');
-            }
         }
 
         function renderAIMemoryTable() {
