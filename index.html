@@ -1082,6 +1082,7 @@
                     else nav.classList.remove('active');
                 }
             });
+            try { localStorage.setItem(STORAGE_PREFIX + 'ACTIVE_TAB', tabId); } catch(e) {}
             renderLedger();
         }
 
@@ -1095,10 +1096,12 @@
             if (m) m.classList.remove('active');
         }
 
-        /* 100% AUTOMATIC CLOUD SYNC ENGINE */
+        /* 100% SAFE AUTOMATIC CLOUD & LOCAL STORAGE SYNC ENGINE */
         function saveState(skipCloudPush = false) {
             try {
-                lastLocalUpdate = Date.now();
+                if (!lastLocalUpdate || lastLocalUpdate === 0) {
+                    lastLocalUpdate = Date.now();
+                }
                 localStorage.setItem(STORAGE_PREFIX + 'TRANSACTIONS', JSON.stringify(transactions));
                 localStorage.setItem(STORAGE_PREFIX + 'VENDOR_MEMORY', JSON.stringify(vendorMemory));
                 localStorage.setItem(STORAGE_PREFIX + 'LAST_UPDATED', lastLocalUpdate.toString());
@@ -1151,7 +1154,12 @@
                         const cloudTime = cloudData.lastUpdated || 0;
                         const localTime = parseInt(localStorage.getItem(STORAGE_PREFIX + 'LAST_UPDATED') || '0');
 
-                        if (cloudTime > localTime) {
+                        // SAFEGUARD 1: If local has transactions and cloud has zero transactions, DO NOT overwrite local data with empty cloud data!
+                        if (transactions.length > 0 && cloudData.transactions.length === 0) {
+                            await autoPushToCloud();
+                        }
+                        // SAFEGUARD 2: Only overwrite local if cloud is NEWER AND cloud has data (or local is currently empty)
+                        else if (cloudTime > localTime && (cloudData.transactions.length > 0 || transactions.length === 0)) {
                             transactions = cloudData.transactions;
                             if (cloudData.vendorMemory) vendorMemory = cloudData.vendorMemory;
                             lastLocalUpdate = cloudTime;
@@ -1161,9 +1169,12 @@
 
                             const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                             if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down"></i> 🟢 อัปเดตข้อมูลจากอุปกรณ์อื่นแล้ว (${nowStr})`;
-                        } else if (localTime > cloudTime) {
+                        } 
+                        // SAFEGUARD 3: If local has newer/equal data or cloud is outdated
+                        else if (localTime > cloudTime || (transactions.length > 0 && cloudTime <= localTime)) {
                             await autoPushToCloud();
-                        } else {
+                        } 
+                        else {
                             const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                             if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> 🟢 ข้อมูลตรงกัน 100% (${nowStr})`;
                         }
@@ -1340,6 +1351,7 @@
                 id: docNo, date, delivery_date: date, credit_days: creditDays, due_date: dueDate, type, desc: desc || "สแกนด้วย AI OCR", vendor, before_vat, vat, wht, net, status: "Unpaid", file_data: fileData
             });
 
+            lastLocalUpdate = Date.now();
             saveState();
             renderLedger();
             document.getElementById('ocr-preview-box').style.display = 'none';
@@ -2110,6 +2122,7 @@
                 const t = transactions.find(x => x.id === txId);
                 if (t) {
                     t.file_data = e.target.result;
+                    lastLocalUpdate = Date.now();
                     saveState();
                     renderLedger();
                     viewDocumentModal(txId);
@@ -2329,6 +2342,7 @@
                 id: docNo, date, delivery_date: date, credit_days: creditDays, due_date: dueDate, type, desc: desc || "บันทึกด้วยตนเอง", vendor, before_vat: net, vat: 0, wht: 0, net, status: "Unpaid"
             });
 
+            lastLocalUpdate = Date.now();
             saveState();
             renderLedger();
             closeModal('manual-entry-modal');
@@ -2349,6 +2363,7 @@
             if (t) {
                 t.status = "Paid";
                 t.pay_date = document.getElementById('pay-date').value || TODAY_DATE_STR;
+                lastLocalUpdate = Date.now();
                 saveState();
                 renderLedger();
                 closeModal('payment-modal');
@@ -2393,11 +2408,13 @@
                 const parsed = JSON.parse(raw);
                 if (Array.isArray(parsed)) {
                     transactions = parsed;
+                    lastLocalUpdate = Date.now();
                     saveState();
                     renderLedger();
                     alert(`🎉 กู้คืนข้อมูลสำเร็จ! โหลดข้อมูล ${transactions.length} รายการลงระบบแล้วครับ! (ซิงก์คลาวด์สดอัตโนมัติ)`);
                 } else if (parsed && parsed.transactions && Array.isArray(parsed.transactions)) {
                     transactions = parsed.transactions;
+                    lastLocalUpdate = Date.now();
                     saveState();
                     renderLedger();
                     alert(`🎉 กู้คืนข้อมูลสำเร็จ! โหลดข้อมูล ${transactions.length} รายการลงระบบแล้วครับ! (ซิงก์คลาวด์สดอัตโนมัติ)`);
@@ -2432,7 +2449,14 @@
                 try { transactions = JSON.parse(saved); } catch(e) { transactions = []; }
             } else {
                 transactions = [];
-                saveState(true);
+            }
+
+            const savedTime = localStorage.getItem(STORAGE_PREFIX + 'LAST_UPDATED');
+            if (savedTime) {
+                lastLocalUpdate = parseInt(savedTime) || Date.now();
+            } else {
+                lastLocalUpdate = Date.now();
+                localStorage.setItem(STORAGE_PREFIX + 'LAST_UPDATED', lastLocalUpdate.toString());
             }
 
             const savedMem = localStorage.getItem(STORAGE_PREFIX + 'VENDOR_MEMORY');
@@ -2443,11 +2467,13 @@
                 } catch(e) {}
             }
 
+            const activeTab = localStorage.getItem(STORAGE_PREFIX + 'ACTIVE_TAB') || 'dashboard';
+
             initOCRDragAndDrop();
             updateGlobalYearOptions();
-            renderLedger();
+            switchTab(activeTab);
 
-            // 1. Initial Auto Pull from Cloud immediately on load
+            // 1. Initial Auto Pull from Cloud immediately on load (safely)
             autoSyncFromCloud();
 
             // 2. Periodic Auto Heartbeat Poll every 6 seconds
