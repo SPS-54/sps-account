@@ -143,7 +143,7 @@
                     <i class="fa-solid fa-filter text-indigo-600" style="font-size: 18px;"></i>
                     <div>
                         <div style="font-weight: 700; font-size: 14px; color: #0f172a;">📅 ตัวกรองข้อมูลภาพรวมทั้งระบบ (Global Date Filter)</div>
-                        <div style="font-size: 11px; color: #64748b;">เลือกดูข้อมูลบัญชีแยกตามรายเดือน รายปี หรือดูข้อมูลรวมทั้งหมด (แสดงผลย้อนหลัง/ล่วงหน้าอัตโนมัติ)</div>
+                        <div style="font-size: 11px; color: #64748b;">เลือกดูข้อมูลบัญชีแยกตามรายเดือน รายปี หรือดูข้อมูลรวมทั้งหมด (ตารางรอรับ/รอจ่ายยึดวันครบกำหนดเป็นหลัก)</div>
                     </div>
                 </div>
 
@@ -497,7 +497,7 @@
             <div class="content-box">
                 <div class="box-header">
                     <div class="box-title" style="color: #047857;">
-                        <i class="fa-solid fa-circle-down text-emerald-600"></i> 🟢 ตารางรายการรอรับเงิน (Pending Receivables) - เรียงจากวันใกล้ที่สุด
+                        <i class="fa-solid fa-circle-down text-emerald-600"></i> 🟢 ตารางรายการรอรับเงิน (Pending Receivables) - ยึดตามวันครบกำหนดชำระ
                     </div>
                     <div id="pending-inc-summary" style="font-weight: 700; font-size: 13px; color: #047857; background: #d1fae5; padding: 4px 12px; border-radius: 12px;">
                         รวม 0 รายการ (฿0.00)
@@ -527,7 +527,7 @@
             <div class="content-box">
                 <div class="box-header">
                     <div class="box-title" style="color: #be123c;">
-                        <i class="fa-solid fa-circle-up text-rose-600"></i> 🔴 ตารางรายการรอจ่ายเงิน (Pending Payables) - เรียงจากวันใกล้ที่สุด
+                        <i class="fa-solid fa-circle-up text-rose-600"></i> 🔴 ตารางรายการรอจ่ายเงิน (Pending Payables) - ยึดตามวันครบกำหนดชำระ
                     </div>
                     <div id="pending-exp-summary" style="font-weight: 700; font-size: 13px; color: #be123c; background: #ffe4e6; padding: 4px 12px; border-radius: 12px;">
                         รวม 0 รายการ (฿0.00)
@@ -1030,13 +1030,19 @@
             return new Date(0);
         }
 
-        /* GLOBAL DATE FILTER ENGINE */
-        function getFilteredTransactions() {
+        /* GLOBAL DATE FILTER ENGINE (SUPPORTING DUE DATE FILTERING FOR PENDING ITEMS) */
+        function getFilteredTransactions(useDueDate = false) {
             const monthVal = document.getElementById('global-filter-month')?.value || 'ALL';
             const yearVal = document.getElementById('global-filter-year')?.value || 'ALL';
 
             return transactions.filter(t => {
-                const dateStr = t.date || t.due_date || '';
+                let dateStr = '';
+                if (useDueDate && t.due_date) {
+                    dateStr = t.due_date;
+                } else {
+                    dateStr = t.date || t.due_date || '';
+                }
+
                 if (!dateStr || !dateStr.includes('/')) return true;
                 const parts = dateStr.split('/');
                 if (parts.length < 3) return true;
@@ -1064,13 +1070,14 @@
 
             const yearsSet = new Set(['2026', '2025', '2027']);
             transactions.forEach(t => {
-                const dStr = t.date || t.due_date || '';
-                if (dStr.includes('/')) {
-                    const parts = dStr.split('/');
-                    if (parts.length === 3 && parts[2].length === 4) {
-                        yearsSet.add(parts[2]);
+                [t.date, t.due_date].forEach(dStr => {
+                    if (dStr && dStr.includes('/')) {
+                        const parts = dStr.split('/');
+                        if (parts.length === 3 && parts[2].length === 4) {
+                            yearsSet.add(parts[2]);
+                        }
                     }
-                }
+                });
             });
 
             const sortedYears = Array.from(yearsSet).sort((a, b) => parseInt(a) - parseInt(b));
@@ -1314,7 +1321,12 @@
         function renderLedger() {
             const monthVal = document.getElementById('global-filter-month')?.value || 'ALL';
             const yearVal = document.getElementById('global-filter-year')?.value || 'ALL';
-            const activeTxs = getFilteredTransactions();
+            
+            // GENERAL LEDGER FILTER (BY DOCUMENT DATE)
+            const activeTxs = getFilteredTransactions(false);
+            
+            // PENDING LEDGER FILTER (BY DUE DATE - วันครบกำหนดชำระ)
+            const activePendingTxs = getFilteredTransactions(true);
 
             // UPDATE STATUS BADGE IN FILTER BAR
             const badge = document.getElementById('global-filter-badge');
@@ -1329,13 +1341,13 @@
                 if (monthVal === 'ALL' && yearVal === 'ALL') {
                     badge.className = 'badge-status badge-paid';
                     badge.innerText = `🟢 แสดงข้อมูลรวมทั้งหมด (${activeTxs.length} รายการ)`;
-                    summaryText.innerText = `แสดงรายการบัญชีทั้งหมดในระบบ (ไม่จำกัดช่วงเวลา)`;
+                    summaryText.innerText = `แสดงรายการบัญชีทั้งหมดในระบบ (ตารางรอรับ/รอจ่ายยึดวันครบกำหนดเป็นหลัก)`;
                 } else {
                     const mLabel = monthVal !== 'ALL' ? (monthNames[monthVal] || `เดือน ${monthVal}`) : 'ทุกเดือน';
                     const yLabel = yearVal !== 'ALL' ? `ปี ${yearVal}` : 'ทุกปี';
                     badge.className = 'badge-status badge-pending';
                     badge.innerText = `🔍 กรองเฉพาะ: ${mLabel} ${yLabel} (พบ ${activeTxs.length}/${transactions.length} รายการ)`;
-                    summaryText.innerText = `กำลังแสดงผลเฉพาะรายการบัญชีประจำ ${mLabel} ${yLabel}`;
+                    summaryText.innerText = `กำลังแสดงผลรายการประจำ ${mLabel} ${yLabel} (ตารางรอรับ/รอจ่ายยึดวันครบกำหนด)`;
                 }
             }
 
@@ -1344,7 +1356,7 @@
             let profit = inc - exp;
             let profitMargin = inc > 0 ? ((profit / inc) * 100).toFixed(1) : "0.0";
             
-            let allPending = activeTxs.filter(t => t.status !== 'Paid');
+            let allPending = activePendingTxs.filter(t => t.status !== 'Paid');
             let pendingTotal = allPending.reduce((a,b) => a + (b.net || 0), 0);
 
             if (document.getElementById('kpi-income')) document.getElementById('kpi-income').innerText = formatTHB(inc);
@@ -1352,7 +1364,7 @@
             if (document.getElementById('kpi-profit')) document.getElementById('kpi-profit').innerText = formatTHB(profit);
             if (document.getElementById('kpi-margin')) document.getElementById('kpi-margin').innerText = `Profit Margin: ${profitMargin}%`;
             if (document.getElementById('kpi-pending-total')) document.getElementById('kpi-pending-total').innerText = formatTHB(pendingTotal);
-            if (document.getElementById('kpi-pending-count')) document.getElementById('kpi-pending-count').innerText = `${allPending.length} รายการค้างชำระ`;
+            if (document.getElementById('kpi-pending-count')) document.getElementById('kpi-pending-count').innerText = `${allPending.length} รายการค้างชำระ (ยึดวันครบกำหนด)`;
 
             const tbodyDash = document.getElementById('ledger-table-body');
             if (tbodyDash) {
@@ -1383,11 +1395,12 @@
             const tbodyPendingInc = document.getElementById('pending-inc-table-body');
             const tbodyPendingExp = document.getElementById('pending-exp-table-body');
 
-            const pendingIncomes = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Income').sort((a, b) => {
+            // PENDING TABLES USE activePendingTxs (FILTERED BY DUE DATE)
+            const pendingIncomes = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Income').sort((a, b) => {
                 return parseDDMMYYYY(a.due_date || a.date) - parseDDMMYYYY(b.due_date || b.date);
             });
 
-            const pendingExpenses = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense').sort((a, b) => {
+            const pendingExpenses = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense').sort((a, b) => {
                 return parseDDMMYYYY(a.due_date || a.date) - parseDDMMYYYY(b.due_date || b.date);
             });
 
@@ -1415,7 +1428,7 @@
 
             if (tbodyPendingInc) {
                 if (pendingIncomes.length === 0) {
-                    tbodyPendingInc.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอรับเงินในขณะนี้ (หรือไม่มีตรงตามตัวกรอง)</td></tr>`;
+                    tbodyPendingInc.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอรับเงินครบกำหนดในเดือน/ปีนี้</td></tr>`;
                 } else {
                     tbodyPendingInc.innerHTML = pendingIncomes.map(t => {
                         const diffDays = Math.ceil((parseDDMMYYYY(t.due_date).getTime() - today.getTime()) / (1000 * 3600 * 24));
@@ -1439,7 +1452,7 @@
 
             if (tbodyPendingExp) {
                 if (pendingExpenses.length === 0) {
-                    tbodyPendingExp.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอจ่ายเงินในขณะนี้ (หรือไม่มีตรงตามตัวกรอง)</td></tr>`;
+                    tbodyPendingExp.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอจ่ายเงินครบกำหนดในเดือน/ปีนี้</td></tr>`;
                 } else {
                     tbodyPendingExp.innerHTML = pendingExpenses.map(t => {
                         const diffDays = Math.ceil((parseDDMMYYYY(t.due_date).getTime() - today.getTime()) / (1000 * 3600 * 24));
@@ -1469,7 +1482,7 @@
             try { renderCashflowChart(); } catch(e) {}
         }
 
-        /* DYNAMIC AI LIQUIDITY ALERT & RECOMMENDATIONS ENGINE (WITH DATE FILTER INTEGRATION) */
+        /* DYNAMIC AI LIQUIDITY ALERT & RECOMMENDATIONS ENGINE */
         function updateAILiquidityAlertsAndRecommendations() {
             const initCashInput = document.getElementById('forecast-init-cash');
             const minReserveInput = document.getElementById('forecast-min-reserve');
@@ -1481,10 +1494,10 @@
             const totalPeriods = months * 6; // 6 periods per month (5-day steps) = 90 days total for 3 months
 
             const today = parseDDMMYYYY(TODAY_DATE_STR);
-            const activeTxs = getFilteredTransactions();
+            const activePendingTxs = getFilteredTransactions(true); // Base on DUE DATE for pending items
 
-            const pendingInc = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
-            const pendingExp = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+            const pendingInc = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
 
             const overdueInc = pendingInc.filter(t => parseDDMMYYYY(t.due_date).getTime() < today.getTime());
             const overdueExp = pendingExp.filter(t => parseDDMMYYYY(t.due_date).getTime() < today.getTime());
@@ -1566,7 +1579,7 @@
                 if (score >= 75) {
                     scoreBar.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
                     scoreBadge.className = 'badge-status badge-paid';
-                    scoreBadge.innerText = '🟢 แข็งแกร่ง';
+                    scoreBadge.innerText = '🟢 ดีเยี่ยม';
                 } else if (score >= 50) {
                     scoreBar.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
                     scoreBadge.className = 'badge-status badge-pending';
@@ -1591,6 +1604,7 @@
             }
 
             // 4 ACTIONABLE AI RECOMMENDATIONS
+            const activeGenTxs = getFilteredTransactions(false);
             const recInc = document.getElementById('ai-rec-receivables');
             if (recInc) {
                 if (overdueInc.length > 0) {
@@ -1629,27 +1643,26 @@
 
             const recTax = document.getElementById('ai-rec-tax');
             if (recTax) {
-                const vatSales = activeTxs.filter(t => t.status === 'Paid' && t.type === 'Income').reduce((a,b) => a + (b.vat||0), 0);
-                const vatBuys = activeTxs.filter(t => t.status === 'Paid' && t.type === 'Expense').reduce((a,b) => a + (b.vat||0), 0);
+                const vatSales = activeGenTxs.filter(t => t.status === 'Paid' && t.type === 'Income').reduce((a,b) => a + (b.vat||0), 0);
+                const vatBuys = activeGenTxs.filter(t => t.status === 'Paid' && t.type === 'Expense').reduce((a,b) => a + (b.vat||0), 0);
                 const vatNet = vatSales - vatBuys;
-                const whtTotal = activeTxs.filter(t => t.status === 'Paid').reduce((a,b) => a + (b.wht||0), 0);
+                const whtTotal = activeGenTxs.filter(t => t.status === 'Paid').reduce((a,b) => a + (b.wht||0), 0);
 
                 recTax.innerHTML = `📌 <strong>กระทบยอดภาษีสะสม:</strong> ภาษีซื้อ ${formatTHB(vatBuys)} | หัก ณ ที่จ่ายสะสม ${formatTHB(whtTotal)}<br>💡 <strong>คำแนะนำ AI:</strong> ${vatNet < 0 ? `ยื่นขอคืนภาษีซื้อ ภ.พ.30 จำนวน <strong>${formatTHB(Math.abs(vatNet))}</strong> เพื่อเปลี่ยนเป็นกระแสเงินสดรับกลับเข้าบริษัท` : `จัดเตรียมเงินสด ${formatTHB(vatNet)} สำหรับยื่น ภ.พ.30 ภายในวันที่ 15`}`;
             }
         }
 
         function openAIEmergencyPlanModal() {
-            const today = parseDDMMYYYY(TODAY_DATE_STR);
-            const activeTxs = getFilteredTransactions();
-            const pendingInc = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
-            const pendingExp = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+            const activePendingTxs = getFilteredTransactions(true);
+            const pendingInc = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
 
             const container = document.getElementById('ai-emergency-plan-content');
             if (!container) return;
 
             let html = `
                 <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; padding: 12px; border-radius: 8px;">
-                    <div style="font-weight: 700; color: #34d399; font-size: 13px;">1. เร่งรัดทวงถามลูกหนี้ 3 รายแรก (เพิ่มเงินสดทันที)</div>
+                    <div style="font-weight: 700; color: #34d399; font-size: 13px;">1. เร่งรัดทวงถามลูกหนี้ 3 รายแรก (ยึดตามวันครบกำหนด)</div>
                     <ul style="margin-top: 6px; padding-left: 18px; line-height: 1.6;">
             `;
 
@@ -1658,7 +1671,7 @@
                     html += `<li><strong>${t.vendor}</strong> (ยอด ${formatTHB(t.net)}) — กำหนดชำระ: ${t.due_date}</li>`;
                 });
             } else {
-                html += `<li>ไม่มีรายการลูกหนี้ค้างชำระ</li>`;
+                html += `<li>ไม่มีรายการลูกหนี้ค้างชำระในเดือน/ปีนี้</li>`;
             }
 
             html += `
@@ -1666,16 +1679,16 @@
                 </div>
 
                 <div style="background: rgba(244, 63, 94, 0.1); border-left: 4px solid #f43f5e; padding: 12px; border-radius: 8px;">
-                    <div style="font-weight: 700; color: #fb7185; font-size: 13px;">2. เจรจาชะลอหรือแบ่งจ่ายเจ้าหนี้ 3 รายแรก (สงวนเงินสด)</div>
+                    <div style="font-weight: 700; color: #fb7185; font-size: 13px;">2. เจรจาชะลอหรือแบ่งจ่ายเจ้าหนี้ 3 รายแรก (ยึดตามวันครบกำหนด)</div>
                     <ul style="margin-top: 6px; padding-left: 18px; line-height: 1.6;">
             `;
 
             if (pendingExp.length > 0) {
                 pendingExp.slice(0, 3).forEach(t => {
-                    html += `<li><strong>${t.vendor}</strong> (ยอด ${formatTHB(t.net)}) — ขอขยายเครดิตเพิ่ม 15 วัน</li>`;
+                    html += `<li><strong>${t.vendor}</strong> (ยอด ${formatTHB(t.net)}) — ครบกำหนด ${t.due_date} (ขอขยายเครดิตเพิ่ม 15 วัน)</li>`;
                 });
             } else {
-                html += `<li>ไม่มีภาระเจ้าหนี้ค้างจ่าย</li>`;
+                html += `<li>ไม่มีภาระเจ้าหนี้ค้างจ่ายในเดือน/ปีนี้</li>`;
             }
 
             html += `
@@ -1697,14 +1710,14 @@
         function copyAIReportToClipboard() {
             const initCash = parseFloat(document.getElementById('forecast-init-cash')?.value) || 100000;
             const minReserve = parseFloat(document.getElementById('forecast-min-reserve')?.value) || 50000;
-            const activeTxs = getFilteredTransactions();
-            const pendingInc = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
-            const pendingExp = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+            const activePendingTxs = getFilteredTransactions(true);
+            const pendingInc = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
             
             const incTotal = pendingInc.reduce((a,b) => a + (b.net || 0), 0);
             const expTotal = pendingExp.reduce((a,b) => a + (b.net || 0), 0);
 
-            const reportStr = `🧠 [รายงานการประมวลผลสภาพคล่อง 3 เดือน & คำแนะนำ AI SPS V2]\nวันที่: ${TODAY_DATE_STR}\n------------------------------\n💰 เงินสดเริ่มต้น: ${formatTHB(initCash)}\n🟢 ยอดรอรับเงินรวม: ${formatTHB(incTotal)} (${pendingInc.length} รายการ)\n🔴 ยอดรอจ่ายเงินรวม: ${formatTHB(expTotal)} (${pendingExp.length} รายการ)\n🛡️ เกณฑ์เงินสดสำรองขั้นต่ำ: ${formatTHB(minReserve)}\n------------------------------\n💡 คำแนะนำ AI:\n1. เร่งรัดลูกหนี้ค้างชำระเพื่อเพิ่มกระแสเงินสดรับเข้า\n2. จัดลำดับความสำคัญจ่ายชำระเจ้าหนี้ตามวันครบกำหนด\n3. รักษาระดับเงินสดสำรองให้ปลอดภัยเสมอ!`;
+            const reportStr = `🧠 [รายงานการประมวลผลสภาพคล่อง 3 เดือน & คำแนะนำ AI SPS V2]\nวันที่: ${TODAY_DATE_STR}\n------------------------------\n💰 เงินสดเริ่มต้น: ${formatTHB(initCash)}\n🟢 ยอดรอรับเงินรวม (ตามวันครบกำหนด): ${formatTHB(incTotal)} (${pendingInc.length} รายการ)\n🔴 ยอดรอจ่ายเงินรวม (ตามวันครบกำหนด): ${formatTHB(expTotal)} (${pendingExp.length} รายการ)\n🛡️ เกณฑ์เงินสดสำรองขั้นต่ำ: ${formatTHB(minReserve)}\n------------------------------\n💡 คำแนะนำ AI:\n1. เร่งรัดลูกหนี้ค้างชำระเพื่อเพิ่มกระแสเงินสดรับเข้า\n2. จัดลำดับความสำคัญจ่ายชำระเจ้าหนี้ตามวันครบกำหนด\n3. รักษาระดับเงินสดสำรองให้ปลอดภัยเสมอ!`;
 
             navigator.clipboard.writeText(reportStr).then(() => {
                 alert("📋 คัดลอกรายงานคำแนะนำ AI สภาพคล่องเรียบร้อยแล้ว!\nนำไปกดวางส่งในแชท Line ผู้บริหารได้เลยครับ!");
@@ -1714,19 +1727,19 @@
         }
 
         function copyAIEmergencyPlanToClipboard() {
-            const activeTxs = getFilteredTransactions();
-            const pendingInc = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
-            const pendingExp = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+            const activePendingTxs = getFilteredTransactions(true);
+            const pendingInc = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
             
-            let planText = `⚡ [แผนปฏิบัติการแก้สภาพคล่องฉุกเฉิน AI SPS V2 (3 เดือน)]\nวันที่: ${TODAY_DATE_STR}\n------------------------------\n1. เร่งรัดทวงถามลูกหนี้ 3 รายแรก:\n`;
+            let planText = `⚡ [แผนปฏิบัติการแก้สภาพคล่องฉุกเฉิน AI SPS V2 (3 เดือน)]\nวันที่: ${TODAY_DATE_STR}\n------------------------------\n1. เร่งรัดทวงถามลูกหนี้ 3 รายแรก (ยึดตามวันครบกำหนด):\n`;
             if (pendingInc.length > 0) {
-                pendingInc.slice(0, 3).forEach(t => { planText += `- ${t.vendor} (${formatTHB(t.net)})\n`; });
-            } else { planText += `- ไม่มีลูกหนี้ค้างชำระ\n`; }
+                pendingInc.slice(0, 3).forEach(t => { planText += `- ${t.vendor} (${formatTHB(t.net)}) | กำหนดชำระ: ${t.due_date}\n`; });
+            } else { planText += `- ไม่มีลูกหนี้ค้างชำระในเดือน/ปีนี้\n`; }
 
-            planText += `\n2. เจรจาชะลอหรือขยายเครดิตเจ้าหนี้ 3 รายแรก:\n`;
+            planText += `\n2. เจรจาชะลอหรือขยายเครดิตเจ้าหนี้ 3 รายแรก (ยึดตามวันครบกำหนด):\n`;
             if (pendingExp.length > 0) {
-                pendingExp.slice(0, 3).forEach(t => { planText += `- ${t.vendor} (${formatTHB(t.net)})\n`; });
-            } else { planText += `- ไม่มีเจ้าหนี้ค้างจ่าย\n`; }
+                pendingExp.slice(0, 3).forEach(t => { planText += `- ${t.vendor} (${formatTHB(t.net)}) | กำหนดชำระ: ${t.due_date}\n`; });
+            } else { planText += `- ไม่มีเจ้าหนี้ค้างจ่ายในเดือน/ปีนี้\n`; }
 
             planText += `------------------------------\n🎯 เป้าหมาย: ดึงเงินสดเข้าทันทีและชะลอรายจ่ายเพื่อรักษาสภาพคล่อง 100%!`;
 
@@ -1742,7 +1755,7 @@
             const tbodyCustomer = document.getElementById('supplier-inc-table-body');
             if (!tbodyCreditor && !tbodyCustomer) return;
 
-            const activeTxs = getFilteredTransactions();
+            const activeTxs = getFilteredTransactions(false);
 
             const expTxs = activeTxs.filter(t => t.type === 'Expense').sort((a, b) => {
                 return parseDDMMYYYY(a.date || a.due_date) - parseDDMMYYYY(b.date || b.due_date);
@@ -1841,7 +1854,7 @@
             const tbodyExp = document.getElementById('inout-exp-table-body');
             if (!tbodyInc && !tbodyExp) return;
 
-            const activeTxs = getFilteredTransactions();
+            const activeTxs = getFilteredTransactions(false);
 
             const paidIncomes = activeTxs.filter(t => t.status === 'Paid' && t.type === 'Income').sort((a, b) => {
                 return parseDDMMYYYY(a.date || a.pay_date) - parseDDMMYYYY(b.date || b.pay_date);
@@ -2096,7 +2109,7 @@
         function renderDashboardCharts() {
             if (typeof Chart === 'undefined') return;
 
-            const activeTxs = getFilteredTransactions();
+            const activeTxs = getFilteredTransactions(false);
 
             const expTxs = activeTxs.filter(t => t.type === 'Expense');
             const catMap = {};
@@ -2139,7 +2152,7 @@
             const totalPeriods = months * 6; // 6 periods per month = 18 periods for 3 months (90 days)
 
             const today = parseDDMMYYYY(TODAY_DATE_STR);
-            const activeTxs = getFilteredTransactions();
+            const activePendingTxs = getFilteredTransactions(true); // Base on DUE DATE for pending items
 
             const dateLabels = [];
             const incAmounts = [];
@@ -2149,8 +2162,8 @@
 
             let runningCash = initCash;
 
-            const pendingInc = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
-            const pendingExp = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
+            const pendingInc = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
 
             for (let i = 0; i < totalPeriods; i++) {
                 const pStart = new Date(today);
