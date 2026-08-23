@@ -1859,6 +1859,29 @@
             syncPushToCloud();
         }
 
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'pending', 'supplier', 'ocr', 'inout', 'forecast', 'advisor'];
+            tabs.forEach(t => {
+                const sec = document.getElementById('tab-' + t);
+                const btn = document.getElementById('btn-' + t);
+                if (sec) {
+                    if (t === tabId) {
+                        sec.classList.remove('hidden');
+                    } else {
+                        sec.classList.add('hidden');
+                    }
+                }
+                if (btn) {
+                    if (t === tabId) {
+                        btn.className = "tab-btn active-tab flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all bg-indigo-600 text-white shadow-md";
+                    } else {
+                        btn.className = "tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all";
+                    }
+                }
+            });
+            try { renderLedger(); } catch(e) {}
+        }
+
         function populateMonthDropdown() {
             const selectEl = document.getElementById('global-month-filter');
             if (!selectEl) return;
