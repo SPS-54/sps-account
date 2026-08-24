@@ -2484,9 +2484,16 @@
         }
 
         function copySystemDataCode() {
-            const codeStr = JSON.stringify(transactions, null, 2);
+            const sanitizedTxs = transactions.map(t => {
+                if (t.file_data && t.file_data.length > 500) {
+                    const { file_data, ...rest } = t;
+                    return rest;
+                }
+                return t;
+            });
+            const codeStr = JSON.stringify(sanitizedTxs);
             navigator.clipboard.writeText(codeStr).then(() => {
-                alert("📋 คัดลอกรหัสข้อมูลเรียบร้อยแล้ว!\nนำรหัสนี้ไปส่งในแชท Line -> เปิดบนมือถือ -> กดแถบ 'นำเข้า/สำรองข้อมูล' วางรหัสแล้วกด 'กู้คืนข้อมูล' ได้เลยครับ!");
+                alert("📋 คัดลอกรหัสข้อมูลเรียบร้อยแล้ว!\n(บีบอัดรหัสสั้นเรียบร้อย ไม่ถูก Line ตัดทอนแน่นอน)\n\nนำรหัสนี้ไปวางที่ช่อง 'นำเข้า/สำรองข้อมูล' บนมือถือ แล้วกด 'กู้คืนข้อมูล' ได้เลยครับ!");
             }).catch(e => {
                 prompt("📋 คัดลอกรหัสข้อมูลด้านล่างนี้ไปส่งใน Line:", codeStr);
             });
@@ -2498,7 +2505,7 @@
             }
             if (PUBLIC_CLOUD_RELAY_URL) {
                 navigator.clipboard.writeText(PUBLIC_CLOUD_RELAY_URL).then(() => {
-                    alert(`🔑 คัดลอกคีย์ซิงก์คลาวด์จับคู่อุปกรณ์เรียบร้อยแล้ว!\nนำลิงก์นี้ไปวางที่ช่อง "นำเข้า/สำรองข้อมูล" บนมือถือ ทั้ง 2 เครื่องจะเชื่อมต่อกันตลอดเวลาครับ`);
+                    alert(`🔑 คัดลอกคีย์ซิงก์คลาวด์เรียบร้อยแล้ว!\n(ลิงก์สั้นเพียง 60 ตัวอักษร นำไปวางในมือถือได้ 100%)\n\nนำลิงก์นี้ไปวางที่ช่อง "นำเข้า/สำรองข้อมูล" บนมือถือ แล้วกดกู้คืนข้อมูลได้เลยครับ!`);
                 }).catch(e => {
                     prompt("🔑 คัดลอกคีย์ซิงก์คลาวด์ด้านล่างนี้:", PUBLIC_CLOUD_RELAY_URL);
                 });
