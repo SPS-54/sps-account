@@ -78,7 +78,7 @@
         .badge-overdue { background: #ffe4e6; color: #be123c; border: 1px solid #fecdd3; }
 
         /* MODALS */
-        .modal-overlay { display: none !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.75); z-index: 99999; justify-content: center; align-items: center; padding: 16px; backdrop-filter: blur(4px); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.75); z-index: 99999; justify-content: center; align-items: center; padding: 16px; backdrop-filter: blur(4px); }
         .modal-overlay.active { display: flex !important; }
         .modal-card { background: #ffffff; border-radius: 16px; width: 100%; max-width: 580px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid #cbd5e1; }
         .modal-header { background: #0f172a; color: #ffffff; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; }
@@ -1503,12 +1503,18 @@
 
         function openModal(id) {
             const m = document.getElementById(id);
-            if (m) m.classList.add('active');
+            if (m) {
+                m.classList.add('active');
+                m.style.display = 'flex';
+            }
         }
 
         function closeModal(id) {
             const m = document.getElementById(id);
-            if (m) m.classList.remove('active');
+            if (m) {
+                m.classList.remove('active');
+                m.style.display = 'none';
+            }
         }
 
         /* 100% SAFE AUTOMATIC CLOUD & LOCAL STORAGE SYNC ENGINE */
@@ -1847,9 +1853,11 @@
                 if (activeTxs.length === 0) {
                     tbodyDash.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:30px; color:#64748b;">📭 ไม่พบรายการที่ตรงกับตัวกรองค้นหา</td></tr>`;
                 } else {
-                    tbodyDash.innerHTML = activeTxs.map(t => `
+                    tbodyDash.innerHTML = activeTxs.map(t => {
+                        const safeId = (t.id || '').replace(/'/g, "\\'");
+                        return `
                         <tr>
-                            <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:bold; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
+                            <td onclick="viewDocumentModal('${safeId}')" style="font-family:monospace; font-weight:bold; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
                             <td style="font-family:monospace;">${t.date}</td>
                             <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
                             <td style="font-family:monospace; font-weight:bold; color:#d97706;">${t.credit_days || 30} วัน</td>
@@ -1862,12 +1870,13 @@
                             </td>
                             <td style="text-align:center;">
                                 <div style="display:flex; gap:4px; justify-content:center;">
-                                    <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
-                                    ${t.status === 'Paid' ? '<button class="btn btn-outline btn-sm" disabled>เรียบร้อย</button>' : `<button onclick="openPaymentModal('${t.id}')" class="btn btn-amber btn-sm">แจ้งชำระ</button>`}
+                                    <button onclick="openEditModal('${safeId}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                    ${t.status === 'Paid' ? '<button class="btn btn-outline btn-sm" disabled>เรียบร้อย</button>' : `<button onclick="openPaymentModal('${safeId}')" class="btn btn-amber btn-sm">แจ้งชำระ</button>`}
                                 </div>
                             </td>
                         </tr>
-                    `).join('');
+                    `;
+                    }).join('');
                 }
             }
 
@@ -1931,21 +1940,22 @@
                     tbodyPendingInc.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอรับเงินในขณะนี้</td></tr>`;
                 } else {
                     tbodyPendingInc.innerHTML = pendingIncomes.map(t => {
+                        const safeId = (t.id || '').replace(/'/g, "\\'");
                         const targetDate = (t.pay_method === 'Cheque' && t.cheque_date) ? t.cheque_date : t.due_date;
                         const diffDays = Math.ceil((parseDDMMYYYY(targetDate).getTime() - today.getTime()) / (1000 * 3600 * 24));
                         let countdown = diffDays > 0 ? `<span class="badge-status badge-pending">เหลือ ${diffDays} วัน</span>` : `<span class="badge-status badge-overdue">เกินกำหนด ${Math.abs(diffDays)} วัน</span>`;
                         
                         let chequeBadge = '';
-                        let actionBtn = `<button onclick="openPaymentModal('${t.id}')" class="btn btn-emerald btn-sm">💵 รับชำระแล้ว</button>`;
+                        let actionBtn = `<button onclick="openPaymentModal('${safeId}')" class="btn btn-emerald btn-sm">💵 รับชำระแล้ว</button>`;
 
                         if (t.pay_method === 'Cheque') {
                             chequeBadge = `<br><span class="badge-status" style="background:#e0e7ff; color:#3730a3; border:1px solid #c7d2fe; font-size:10px; margin-top:2px;"><i class="fa-solid fa-money-check"></i> เช็ครับ: ${t.cheque_no || '-'} (${t.cheque_bank || 'ธนาคาร'})</span>`;
-                            actionBtn = `<button onclick="openPaymentModal('${t.id}')" class="btn btn-amber btn-sm">📜 ยืนยันเช็คผ่าน</button>`;
+                            actionBtn = `<button onclick="openPaymentModal('${safeId}')" class="btn btn-amber btn-sm">📜 ยืนยันเช็คผ่าน</button>`;
                         }
 
                         return `
                             <tr>
-                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:bold; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
+                                <td onclick="viewDocumentModal('${safeId}')" style="font-family:monospace; font-weight:bold; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
                                 <td style="font-family:monospace; font-weight:bold; color:#047857; background:#d1fae5;">${targetDate}${chequeBadge}</td>
                                 <td style="text-align:center;">${countdown}</td>
                                 <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
@@ -1955,7 +1965,7 @@
                                 <td style="text-align:right; font-family:monospace; font-weight:bold; color:#047857;">${formatTHB(t.net)}</td>
                                 <td style="text-align:center;">
                                     <div style="display:flex; gap:4px; justify-content:center;">
-                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                        <button onclick="openEditModal('${safeId}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
                                         ${actionBtn}
                                     </div>
                                 </td>
@@ -1970,21 +1980,22 @@
                     tbodyPendingExp.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอจ่ายเงินในขณะนี้</td></tr>`;
                 } else {
                     tbodyPendingExp.innerHTML = pendingExpenses.map(t => {
+                        const safeId = (t.id || '').replace(/'/g, "\\'");
                         const targetDate = (t.pay_method === 'Cheque' && t.cheque_date) ? t.cheque_date : t.due_date;
                         const diffDays = Math.ceil((parseDDMMYYYY(targetDate).getTime() - today.getTime()) / (1000 * 3600 * 24));
                         let countdown = diffDays > 0 ? `<span class="badge-status badge-pending">เหลือ ${diffDays} วัน</span>` : `<span class="badge-status badge-overdue">เกินกำหนด ${Math.abs(diffDays)} วัน</span>`;
                         
                         let chequeBadge = '';
-                        let actionBtn = `<button onclick="openPaymentModal('${t.id}')" class="btn btn-rose btn-sm">💳 แจ้งจ่ายเงิน</button>`;
+                        let actionBtn = `<button onclick="openPaymentModal('${safeId}')" class="btn btn-rose btn-sm">💳 แจ้งจ่ายเงิน</button>`;
 
                         if (t.pay_method === 'Cheque') {
                             chequeBadge = `<br><span class="badge-status" style="background:#ffe4e6; color:#be123c; border:1px solid #fca5a5; font-size:10px; margin-top:2px;"><i class="fa-solid fa-money-check"></i> เช็คจ่าย: ${t.cheque_no || '-'} (${t.cheque_bank || 'ธนาคาร'})</span>`;
-                            actionBtn = `<button onclick="openPaymentModal('${t.id}')" class="btn btn-amber btn-sm">📜 ยืนยันเช็คผ่าน</button>`;
+                            actionBtn = `<button onclick="openPaymentModal('${safeId}')" class="btn btn-amber btn-sm">📜 ยืนยันเช็คผ่าน</button>`;
                         }
 
                         return `
                             <tr>
-                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:bold; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
+                                <td onclick="viewDocumentModal('${safeId}')" style="font-family:monospace; font-weight:bold; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
                                 <td style="font-family:monospace; font-weight:bold; color:#e11d48; background:#ffe4e6;">${targetDate}${chequeBadge}</td>
                                 <td style="text-align:center;">${countdown}</td>
                                 <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
@@ -1994,7 +2005,7 @@
                                 <td style="text-align:right; font-family:monospace; font-weight:bold; color:#e11d48;">${formatTHB(t.net)}</td>
                                 <td style="text-align:center;">
                                     <div style="display:flex; gap:4px; justify-content:center;">
-                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                        <button onclick="openEditModal('${safeId}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
                                         ${actionBtn}
                                     </div>
                                 </td>
@@ -2325,6 +2336,7 @@
                     tbodyCreditor.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">📭 ยังไม่มีข้อมูลรายการเจ้าหนี้ / รายจ่าย</td></tr>`;
                 } else {
                     tbodyCreditor.innerHTML = expTxs.map(t => {
+                        const safeId = (t.id || '').replace(/'/g, "\\'");
                         const isPaid = t.status === 'Paid';
                         const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
                         const docBtnIcon = t.file_data ? 'fa-file-lines' : 'fa-file-invoice';
@@ -2332,7 +2344,7 @@
                         return `
                             <tr>
                                 <td style="font-family:monospace; font-weight:600;">${t.date}</td>
-                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
+                                <td onclick="viewDocumentModal('${safeId}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
                                 <td style="font-weight:700; color:#0f172a;">${t.vendor}</td>
                                 <td>${t.desc}</td>
                                 <td style="font-family:monospace; font-size:11px;">${t.credit_days || 30} วัน (${t.due_date})</td>
@@ -2342,8 +2354,8 @@
                                 <td style="text-align:center;">${isPaid ? '<span class="badge-status badge-paid">ชำระแล้ว</span>' : '<span class="badge-status badge-pending">ค้างชำระ</span>'}</td>
                                 <td style="text-align:center;">
                                     <div style="display:flex; gap:4px; justify-content:center;">
-                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
-                                        <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                        <button onclick="openEditModal('${safeId}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                        <button onclick="viewDocumentModal('${safeId}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
                                     </div>
                                 </td>
                             </tr>
@@ -2357,6 +2369,7 @@
                     tbodyCustomer.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">📭 ยังไม่มีข้อมูลรายการลูกค้า / รายรับ</td></tr>`;
                 } else {
                     tbodyCustomer.innerHTML = incTxs.map(t => {
+                        const safeId = (t.id || '').replace(/'/g, "\\'");
                         const isPaid = t.status === 'Paid';
                         const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
                         const docBtnIcon = t.file_data ? 'fa-file-lines' : 'fa-file-invoice';
@@ -2364,7 +2377,7 @@
                         return `
                             <tr>
                                 <td style="font-family:monospace; font-weight:600;">${t.date}</td>
-                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
+                                <td onclick="viewDocumentModal('${safeId}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
                                 <td style="font-weight:700; color:#0f172a;">${t.vendor}</td>
                                 <td>${t.desc}</td>
                                 <td style="font-family:monospace; font-size:11px;">${t.credit_days || 30} วัน (${t.due_date})</td>
@@ -2374,8 +2387,8 @@
                                 <td style="text-align:center;">${isPaid ? '<span class="badge-status badge-paid">รับชำระแล้ว</span>' : '<span class="badge-status badge-pending">ค้างรับ</span>'}</td>
                                 <td style="text-align:center;">
                                     <div style="display:flex; gap:4px; justify-content:center;">
-                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
-                                        <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                        <button onclick="openEditModal('${safeId}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                        <button onclick="viewDocumentModal('${safeId}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
                                     </div>
                                 </td>
                             </tr>
@@ -2451,6 +2464,7 @@
                     tbodyInc.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายรับที่ชำระแล้ว</td></tr>`;
                 } else {
                     tbodyInc.innerHTML = paidIncomes.map(t => {
+                        const safeId = (t.id || '').replace(/'/g, "\\'");
                         const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
                         const docBtnIcon = t.file_data ? 'fa-file-lines' : 'fa-file-invoice';
                         const docBtnLabel = t.file_data ? 'ดู/โหลดเอกสาร' : '📄 ดู/โหลดเอกสาร';
@@ -2458,7 +2472,7 @@
                         return `
                             <tr>
                                 <td style="font-family:monospace; font-weight:600; color:#047857;">${completionDate}</td>
-                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
+                                <td onclick="viewDocumentModal('${safeId}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
                                 <td style="font-weight:700; color:#0f172a;">${t.vendor}</td>
                                 <td>${t.desc}</td>
                                 <td style="font-family:monospace; font-size:11px;">${t.credit_days || 30} วัน (${t.due_date})</td>
@@ -2469,8 +2483,8 @@
                                 <td style="text-align:center;"><span class="badge-status badge-paid">รับชำระแล้ว</span></td>
                                 <td style="text-align:center;">
                                     <div style="display:flex; gap:4px; justify-content:center;">
-                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
-                                        <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                        <button onclick="openEditModal('${safeId}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                        <button onclick="viewDocumentModal('${safeId}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
                                     </div>
                                 </td>
                             </tr>
@@ -2484,6 +2498,7 @@
                     tbodyExp.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายจ่ายที่จ่ายแล้ว</td></tr>`;
                 } else {
                     tbodyExp.innerHTML = paidExpenses.map(t => {
+                        const safeId = (t.id || '').replace(/'/g, "\\'");
                         const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
                         const docBtnIcon = t.file_data ? 'fa-file-lines' : 'fa-file-invoice';
                         const docBtnLabel = t.file_data ? 'ดู/โหลดเอกสาร' : '📄 ดู/โหลดเอกสาร';
@@ -2491,7 +2506,7 @@
                         return `
                             <tr>
                                 <td style="font-family:monospace; font-weight:600; color:#be123c;">${completionDate}</td>
-                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
+                                <td onclick="viewDocumentModal('${safeId}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
                                 <td style="font-weight:700; color:#0f172a;">${t.vendor}</td>
                                 <td>${t.desc}</td>
                                 <td style="font-family:monospace; font-size:11px;">${t.credit_days || 30} วัน (${t.due_date})</td>
@@ -2502,8 +2517,8 @@
                                 <td style="text-align:center;"><span class="badge-status badge-paid">ชำระแล้ว</span></td>
                                 <td style="text-align:center;">
                                     <div style="display:flex; gap:4px; justify-content:center;">
-                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
-                                        <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                        <button onclick="openEditModal('${safeId}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                        <button onclick="viewDocumentModal('${safeId}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
                                     </div>
                                 </td>
                             </tr>
@@ -2514,37 +2529,26 @@
         }
 
         function viewDocumentModal(txId) {
-            const t = transactions.find(x => x.id === txId);
-            if (!t) return;
+            try {
+                const t = transactions.find(x => String(x.id) === String(txId));
+                if (!t) { alert('⚠️ ไม่พบรายการ ID: ' + txId); return; }
 
-            document.getElementById('doc-modal-tx-id').value = t.id;
-            document.getElementById('doc-modal-title').innerHTML = `<i class="fa-solid fa-file-invoice text-indigo-400"></i> เอกสารประกอบรายการ [${t.id}] - ${t.vendor}`;
+                if (document.getElementById('doc-modal-tx-id')) document.getElementById('doc-modal-tx-id').value = t.id;
+                if (document.getElementById('doc-modal-title')) {
+                    document.getElementById('doc-modal-title').innerHTML = `<i class="fa-solid fa-file-invoice text-indigo-400"></i> เอกสารประกอบรายการ [${t.id}] - ${t.vendor}`;
+                }
 
-            const previewContainer = document.getElementById('doc-modal-preview-container');
-            const downloadBtn = document.getElementById('doc-modal-download-btn');
+                const previewContainer = document.getElementById('doc-modal-preview-container');
+                const downloadBtn = document.getElementById('doc-modal-download-btn');
 
-            if (t.file_data) {
-                previewContainer.innerHTML = `
-                    <div style="text-align: center; margin-bottom: 16px;">
-                        <img src="${t.file_data}" style="max-width: 100%; max-height: 420px; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                    </div>
-                `;
-                downloadBtn.onclick = function() {
-                    const a = document.createElement('a');
-                    a.href = t.file_data;
-                    a.download = `Doc_${t.id.replace(/[/]/g, '_')}.png`;
-                    a.click();
-                };
-                downloadBtn.style.display = 'inline-flex';
-            } else {
-                const isPaid = t.status === 'Paid';
+                const isPaid = (t.status === 'Paid');
                 const beforeVat = t.before_vat || t.net || 0;
                 const vat = t.vat || 0;
                 const wht = t.wht || 0;
                 const net = t.net || 0;
 
                 let filePreviewHtml = '';
-                const attachedFile = t.cheque_file_data || t.file_data;
+                const attachedFile = t.file_data || t.cheque_file_data;
 
                 if (attachedFile) {
                     if (attachedFile.startsWith('data:image')) {
@@ -2553,8 +2557,8 @@
                                 <div style="font-size: 12px; font-weight: 700; color: #3730a3; margin-bottom: 8px;"><i class="fa-solid fa-image"></i> รูปเช็ค / เอกสารตัวจริงในระบบ:</div>
                                 <img src="${attachedFile}" style="max-width: 100%; max-height: 350px; border-radius: 8px; border: 1px solid #94a3b8; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" alt="รูปเช็คฉบับจริง">
                                 <div style="margin-top: 8px;">
-                                    <a href="${attachedFile}" download="Cheque_${(t.cheque_no || t.id).replace(/[/]/g, '_')}.png" class="btn btn-emerald btn-sm" style="font-size:11px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
-                                        <i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดรูปเช็คฉบับจริงลงเครื่อง
+                                    <a href="${attachedFile}" download="Doc_${String(t.cheque_no || t.id).replace(/[/]/g, '_')}.png" class="btn btn-emerald btn-sm" style="font-size:11px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                                        <i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดรูปเอกสาร/เช็คฉบับจริงลงเครื่อง
                                     </a>
                                 </div>
                             </div>
@@ -2563,8 +2567,8 @@
                         filePreviewHtml = `
                             <div style="margin-top: 14px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; text-align: center;">
                                 <div style="font-size: 12px; font-weight: 700; color: #3730a3; margin-bottom: 8px;"><i class="fa-solid fa-file-pdf"></i> เอกสาร PDF ตัวจริงในระบบ:</div>
-                                <a href="${attachedFile}" download="Cheque_Doc_${(t.cheque_no || t.id).replace(/[/]/g, '_')}.pdf" class="btn btn-emerald btn-sm" style="font-size:11px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
-                                    <i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดไฟล์ PDF เช็ค/เอกสารฉบับจริง
+                                <a href="${attachedFile}" download="Doc_${String(t.cheque_no || t.id).replace(/[/]/g, '_')}.pdf" class="btn btn-emerald btn-sm" style="font-size:11px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                                    <i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดไฟล์ PDF เอกสารฉบับจริง
                                 </a>
                             </div>
                         `;
@@ -2580,80 +2584,87 @@
                     `;
                 }
 
-                previewContainer.innerHTML = `
-                    <div id="digital-voucher-card" style="background: #ffffff; border: 2px solid #0f172a; border-radius: 12px; padding: 20px; color: #0f172a; font-family: 'Prompt', sans-serif;">
-                        <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px;">
-                            <div>
-                                <h3 style="font-size: 16px; font-weight: 800; color: #4f46e5;">บริษัท เอสพีเอส บัญชีและการเงิน จำกัด (SPS)</h3>
-                                <p style="font-size: 11px; color: #64748b;">ใบสำคัญจ่าย / ใบรับเงินดิจิทัล V2 (Official Accounting Voucher)</p>
+                if (previewContainer) {
+                    previewContainer.innerHTML = `
+                        <div id="digital-voucher-card" style="background: #ffffff; border: 2px solid #0f172a; border-radius: 12px; padding: 20px; color: #0f172a; font-family: 'Prompt', sans-serif;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px;">
+                                <div>
+                                    <h3 style="font-size: 16px; font-weight: 800; color: #4f46e5;">บริษัท เอสพีเอส บัญชีและการเงิน จำกัด (SPS)</h3>
+                                    <p style="font-size: 11px; color: #64748b;">ใบสำคัญจ่าย / ใบรับเงินดิจิทัล V2 (Official Accounting Voucher)</p>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span style="font-size: 14px; font-weight: 800; font-family: monospace; color: #4f46e5;">${t.id}</span>
+                                    <p style="font-size: 11px; color: #64748b;">วันที่: ${t.date}</p>
+                                </div>
                             </div>
-                            <div style="text-align: right;">
-                                <span style="font-size: 14px; font-weight: 800; font-family: monospace; color: #4f46e5;">${t.id}</span>
-                                <p style="font-size: 11px; color: #64748b;">วันที่: ${t.date}</p>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; margin-bottom: 14px; background: #f8fafc; padding: 12px; border-radius: 8px;">
+                                <div>
+                                    <strong>คู่ค้า / ซัพพลายเออร์:</strong> ${t.vendor}<br>
+                                    <strong>ประเภทรายการ:</strong> ${t.type === 'Expense' ? '🔴 รายจ่าย' : '🟢 รายรับ'}
+                                </div>
+                                <div>
+                                    <strong>เครดิตเทอม:</strong> ${t.credit_days || 30} วัน<br>
+                                    <strong>วันครบกำหนด:</strong> ${t.due_date}
+                                </div>
+                            </div>
+
+                            ${chequeDetailInfo}
+
+                            <div style="margin-bottom: 14px; margin-top: 10px;">
+                                <strong>รายละเอียด:</strong>
+                                <div style="border-bottom: 1px solid #cbd5e1; padding: 6px 0; font-size: 13px;">${t.desc}</div>
+                            </div>
+
+                            <div style="width: 240px; margin-left: auto; font-size: 12px; line-height: 1.8;">
+                                <div style="display:flex; justify-content:space-between;"><span>มูลค่าก่อน VAT:</span> <span style="font-family:monospace; font-weight:bold;">${formatTHB(beforeVat)}</span></div>
+                                <div style="display:flex; justify-content:space-between;"><span>ภาษี 7%:</span> <span style="font-family:monospace; font-weight:bold;">${formatTHB(vat)}</span></div>
+                                <div style="display:flex; justify-content:space-between;"><span>หัก ณ ที่จ่าย 3%:</span> <span style="font-family:monospace; font-weight:bold; color:#be123c;">-${formatTHB(wht)}</span></div>
+                                <div style="display:flex; justify-content:space-between; border-top: 2px solid #0f172a; border-bottom: 2px solid #0f172a; padding: 4px 0; margin-top: 4px; font-size: 13px; font-weight: 800;">
+                                    <span>ยอดเงินสุทธิ:</span> <span style="font-family:monospace; color:${isPaid ? '#047857' : '#be123c'};">${formatTHB(net)}</span>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #cbd5e1; padding-top: 10px;">
+                                <div style="font-size: 11px; color: #64748b;">
+                                    สถานะเอกสาร: <strong style="color: ${isPaid ? '#047857' : '#b45309'};">${isPaid ? '✅ ชำระเงินเรียบร้อยแล้ว' : '⏳ รอชำระเงิน'}</strong>
+                                </div>
+                                <div style="font-size: 10px; color: #94a3b8; font-family: monospace;">VERIFIED BY SPS V2 AI</div>
                             </div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; margin-bottom: 14px; background: #f8fafc; padding: 12px; border-radius: 8px;">
-                            <div>
-                                <strong>คู่ค้า / ซัพพลายเออร์:</strong> ${t.vendor}<br>
-                                <strong>ประเภทรายการ:</strong> ${t.type === 'Expense' ? '🔴 รายจ่าย' : '🟢 รายรับ'}
-                            </div>
-                            <div>
-                                <strong>เครดิตเทอม:</strong> ${t.credit_days || 30} วัน<br>
-                                <strong>วันครบกำหนด:</strong> ${t.due_date}
-                            </div>
+                        ${filePreviewHtml}
+                        
+                        <div style="margin-top: 14px; background: #eff6ff; padding: 12px; border-radius: 8px; border: 1px solid #bfdbfe; text-align: center;">
+                            <p style="font-size: 11px; color: #1e40af; margin-bottom: 6px;"><i class="fa-solid fa-paperclip"></i> แนบรูปภาพเช็ค / สลิป / สแกนเอกสารตัวจริงเพิ่มเติม:</p>
+                            <input type="file" accept="image/*,.pdf" onchange="attachDocToTx('${t.id}', event)" style="font-size: 11px;">
                         </div>
-
-                        ${chequeDetailInfo}
-
-                        <div style="margin-bottom: 14px; margin-top: 10px;">
-                            <strong>รายละเอียด:</strong>
-                            <div style="border-bottom: 1px solid #cbd5e1; padding: 6px 0; font-size: 13px;">${t.desc}</div>
-                        </div>
-
-                        <div style="width: 240px; margin-left: auto; font-size: 12px; line-height: 1.8;">
-                            <div style="display:flex; justify-content:space-between;"><span>มูลค่าก่อน VAT:</span> <span style="font-family:monospace; font-weight:bold;">${formatTHB(beforeVat)}</span></div>
-                            <div style="display:flex; justify-content:space-between;"><span>ภาษี 7%:</span> <span style="font-family:monospace; font-weight:bold;">${formatTHB(vat)}</span></div>
-                            <div style="display:flex; justify-content:space-between;"><span>หัก ณ ที่จ่าย 3%:</span> <span style="font-family:monospace; font-weight:bold; color:#be123c;">-${formatTHB(wht)}</span></div>
-                            <div style="display:flex; justify-content:space-between; border-top: 2px solid #0f172a; border-bottom: 2px solid #0f172a; padding: 4px 0; margin-top: 4px; font-size: 13px; font-weight: 800;">
-                                <span>ยอดเงินสุทธิ:</span> <span style="font-family:monospace; color:${isPaid ? '#047857' : '#be123c'};">${formatTHB(net)}</span>
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #cbd5e1; padding-top: 10px;">
-                            <div style="font-size: 11px; color: #64748b;">
-                                สถานะเอกสาร: <strong style="color: ${isPaid ? '#047857' : '#b45309'};">${isPaid ? '✅ ชำระเงินเรียบร้อยแล้ว' : '⏳ รอชำระเงิน'}</strong>
-                            </div>
-                            <div style="font-size: 10px; color: #94a3b8; font-family: monospace;">VERIFIED BY SPS V2 AI</div>
-                        </div>
-                    </div>
-
-                    ${filePreviewHtml}
-                    
-                    <div style="margin-top: 14px; background: #eff6ff; padding: 12px; border-radius: 8px; border: 1px solid #bfdbfe; text-align: center;">
-                        <p style="font-size: 11px; color: #1e40af; margin-bottom: 6px;"><i class="fa-solid fa-paperclip"></i> แนบรูปภาพเช็ค / สลิป / สแกนเอกสารตัวจริงเพิ่มเติม:</p>
-                        <input type="file" accept="image/*,.pdf" onchange="attachDocToTx('${t.id}', event)" style="font-size: 11px;">
-                    </div>
-                `;
-
-                if (attachedFile) {
-                    downloadBtn.onclick = function() {
-                        const a = document.createElement('a');
-                        a.href = attachedFile;
-                        a.download = `Cheque_Doc_${(t.cheque_no || t.id).replace(/[/]/g, '_')}.png`;
-                        a.click();
-                    };
-                    downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดรูปเช็ค/เอกสารฉบับจริง`;
-                } else {
-                    downloadBtn.onclick = function() {
-                        downloadGeneratedVoucher(t);
-                    };
-                    downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดเอกสารดิจิทัล`;
+                    `;
                 }
-                downloadBtn.style.display = 'inline-flex';
-            }
 
-            openModal('doc-view-modal');
+                if (downloadBtn) {
+                    if (attachedFile) {
+                        downloadBtn.onclick = function() {
+                            const a = document.createElement('a');
+                            a.href = attachedFile;
+                            a.download = `Doc_${String(t.cheque_no || t.id).replace(/[/]/g, '_')}.png`;
+                            a.click();
+                        };
+                        downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดรูปเช็ค/เอกสารฉบับจริง`;
+                    } else {
+                        downloadBtn.onclick = function() {
+                            downloadGeneratedVoucher(t);
+                        };
+                        downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดเอกสารดิจิทัล`;
+                    }
+                    downloadBtn.style.display = 'inline-flex';
+                }
+
+                openModal('doc-view-modal');
+            } catch(err) {
+                console.error("Error in viewDocumentModal:", err);
+                alert("⚠️ เกิดข้อผิดพลาดในการเปิดดูเอกสาร: " + err.message);
+            }
         }
 
         function downloadGeneratedVoucher(t) {
