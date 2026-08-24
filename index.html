@@ -2984,61 +2984,83 @@
         }
 
         function openEditModal(txId) {
-            const t = transactions.find(x => x.id === txId);
-            if (!t) { alert('⚠️ ไม่พบรายการที่ต้องการแก้ไข'); return; }
+            try {
+                const t = transactions.find(x => String(x.id) === String(txId));
+                if (!t) { alert('⚠️ ไม่พบรายการที่ต้องการแก้ไข ID: ' + txId); return; }
 
-            document.getElementById('edit-tx-id').value = t.id;
-            document.getElementById('edit-doc-no').value = t.id;
-            document.getElementById('edit-type').value = t.type || 'Expense';
-            document.getElementById('edit-status').value = t.status || 'Unpaid';
-            document.getElementById('edit-pay-method').value = t.pay_method || 'Transfer';
-            document.getElementById('edit-date').value = t.date || TODAY_DATE_STR;
-            document.getElementById('edit-credit-days').value = (t.credit_days !== undefined) ? t.credit_days : 30;
-            document.getElementById('edit-vendor').value = t.vendor || '';
-            document.getElementById('edit-desc').value = t.desc || '';
+                if (document.getElementById('edit-tx-id')) document.getElementById('edit-tx-id').value = t.id || '';
+                if (document.getElementById('edit-doc-no')) document.getElementById('edit-doc-no').value = t.id || '';
+                
+                let tType = t.type || 'Expense';
+                if (tType === 'รายจ่าย') tType = 'Expense';
+                if (tType === 'รายรับ') tType = 'Income';
+                if (document.getElementById('edit-type')) document.getElementById('edit-type').value = tType;
 
-            toggleChequeInputs('edit');
+                let tStatus = t.status || 'Unpaid';
+                if (tStatus === 'ชำระแล้ว' || tStatus === 'รับชำระแล้ว') tStatus = 'Paid';
+                if (tStatus === 'รอชำระ' || tStatus === 'ค้างชำระ' || tStatus === 'ค้างรับ') tStatus = 'Unpaid';
+                if (document.getElementById('edit-status')) document.getElementById('edit-status').value = tStatus;
 
-            if (t.pay_method === 'Cheque') {
-                if (document.getElementById('edit-cheque-no')) document.getElementById('edit-cheque-no').value = t.cheque_no || '';
-                if (document.getElementById('edit-cheque-bank')) document.getElementById('edit-cheque-bank').value = t.cheque_bank || 'กสิกรไทย (KBANK)';
-                if (document.getElementById('edit-cheque-date')) document.getElementById('edit-cheque-date').value = t.cheque_date || t.due_date || t.date;
-                if (document.getElementById('edit-cheque-status')) document.getElementById('edit-cheque-status').value = t.cheque_status || 'Pending';
-            }
+                let tPayMethod = t.pay_method || 'Transfer';
+                if (tPayMethod === 'เงินโอน' || tPayMethod === 'โอนเงิน') tPayMethod = 'Transfer';
+                if (tPayMethod === 'เงินสด') tPayMethod = 'Cash';
+                if (tPayMethod === 'เช็ค') tPayMethod = 'Cheque';
+                if (document.getElementById('edit-pay-method')) document.getElementById('edit-pay-method').value = tPayMethod;
 
-            let bVat = t.before_vat || t.net || 0;
-            let vatVal = t.vat || 0;
-            let whtVal = t.wht || 0;
+                if (document.getElementById('edit-date')) document.getElementById('edit-date').value = t.date || TODAY_DATE_STR;
+                if (document.getElementById('edit-credit-days')) document.getElementById('edit-credit-days').value = (t.credit_days !== undefined) ? t.credit_days : 30;
+                if (document.getElementById('edit-vendor')) document.getElementById('edit-vendor').value = t.vendor || '';
+                if (document.getElementById('edit-desc')) document.getElementById('edit-desc').value = t.desc || '';
 
-            if (vatVal > 0) {
-                document.getElementById('edit-vat-mode').value = 'EXC_VAT';
-            } else {
-                document.getElementById('edit-vat-mode').value = 'NO_VAT';
-            }
+                toggleChequeInputs('edit');
 
-            if (whtVal > 0 && bVat > 0) {
-                let estRate = Math.round((whtVal / bVat) * 100);
-                if ([1, 2, 3, 5].includes(estRate)) {
-                    document.getElementById('edit-wht-mode').value = String(estRate);
-                } else {
-                    document.getElementById('edit-wht-mode').value = 'CUSTOM';
-                    if (document.getElementById('edit-wht-custom-rate')) {
-                        document.getElementById('edit-wht-custom-rate').value = ((whtVal / bVat) * 100).toFixed(1);
+                if (tPayMethod === 'Cheque') {
+                    if (document.getElementById('edit-cheque-no')) document.getElementById('edit-cheque-no').value = t.cheque_no || '';
+                    if (document.getElementById('edit-cheque-bank')) document.getElementById('edit-cheque-bank').value = t.cheque_bank || 'กสิกรไทย (KBANK)';
+                    if (document.getElementById('edit-cheque-date')) document.getElementById('edit-cheque-date').value = t.cheque_date || t.due_date || t.date || TODAY_DATE_STR;
+                    if (document.getElementById('edit-cheque-status')) document.getElementById('edit-cheque-status').value = t.cheque_status || 'Pending';
+                }
+
+                let bVat = (t.before_vat !== undefined) ? t.before_vat : (t.net || 0);
+                let vatVal = t.vat || 0;
+                let whtVal = t.wht || 0;
+
+                const vatSelect = document.getElementById('edit-vat-mode');
+                if (vatSelect) {
+                    if (vatVal > 0) vatSelect.value = 'EXC_VAT';
+                    else vatSelect.value = 'NO_VAT';
+                }
+
+                const whtSelect = document.getElementById('edit-wht-mode');
+                if (whtSelect) {
+                    if (whtVal > 0 && bVat > 0) {
+                        let estRate = Math.round((whtVal / bVat) * 100);
+                        if ([1, 2, 3, 5].includes(estRate)) {
+                            whtSelect.value = String(estRate);
+                        } else {
+                            whtSelect.value = 'CUSTOM';
+                            if (document.getElementById('edit-wht-custom-rate')) {
+                                document.getElementById('edit-wht-custom-rate').value = ((whtVal / bVat) * 100).toFixed(1);
+                            }
+                        }
+                    } else {
+                        whtSelect.value = '0';
                     }
                 }
-            } else {
-                document.getElementById('edit-wht-mode').value = '0';
+
+                if (document.getElementById('edit-base-amount')) document.getElementById('edit-base-amount').value = bVat;
+                calcEditAmounts();
+
+                if (t.before_vat !== undefined && document.getElementById('edit-before-vat')) document.getElementById('edit-before-vat').value = Number(bVat).toFixed(2);
+                if (t.vat !== undefined && document.getElementById('edit-vat')) document.getElementById('edit-vat').value = Number(vatVal).toFixed(2);
+                if (t.wht !== undefined && document.getElementById('edit-wht')) document.getElementById('edit-wht').value = Number(whtVal).toFixed(2);
+                if (t.net !== undefined && document.getElementById('edit-net')) document.getElementById('edit-net').value = Number(t.net).toFixed(2);
+
+                openModal('edit-transaction-modal');
+            } catch (err) {
+                console.error("Error in openEditModal:", err);
+                alert("⚠️ เกิดข้อผิดพลาดในการเปิดหน้าแก้ไข: " + err.message);
             }
-
-            document.getElementById('edit-base-amount').value = bVat;
-            calcEditAmounts();
-
-            if (t.before_vat !== undefined) document.getElementById('edit-before-vat').value = bVat.toFixed(2);
-            if (t.vat !== undefined) document.getElementById('edit-vat').value = vatVal.toFixed(2);
-            if (t.wht !== undefined) document.getElementById('edit-wht').value = whtVal.toFixed(2);
-            if (t.net !== undefined) document.getElementById('edit-net').value = t.net.toFixed(2);
-
-            openModal('edit-transaction-modal');
         }
 
         function saveTransactionEdit() {

@@ -2103,161 +2103,143 @@
             if (overdueInc.length > 0) score -= 10;
             score = Math.max(0, Math.min(100, score));
 
-            const scoreNum = document.getEle                                <td style="text-align:center;">
-                                    <div style="display:flex; gap:4px; justify-content:center;">
-                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
-                                        <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('');
+            const scoreNum = document.getElementById('ai-health-score-num');
+            const scoreBar = document.getElementById('ai-health-score-bar');
+            const scoreBadge = document.getElementById('ai-health-score-status');
+
+            if (scoreNum && scoreBar && scoreBadge) {
+                scoreNum.innerText = `${score}/100`;
+                scoreBar.style.width = `${score}%`;
+                if (score >= 75) {
+                    scoreBar.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
+                    scoreBadge.className = 'badge-status badge-paid';
+                    scoreBadge.innerText = '🟢 ดีเยี่ยม';
+                } else if (score >= 50) {
+                    scoreBar.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+                    scoreBadge.className = 'badge-status badge-pending';
+                    scoreBadge.innerText = '🟡 พึงระวัง';
+                } else {
+                    scoreBar.style.background = 'linear-gradient(90deg, #e11d48, #f43f5e)';
+                    scoreBadge.className = 'badge-status badge-overdue';
+                    scoreBadge.innerText = '🚨 เสี่ยงตึงตัววิกฤต';
                 }
             }
 
-            if (tbodyCustomer) {
-                if (incTxs.length === 0) {
-                    tbodyCustomer.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">📭 ยังไม่มีข้อมูลรายการลูกค้า / รายรับ</td></tr>`;
+            const avgDailyExp = 3000;
+            const runwayDays = Math.max(0, Math.floor(initCash / avgDailyExp));
+            if (document.getElementById('ai-runway-days')) {
+                document.getElementById('ai-runway-days').innerText = `${runwayDays} วัน`;
+            }
+            if (document.getElementById('ai-overdue-risk-amt')) {
+                document.getElementById('ai-overdue-risk-amt').innerText = formatTHB(totalOverdueIncAmt + totalOverdueExpAmt);
+            }
+            if (document.getElementById('ai-overdue-risk-count')) {
+                document.getElementById('ai-overdue-risk-count').innerText = `${overdueInc.length + overdueExp.length} รายการเกินกำหนดชำระ`;
+            }
+
+            // 4 ACTIONABLE AI RECOMMENDATIONS
+            const activeGenTxs = getFilteredTransactions(false);
+            const recInc = document.getElementById('ai-rec-receivables');
+            if (recInc) {
+                if (overdueInc.length > 0) {
+                    const topCust = overdueInc[0];
+                    recInc.innerHTML = `📌 <strong>พบลูกหนี้เกินกำหนด:</strong> <span style="color:#fde68a;">[${topCust.vendor}]</span> ยอด ${formatTHB(topCust.net)} เกินกำหนดแล้ว<br>💡 <strong>คำแนะนำ AI:</strong> ติดตามทวงถามทันที หรือเสนอส่วนลดเงินสด (Cash Discount 1.5%) เพื่อดึงเงินสด <strong>${formatTHB(totalOverdueIncAmt)}</strong> เข้ามาในระบบด่วน`;
+                } else if (pendingInc.length > 0) {
+                    const nextCust = pendingInc[0];
+                    recInc.innerHTML = `📌 <strong>รายการรอเก็บเงินถัดไป:</strong> <span style="color:#a7f3d0;">[${nextCust.vendor}]</span> ยอด ${formatTHB(nextCust.net)} (ครบกำหนด ${nextCust.due_date})<br>💡 <strong>คำแนะนำ AI:</strong> ส่งใบแจ้งหนี้ล่วงหน้า 5 วันทำการเพื่อยืนยันวันโอนชำระเงินตามกำหนด`;
                 } else {
-                    tbodyCustomer.innerHTML = incTxs.map(t => {
-                        const isPaid = t.status === 'Paid';
-                        const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
-                        const docBtnIcon = t.file_data ? 'fa-file-lines' : 'fa-file-invoice';
-                        const docBtnLabel = t.file_data ? 'ดู/โหลดเอกสาร' : '📄 ดู/โหลดเอกสาร';
-                        return `
-                            <tr>
-                                <td style="font-family:monospace; font-weight:600;">${t.date}</td>
-                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
-                                <td style="font-weight:700; color:#0f172a;">${t.vendor}</td>
-                                <td>${t.desc}</td>
-                                <td style="font-family:monospace; font-size:11px;">${t.credit_days || 30} วัน (${t.due_date})</td>
-                                <td style="text-align:right; font-family:monospace; font-weight:700; color:#047857;">${isPaid ? formatTHB(t.net) : '฿0.00'}</td>
-                                <td style="text-align:right; font-family:monospace; font-weight:700; color:#d97706;">${!isPaid ? formatTHB(t.net) : '฿0.00'}</td>
-                                <td style="text-align:right; font-family:monospace; font-weight:700;">${formatTHB(t.net)}</td>
-                                <td style="text-align:center;">${isPaid ? '<span class="badge-status badge-paid">รับชำระแล้ว</span>' : '<span class="badge-status badge-pending">ค้างรับ</span>'}</td>
-                                <td style="text-align:center;">
-                                    <div style="display:flex; gap:4px; justify-content:center;">
-                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
-                                        <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('');
+                    recInc.innerHTML = `📌 <strong>ไม่มีลูกหนี้ค้างชำระ:</strong> ระบบเก็บเงินสดได้ 100%<br>💡 <strong>คำแนะนำ AI:</strong> รักษารูปแบบเครดิตเทอม 30 วันมาตรฐานเพื่อจูงใจลูกค้าใหม่`;
                 }
+            }
+
+            const recExp = document.getElementById('ai-rec-payables');
+            if (recExp) {
+                if (overdueExp.length > 0) {
+                    const topSupp = overdueExp[0];
+                    recExp.innerHTML = `📌 <strong>มีเจ้าหนี้เกินกำหนด:</strong> <span style="color:#fecdd3;">[${topSupp.vendor}]</span> ยอด ${formatTHB(topSupp.net)}<br>💡 <strong>คำแนะนำ AI:</strong> ชำระยอดนี้เป็นลำดับแรกเพื่อรักษาเครดิต หรือขอแบ่งชำระเป็น 2 งวดหากเงินสดตึงตัว`;
+                } else if (pendingExp.length > 0) {
+                    const nextSupp = pendingExp[0];
+                    recExp.innerHTML = `📌 <strong>เจ้าหนี้รอชำระถัดไป:</strong> <span style="color:#fed7aa;">[${nextSupp.vendor}]</span> ยอด ${formatTHB(nextSupp.net)} (ครบกำหนด ${nextSupp.due_date})<br>💡 <strong>คำแนะนำ AI:</strong> ชะลอการจ่ายให้ใกล้กับวันครบกำหนดที่สุด เพื่อถือครองกระแสเงินสดสำรองไว้ให้นานที่สุด`;
+                } else {
+                    recExp.innerHTML = `📌 <strong>ไม่มีภาระเจ้าหนี้ค้างจ่าย:</strong><br>💡 <strong>คำแนะนำ AI:</strong> พิจารณาเจรจาขอส่วนลดการชำระเงินเร็ว (Early Payment Discount) จากซัพพลายเออร์หลัก 2-3%`;
+                }
+            }
+
+            const recRes = document.getElementById('ai-rec-reserve');
+            if (recRes) {
+                if (lowestProjectedBal < minReserve) {
+                    const diff = minReserve - lowestProjectedBal;
+                    recRes.innerHTML = `📌 <strong>เงินสดคาดการณ์ต่ำกว่าเกณฑ์:</strong> ขาดอยู่อีก <strong>${formatTHB(diff)}</strong> (พยากรณ์ 3 เดือน)<br>💡 <strong>คำแนะนำ AI:</strong> ปรับเพิ่มเงินสดเริ่มต้น หรือชะลอรายจ่ายที่ไม่จำเป็นเพื่อรักษาระดับสำรองขั้นต่ำ ${formatTHB(minReserve)}`;
+                } else {
+                    recRes.innerHTML = `📌 <strong>เงินสดสำรองเพียงพอ:</strong> คาดการณ์เงินสดต่ำสุด ${formatTHB(lowestProjectedBal)} สูงกว่าเกณฑ์สำรอง ${formatTHB(minReserve)} (พยากรณ์ 3 เดือน)<br>💡 <strong>คำแนะนำ AI:</strong> สภาพคล่องส่วนเกินสามารถนำไปลงทุนหมุนเวียนเพิ่มกำไรให้บริษัทได้`;
+                }
+            }
+
+            const recTax = document.getElementById('ai-rec-tax');
+            if (recTax) {
+                const vatSales = activeGenTxs.filter(t => t.status === 'Paid' && t.type === 'Income').reduce((a,b) => a + (b.vat||0), 0);
+                const vatBuys = activeGenTxs.filter(t => t.status === 'Paid' && t.type === 'Expense').reduce((a,b) => a + (b.vat||0), 0);
+                const vatNet = vatSales - vatBuys;
+                const whtTotal = activeGenTxs.filter(t => t.status === 'Paid').reduce((a,b) => a + (b.wht||0), 0);
+
+                recTax.innerHTML = `📌 <strong>กระทบยอดภาษีสะสม:</strong> ภาษีซื้อ ${formatTHB(vatBuys)} | หัก ณ ที่จ่ายสะสม ${formatTHB(whtTotal)}<br>💡 <strong>คำแนะนำ AI:</strong> ${vatNet < 0 ? `ยื่นขอคืนภาษีซื้อ ภ.พ.30 จำนวน <strong>${formatTHB(Math.abs(vatNet))}</strong> เพื่อเปลี่ยนเป็นกระแสเงินสดรับกลับเข้าบริษัท` : `จัดเตรียมเงินสด ${formatTHB(vatNet)} สำหรับยื่น ภ.พ.30 ภายในวันที่ 15`}`;
             }
         }
 
-        function renderInOutLedger() {
-            const tbodyInc = document.getElementById('inout-inc-table-body');
-            const tbodyExp = document.getElementById('inout-exp-table-body');
-            if (!tbodyInc && !tbodyExp) return;
+        function openAIEmergencyPlanModal() {
+            const activePendingTxs = getFilteredTransactions(true);
+            const pendingInc = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Income');
+            const pendingExp = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense');
 
-            const activeTxs = getFilteredTransactions(false);
+            const container = document.getElementById('ai-emergency-plan-content');
+            if (!container) return;
 
-            let paidIncomes = activeTxs.filter(t => t.status === 'Paid' && t.type === 'Income').sort((a, b) => {
-                return parseDDMMYYYY(a.date || a.pay_date) - parseDDMMYYYY(b.date || b.pay_date);
-            });
+            let html = `
+                <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; padding: 12px; border-radius: 8px;">
+                    <div style="font-weight: 700; color: #34d399; font-size: 13px;">1. เร่งรัดทวงถามลูกหนี้ 3 รายแรก (ยึดตามวันครบกำหนด)</div>
+                    <ul style="margin-top: 6px; padding-left: 18px; line-height: 1.6;">
+            `;
 
-            let paidExpenses = activeTxs.filter(t => t.status === 'Paid' && t.type === 'Expense').sort((a, b) => {
-                return parseDDMMYYYY(a.date || a.pay_date) - parseDDMMYYYY(b.date || b.pay_date);
-            });
-
-            const searchInc = document.getElementById('search-name-inout-inc')?.value.trim().toLowerCase() || '';
-            const searchExp = document.getElementById('search-name-inout-exp')?.value.trim().toLowerCase() || '';
-
-            if (searchInc) {
-                paidIncomes = paidIncomes.filter(t => 
-                    (t.vendor && t.vendor.toLowerCase().includes(searchInc)) ||
-                    (t.desc && t.desc.toLowerCase().includes(searchInc)) ||
-                    (t.id && t.id.toLowerCase().includes(searchInc)) ||
-                    (t.cheque_no && t.cheque_no.toLowerCase().includes(searchInc))
-                );
+            if (pendingInc.length > 0) {
+                pendingInc.slice(0, 3).forEach(t => {
+                    html += `<li><strong>${t.vendor}</strong> (ยอด ${formatTHB(t.net)}) — กำหนดชำระ: ${t.due_date}</li>`;
+                });
+            } else {
+                html += `<li>ไม่มีรายการลูกหนี้ค้างชำระในขณะนี้</li>`;
             }
 
-            if (searchExp) {
-                paidExpenses = paidExpenses.filter(t => 
-                    (t.vendor && t.vendor.toLowerCase().includes(searchExp)) ||
-                    (t.desc && t.desc.toLowerCase().includes(searchExp)) ||
-                    (t.id && t.id.toLowerCase().includes(searchExp)) ||
-                    (t.cheque_no && t.cheque_no.toLowerCase().includes(searchExp))
-                );
+            html += `
+                    </ul>
+                </div>
+
+                <div style="background: rgba(244, 63, 94, 0.1); border-left: 4px solid #f43f5e; padding: 12px; border-radius: 8px;">
+                    <div style="font-weight: 700; color: #fb7185; font-size: 13px;">2. เจรจาชะลอหรือแบ่งจ่ายเจ้าหนี้ 3 รายแรก (ยึดตามวันครบกำหนด)</div>
+                    <ul style="margin-top: 6px; padding-left: 18px; line-height: 1.6;">
+            `;
+
+            if (pendingExp.length > 0) {
+                pendingExp.slice(0, 3).forEach(t => {
+                    html += `<li><strong>${t.vendor}</strong> (ยอด ${formatTHB(t.net)}) — ครบกำหนด ${t.due_date} (ขอขยายเครดิตเพิ่ม 15 วัน)</li>`;
+                });
+            } else {
+                html += `<li>ไม่มีภาระเจ้าหนี้ค้างจ่ายในขณะนี้</li>`;
             }
 
-            const totalIncNet = paidIncomes.reduce((a,b) => a + (b.net || 0), 0);
-            const totalExpNet = paidExpenses.reduce((a,b) => a + (b.net || 0), 0);
-            const vatSales = paidIncomes.reduce((a,b) => a + (b.vat || 0), 0);
-            const vatBuys = paidExpenses.reduce((a,b) => a + (b.vat || 0), 0);
-            const whtTotal = paidIncomes.reduce((a,b) => a + (b.wht || 0), 0) + paidExpenses.reduce((a,b) => a + (b.wht || 0), 0);
-            const cashProfit = totalIncNet - totalExpNet;
-            const vatNet = vatSales - vatBuys;
-            const margin = totalIncNet > 0 ? ((cashProfit / totalIncNet) * 100).toFixed(1) : "0.0";
+            html += `
+                    </ul>
+                </div>
 
-            if (document.getElementById('recon-inout-inc-net')) document.getElementById('recon-inout-inc-net').innerText = formatTHB(totalIncNet);
-            if (document.getElementById('recon-inout-vat-sale')) document.getElementById('recon-inout-vat-sale').innerText = `ภาษีขาย 7%: ${formatTHB(vatSales)}`;
-            if (document.getElementById('recon-inout-exp-net')) document.getElementById('recon-inout-exp-net').innerText = formatTHB(totalExpNet);
-            if (document.getElementById('recon-inout-vat-buy')) document.getElementById('recon-inout-vat-buy').innerText = `ภาษีซื้อ 7%: ${formatTHB(vatBuys)}`;
-            if (document.getElementById('recon-inout-cash-profit')) document.getElementById('recon-inout-cash-profit').innerText = (cashProfit >= 0 ? '+' : '') + formatTHB(cashProfit);
-            if (document.getElementById('recon-inout-margin')) document.getElementById('recon-inout-margin').innerText = `Net Margin: ${margin}%`;
-            if (document.getElementById('recon-inout-vat-net')) document.getElementById('recon-inout-vat-net').innerText = vatNet >= 0 ? `นำส่งภาษี ${formatTHB(vatNet)}` : `ขอคืนภาษี ${formatTHB(Math.abs(vatNet))}`;
-            if (document.getElementById('recon-inout-wht-total')) document.getElementById('recon-inout-wht-total').innerText = `หัก ณ ที่จ่าย 3% รวม: ${formatTHB(whtTotal)}`;
+                <div style="background: rgba(217, 119, 6, 0.1); border-left: 4px solid #f59e0b; padding: 12px; border-radius: 8px;">
+                    <div style="font-weight: 700; color: #fbbf24; font-size: 13px;">3. สรุปผลลัพธ์สภาพคล่องหลังปฏิบัติตามแผน (ประมวลผล 3 เดือน)</div>
+                    <div style="margin-top: 4px; line-height: 1.6;">
+                        กระแสเงินสดหมุนเวียนจะเพิ่มขึ้นสูงสุด <strong>${formatTHB(pendingInc.slice(0,3).reduce((a,b)=>a+(b.net||0),0))}</strong> และชะลอรายจ่ายออกไปได้ <strong>${formatTHB(pendingExp.slice(0,3).reduce((a,b)=>a+(b.net||0),0))}</strong> ส่งผลให้สภาพคล่องปลอดภัย 100%!
+                    </div>
+                </div>
+            `;
 
-            if (document.getElementById('inout-inc-summary')) {
-                document.getElementById('inout-inc-summary').innerText = `รวม ${paidIncomes.length} รายการ (รับชำระแล้ว: ${formatTHB(totalIncNet)})`;
-            }
-            if (document.getElementById('inout-exp-summary')) {
-                document.getElementById('inout-exp-summary').innerText = `รวม ${paidExpenses.length} รายการ (จ่ายเงินแล้ว: ${formatTHB(totalExpNet)})`;
-            }
-
-            if (tbodyInc) {
-                if (paidIncomes.length === 0) {
-                    tbodyInc.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายรับที่ชำระแล้ว</td></tr>`;
-                } else {
-                    tbodyInc.innerHTML = paidIncomes.map(t => {
-                        const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
-                        const docBtnIcon = t.file_data ? 'fa-file-lines' : 'fa-file-invoice';
-                        const docBtnLabel = t.file_data ? 'ดู/โหลดเอกสาร' : '📄 ดู/โหลดเอกสาร';
-                        const completionDate = t.pay_date || t.date;
-                        return `
-                            <tr>
-                                <td style="font-family:monospace; font-weight:600; color:#047857;">${completionDate}</td>
-                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
-                                <td style="font-weight:700; color:#0f172a;">${t.vendor}</td>
-                                <td>${t.desc}</td>
-                                <td style="font-family:monospace; font-size:11px;">${t.credit_days || 30} วัน (${t.due_date})</td>
-                                <td style="text-align:right; font-family:monospace;">${formatTHB(t.before_vat || t.net)}</td>
-                                <td style="text-align:right; font-family:monospace;">${formatTHB(t.vat || 0)}</td>
-                                <td style="text-align:right; font-family:monospace; color:#be123c;">-${formatTHB(t.wht || 0)}</td>
-                                <td style="text-align:right; font-family:monospace; font-weight:700; color:#047857;">${formatTHB(t.net)}</td>
-                                <td style="text-align:center;"><span class="badge-status badge-paid">รับชำระแล้ว</span></td>
-                                <td style="text-align:center;">
-                                    <div style="display:flex; gap:4px; justify-content:center;">
-                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
-                                        <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('');
-                }
-            }
-
-            if (tbodyExp) {
-                if (paidExpenses.length === 0) {
-                    tbodyExp.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:24px; color:#64748b;">📭 ไม่มีรายการรายจ่ายที่จ่ายแล้ว</td></tr>`;
-                } else {
-                    tbodyExp.innerHTML = paidExpenses.map(t => {
-                        const docBtnClass = t.file_data ? 'btn-indigo' : 'btn-outline';
-                        const docBtnIcon = t.file_data ? 'fa-file-lines' : 'fa-file-invoice';
-                        const docBtnLabel = t.file_data ? 'ดู/โหลดเอกสาร' : '📄 ดู/โหลดเอกสาร';
-                        const completionDate = t.pay_date || t.date;
-                        return `
-                            <tr>
-                                <td style="font-family:monospace; font-weight:600; color:#be123c;">${completionDate}</td>
-                                <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:700; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
-                                <td style="font-weight:700; color:#0f172a;">${t.vendor}</td>
-                                <td>${t.desc}</td>
-                                <td style="font-family:monospace; font-size:11px;">${t.credit_days || 30} วัน (${t.due_date})</td>
+            container.innerHTML = html;
+            openModal('ai-emergency-plan-modal');
+        }
                                 <td style="text-align:right; font-family:monospace;">${formatTHB(t.before_vat || t.net)}</td>
                                 <td style="text-align:right; font-family:monospace;">${formatTHB(t.vat || 0)}</td>
                                 <td style="text-align:right; font-family:monospace; color:#be123c;">-${formatTHB(t.wht || 0)}</td>
@@ -3012,61 +2994,83 @@
         }
 
         function openEditModal(txId) {
-            const t = transactions.find(x => x.id === txId);
-            if (!t) { alert('⚠️ ไม่พบรายการที่ต้องการแก้ไข'); return; }
+            try {
+                const t = transactions.find(x => String(x.id) === String(txId));
+                if (!t) { alert('⚠️ ไม่พบรายการที่ต้องการแก้ไข ID: ' + txId); return; }
 
-            document.getElementById('edit-tx-id').value = t.id;
-            document.getElementById('edit-doc-no').value = t.id;
-            document.getElementById('edit-type').value = t.type || 'Expense';
-            document.getElementById('edit-status').value = t.status || 'Unpaid';
-            document.getElementById('edit-pay-method').value = t.pay_method || 'Transfer';
-            document.getElementById('edit-date').value = t.date || TODAY_DATE_STR;
-            document.getElementById('edit-credit-days').value = (t.credit_days !== undefined) ? t.credit_days : 30;
-            document.getElementById('edit-vendor').value = t.vendor || '';
-            document.getElementById('edit-desc').value = t.desc || '';
+                if (document.getElementById('edit-tx-id')) document.getElementById('edit-tx-id').value = t.id || '';
+                if (document.getElementById('edit-doc-no')) document.getElementById('edit-doc-no').value = t.id || '';
+                
+                let tType = t.type || 'Expense';
+                if (tType === 'รายจ่าย') tType = 'Expense';
+                if (tType === 'รายรับ') tType = 'Income';
+                if (document.getElementById('edit-type')) document.getElementById('edit-type').value = tType;
 
-            toggleChequeInputs('edit');
+                let tStatus = t.status || 'Unpaid';
+                if (tStatus === 'ชำระแล้ว' || tStatus === 'รับชำระแล้ว') tStatus = 'Paid';
+                if (tStatus === 'รอชำระ' || tStatus === 'ค้างชำระ' || tStatus === 'ค้างรับ') tStatus = 'Unpaid';
+                if (document.getElementById('edit-status')) document.getElementById('edit-status').value = tStatus;
 
-            if (t.pay_method === 'Cheque') {
-                if (document.getElementById('edit-cheque-no')) document.getElementById('edit-cheque-no').value = t.cheque_no || '';
-                if (document.getElementById('edit-cheque-bank')) document.getElementById('edit-cheque-bank').value = t.cheque_bank || 'กสิกรไทย (KBANK)';
-                if (document.getElementById('edit-cheque-date')) document.getElementById('edit-cheque-date').value = t.cheque_date || t.due_date || t.date;
-                if (document.getElementById('edit-cheque-status')) document.getElementById('edit-cheque-status').value = t.cheque_status || 'Pending';
-            }
+                let tPayMethod = t.pay_method || 'Transfer';
+                if (tPayMethod === 'เงินโอน' || tPayMethod === 'โอนเงิน') tPayMethod = 'Transfer';
+                if (tPayMethod === 'เงินสด') tPayMethod = 'Cash';
+                if (tPayMethod === 'เช็ค') tPayMethod = 'Cheque';
+                if (document.getElementById('edit-pay-method')) document.getElementById('edit-pay-method').value = tPayMethod;
 
-            let bVat = t.before_vat || t.net || 0;
-            let vatVal = t.vat || 0;
-            let whtVal = t.wht || 0;
+                if (document.getElementById('edit-date')) document.getElementById('edit-date').value = t.date || TODAY_DATE_STR;
+                if (document.getElementById('edit-credit-days')) document.getElementById('edit-credit-days').value = (t.credit_days !== undefined) ? t.credit_days : 30;
+                if (document.getElementById('edit-vendor')) document.getElementById('edit-vendor').value = t.vendor || '';
+                if (document.getElementById('edit-desc')) document.getElementById('edit-desc').value = t.desc || '';
 
-            if (vatVal > 0) {
-                document.getElementById('edit-vat-mode').value = 'EXC_VAT';
-            } else {
-                document.getElementById('edit-vat-mode').value = 'NO_VAT';
-            }
+                toggleChequeInputs('edit');
 
-            if (whtVal > 0 && bVat > 0) {
-                let estRate = Math.round((whtVal / bVat) * 100);
-                if ([1, 2, 3, 5].includes(estRate)) {
-                    document.getElementById('edit-wht-mode').value = String(estRate);
-                } else {
-                    document.getElementById('edit-wht-mode').value = 'CUSTOM';
-                    if (document.getElementById('edit-wht-custom-rate')) {
-                        document.getElementById('edit-wht-custom-rate').value = ((whtVal / bVat) * 100).toFixed(1);
+                if (tPayMethod === 'Cheque') {
+                    if (document.getElementById('edit-cheque-no')) document.getElementById('edit-cheque-no').value = t.cheque_no || '';
+                    if (document.getElementById('edit-cheque-bank')) document.getElementById('edit-cheque-bank').value = t.cheque_bank || 'กสิกรไทย (KBANK)';
+                    if (document.getElementById('edit-cheque-date')) document.getElementById('edit-cheque-date').value = t.cheque_date || t.due_date || t.date || TODAY_DATE_STR;
+                    if (document.getElementById('edit-cheque-status')) document.getElementById('edit-cheque-status').value = t.cheque_status || 'Pending';
+                }
+
+                let bVat = (t.before_vat !== undefined) ? t.before_vat : (t.net || 0);
+                let vatVal = t.vat || 0;
+                let whtVal = t.wht || 0;
+
+                const vatSelect = document.getElementById('edit-vat-mode');
+                if (vatSelect) {
+                    if (vatVal > 0) vatSelect.value = 'EXC_VAT';
+                    else vatSelect.value = 'NO_VAT';
+                }
+
+                const whtSelect = document.getElementById('edit-wht-mode');
+                if (whtSelect) {
+                    if (whtVal > 0 && bVat > 0) {
+                        let estRate = Math.round((whtVal / bVat) * 100);
+                        if ([1, 2, 3, 5].includes(estRate)) {
+                            whtSelect.value = String(estRate);
+                        } else {
+                            whtSelect.value = 'CUSTOM';
+                            if (document.getElementById('edit-wht-custom-rate')) {
+                                document.getElementById('edit-wht-custom-rate').value = ((whtVal / bVat) * 100).toFixed(1);
+                            }
+                        }
+                    } else {
+                        whtSelect.value = '0';
                     }
                 }
-            } else {
-                document.getElementById('edit-wht-mode').value = '0';
+
+                if (document.getElementById('edit-base-amount')) document.getElementById('edit-base-amount').value = bVat;
+                calcEditAmounts();
+
+                if (t.before_vat !== undefined && document.getElementById('edit-before-vat')) document.getElementById('edit-before-vat').value = Number(bVat).toFixed(2);
+                if (t.vat !== undefined && document.getElementById('edit-vat')) document.getElementById('edit-vat').value = Number(vatVal).toFixed(2);
+                if (t.wht !== undefined && document.getElementById('edit-wht')) document.getElementById('edit-wht').value = Number(whtVal).toFixed(2);
+                if (t.net !== undefined && document.getElementById('edit-net')) document.getElementById('edit-net').value = Number(t.net).toFixed(2);
+
+                openModal('edit-transaction-modal');
+            } catch (err) {
+                console.error("Error in openEditModal:", err);
+                alert("⚠️ เกิดข้อผิดพลาดในการเปิดหน้าแก้ไข: " + err.message);
             }
-
-            document.getElementById('edit-base-amount').value = bVat;
-            calcEditAmounts();
-
-            if (t.before_vat !== undefined) document.getElementById('edit-before-vat').value = bVat.toFixed(2);
-            if (t.vat !== undefined) document.getElementById('edit-vat').value = vatVal.toFixed(2);
-            if (t.wht !== undefined) document.getElementById('edit-wht').value = whtVal.toFixed(2);
-            if (t.net !== undefined) document.getElementById('edit-net').value = t.net.toFixed(2);
-
-            openModal('edit-transaction-modal');
         }
 
         function saveTransactionEdit() {
