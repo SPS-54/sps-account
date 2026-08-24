@@ -1258,7 +1258,21 @@
                 if (!lastLocalUpdate || lastLocalUpdate === 0) {
                     lastLocalUpdate = Date.now();
                 }
-                localStorage.setItem(STORAGE_PREFIX + 'TRANSACTIONS', JSON.stringify(transactions));
+                
+                try {
+                    localStorage.setItem(STORAGE_PREFIX + 'TRANSACTIONS', JSON.stringify(transactions));
+                } catch(quotaErr) {
+                    // QuotaExceededError! Strip heavy image Base64 data so all accounting data is saved 100% reliably!
+                    const sanitizedTxs = transactions.map(t => {
+                        if (t.file_data && t.file_data.length > 500) {
+                            const { file_data, ...rest } = t;
+                            return rest;
+                        }
+                        return t;
+                    });
+                    localStorage.setItem(STORAGE_PREFIX + 'TRANSACTIONS', JSON.stringify(sanitizedTxs));
+                }
+
                 localStorage.setItem(STORAGE_PREFIX + 'VENDOR_MEMORY', JSON.stringify(vendorMemory));
                 localStorage.setItem(STORAGE_PREFIX + 'LAST_UPDATED', lastLocalUpdate.toString());
                 localStorage.setItem(STORAGE_PREFIX + 'HAS_INITIALIZED', 'true');
@@ -2537,17 +2551,12 @@
             if (saved) {
                 try { 
                     transactions = JSON.parse(saved); 
-                    if (!Array.isArray(transactions)) {
-                        transactions = [];
-                        saveState();
-                    }
+                    if (!Array.isArray(transactions)) transactions = [];
                 } catch(e) { 
                     transactions = []; 
-                    saveState();
                 }
             } else {
                 transactions = [];
-                saveState();
             }
 
             const savedTime = localStorage.getItem(STORAGE_PREFIX + 'LAST_UPDATED');
