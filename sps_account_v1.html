@@ -1245,6 +1245,8 @@
                 <button onclick="copyAIEmergencyPlanToClipboard()" class="btn btn-amber"><i class="fa-solid fa-copy"></i> 📋 คัดลอกแผนฉุกเฉินส่งเข้า Line บริหาร</button>
             </div>
         </div>
+    </div>
+
     <!-- MODAL 6: LINE AUTOMATIC DAILY NOTIFICATIONS MODAL -->
     <div id="line-notify-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 680px;">
@@ -1285,8 +1287,7 @@
         function getOrGenerateCloudUrl() {
             let url = localStorage.getItem(STORAGE_PREFIX + 'CLOUD_URL');
             if (!url || url.length < 20) {
-                const uniqueId = "139281" + Math.floor(10000000 + Math.random() * 90000000) + Date.now().toString(36);
-                url = "https://jsonblob.com/api/jsonBlob/" + uniqueId;
+                url = "https://jsonblob.com/api/jsonBlob/1392818930554381504";
                 try { localStorage.setItem(STORAGE_PREFIX + 'CLOUD_URL', url); } catch(e) {}
             }
             return url;
@@ -1438,8 +1439,8 @@
                         if (transactions.length > 0 && cloudData.transactions.length === 0) {
                             await autoPushToCloud(false);
                         }
-                        // SAFEGUARD 2: Overwrite local only if cloud is strictly newer and has data
-                        else if (cloudTime > localTime && cloudData.transactions.length > 0) {
+                        // SAFEGUARD 2: Overwrite local if cloud has data and (cloud is newer OR local is currently 0)
+                        else if (cloudData.transactions.length > 0 && (cloudTime > localTime || transactions.length === 0)) {
                             const fileMap = {};
                             transactions.forEach(t => { if (t.id && t.file_data) fileMap[t.id] = t.file_data; });
 
@@ -1449,12 +1450,12 @@
                             });
 
                             if (cloudData.vendorMemory) vendorMemory = cloudData.vendorMemory;
-                            lastLocalUpdate = cloudTime;
+                            lastLocalUpdate = cloudTime || Date.now();
                             
                             saveState(true);
                             renderLedger();
 
-                            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down"></i> 🟢 อัปเดตข้อมูลล่าสุดแล้ว (${nowStr})`;
+                            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down"></i> 🟢 ดึงข้อมูล ${transactions.length} รายการจากคลาวด์แล้ว (${nowStr})`;
                         } 
                         // SAFEGUARD 3: If local is newer/equal, push local
                         else if (localTime > cloudTime || (transactions.length > 0 && cloudTime <= localTime)) {
