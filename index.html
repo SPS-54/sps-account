@@ -842,13 +842,15 @@
             </div>
             <div class="modal-body">
                 <div style="background: #ecfdf5; border: 1px solid #a7f3d0; padding: 14px; border-radius: 10px; margin-bottom: 16px; font-size: 12px; color: #065f46; line-height: 1.6;">
-                    <strong>⚡ ระบบซิงก์คลาวด์อัตโนมัติ 100% (Real-Time Auto-Sync):</strong><br>
-                    ทุกครั้งที่คุณเพิ่มรายการใหม่, สแกนเอกสารด้วย AI, แจ้งจ่ายเงิน หรืออัปเดตข้อมูลบนคอมพิวเตอร์หรือมือถือ ระบบจะซิงก์ข้อมูลขึ้นคลาวด์ให้อัตโนมัติทันที และอีกอุปกรณ์หนึ่งจะอัปเดตเองภายใน 6 วินาที โดยไม่ต้องกดปุ่มใดๆ!
+                    <strong>⚡ วิธีส่งข้อมูลจากคอมพิวเตอร์ไปมือถือ (2 วิธีง่ายๆ):</strong><br>
+                    <b>วิธีที่ 1 (แนะนำ - เร็วที่สุด):</b> กดปุ่ม <b>"📋 คัดลอกรหัสข้อมูลส่งเข้า Line"</b> ส่งรหัสเข้าแชท Line -> เปิดบนมือถือ -> กดแถบ <b>"นำเข้า/สำรองข้อมูล"</b> วางรหัสแล้วกด <b>"กู้คืนข้อมูล"</b> ข้อมูล 41 รายการจะเข้ามือถือทันที!<br>
+                    <b>วิธีที่ 2 (จับคู่ถาวร):</b> กด <b>"🔑 คัดลอกคีย์ซิงก์คลาวด์"</b> นำคีย์ไปวางในมือถือ ทั้ง 2 เครื่องจะเชื่อมต่อท่อน้ำคลาวด์เดียวกันตลอดไป
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <button onclick="syncPushToCloud(true)" class="btn btn-purple" style="justify-content: center; padding: 12px;"><i class="fa-solid fa-cloud-arrow-up"></i> 📤 บังคับอัปโหลดข้อมูลขึ้นคลาวด์ทันที</button>
+                    <button onclick="syncPushToCloud(true)" class="btn btn-purple" style="justify-content: center; padding: 12px;"><i class="fa-solid fa-cloud-arrow-up"></i> 📤 บังคับอัปโหลดข้อมูลขึ้นคลาวด์สดทันที</button>
                     <button onclick="syncPullFromCloud(true)" class="btn btn-indigo" style="justify-content: center; padding: 12px;"><i class="fa-solid fa-cloud-arrow-down"></i> 📥 บังคับดึงข้อมูลจากคลาวด์ลงอุปกรณ์นี้</button>
-                    <button onclick="copySystemDataCode()" class="btn btn-amber" style="justify-content: center; padding: 12px;"><i class="fa-solid fa-copy"></i> 📋 คัดลอกรหัสข้อมูลส่งเข้า Line</button>
+                    <button onclick="copySystemDataCode()" class="btn btn-amber" style="justify-content: center; padding: 12px;"><i class="fa-solid fa-copy"></i> 📋 คัดลอกรหัสข้อมูลส่งเข้า Line (แนะนำวิธีนี้ง่ายและชัวร์ที่สุด)</button>
+                    <button onclick="copyCloudRelayUrl()" class="btn btn-emerald" style="justify-content: center; padding: 12px;"><i class="fa-solid fa-link"></i> 🔑 คัดลอกคีย์ซิงก์คลาวด์จับคู่อุปกรณ์ถาวร</button>
                 </div>
             </div>
             <div class="modal-footer">
@@ -2484,10 +2486,23 @@
         function copySystemDataCode() {
             const codeStr = JSON.stringify(transactions, null, 2);
             navigator.clipboard.writeText(codeStr).then(() => {
-                alert("📋 คัดลอกรหัสข้อมูลเรียบร้อยแล้ว!\nนำรหัสนี้ไปส่งในแชท Line แล้วกดวางรหัสบนอีกเครื่องได้เลยครับ!");
+                alert("📋 คัดลอกรหัสข้อมูลเรียบร้อยแล้ว!\nนำรหัสนี้ไปส่งในแชท Line -> เปิดบนมือถือ -> กดแถบ 'นำเข้า/สำรองข้อมูล' วางรหัสแล้วกด 'กู้คืนข้อมูล' ได้เลยครับ!");
             }).catch(e => {
-                prompt("📋 คัดลอกรหัสข้อมูลด้านล่างนี้:", codeStr);
+                prompt("📋 คัดลอกรหัสข้อมูลด้านล่างนี้ไปส่งใน Line:", codeStr);
             });
+        }
+
+        async function copyCloudRelayUrl() {
+            if (!PUBLIC_CLOUD_RELAY_URL) {
+                await autoPushToCloud(true);
+            }
+            if (PUBLIC_CLOUD_RELAY_URL) {
+                navigator.clipboard.writeText(PUBLIC_CLOUD_RELAY_URL).then(() => {
+                    alert(`🔑 คัดลอกคีย์ซิงก์คลาวด์จับคู่อุปกรณ์เรียบร้อยแล้ว!\nนำลิงก์นี้ไปวางที่ช่อง "นำเข้า/สำรองข้อมูล" บนมือถือ ทั้ง 2 เครื่องจะเชื่อมต่อกันตลอดเวลาครับ`);
+                }).catch(e => {
+                    prompt("🔑 คัดลอกคีย์ซิงก์คลาวด์ด้านล่างนี้:", PUBLIC_CLOUD_RELAY_URL);
+                });
+            }
         }
 
         function handleFileBackupSelect(evt) {
@@ -2503,7 +2518,17 @@
 
         function processBackupTextImport() {
             const raw = document.getElementById('backup-text-input').value.trim();
-            if (!raw) { alert('⚠️ กรุณาวางข้อความแบ็กอัพ หรือเลือกไฟล์ก่อนครับ'); return; }
+            if (!raw) { alert('⚠️ กรุณาวางข้อความแบ็กอัพ หรือเลือกรหัสซิงก์ก่อนครับ'); return; }
+
+            if (raw.startsWith('http://') || raw.startsWith('https://')) {
+                PUBLIC_CLOUD_RELAY_URL = raw;
+                try { localStorage.setItem(STORAGE_PREFIX + 'CLOUD_URL', raw); } catch(e) {}
+                autoSyncFromCloud().then(() => {
+                    alert(`🔗 เชื่อมต่อคีย์ช่องซิงก์สดสำเร็จ! ดึงข้อมูล ${transactions.length} รายการลงอุปกรณ์นี้เรียบร้อยครับ!`);
+                });
+                return;
+            }
+
             try {
                 const parsed = JSON.parse(raw);
                 if (Array.isArray(parsed)) {
