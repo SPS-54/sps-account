@@ -1277,9 +1277,37 @@
             };
         }
 
-        async function createFreshCloudRelay() {
-            PUBLIC_CLOUD_RELAY_URL = getOrGenerateCloudUrl();
-            return true;
+        async function createFreshCloudRelay(dataObj) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+                const payload = dataObj || prepareCloudPayload(true);
+                let res = await fetch("https://jsonblob.com/api/jsonBlob", {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json' 
+                    },
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (res.ok) {
+                    const locationHeader = res.headers.get('Location') || res.headers.get('location');
+                    if (locationHeader) {
+                        let newUrl = locationHeader;
+                        if (newUrl.startsWith('http://')) newUrl = newUrl.replace('http://', 'https://');
+                        PUBLIC_CLOUD_RELAY_URL = newUrl;
+                        try { localStorage.setItem(STORAGE_PREFIX + 'CLOUD_URL', newUrl); } catch(e) {}
+                        return true;
+                    }
+                }
+            } catch(err) {
+                console.error("Error in createFreshCloudRelay:", err);
+            }
+            return false;
         }
 
         async function autoPushToCloud(showSpinner = false) {
@@ -1287,18 +1315,18 @@
             const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
             if (showSpinner && syncBadge) {
-                syncBadge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 🔄 กำลังซิงก์คลาวด์...`;
-            }
-
-            if (!PUBLIC_CLOUD_RELAY_URL) {
-                await createFreshCloudRelay();
+                syncBadge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 🔄 กำลังดันข้อมูลขึ้นคลาวด์สด...`;
             }
 
             const dataObj = prepareCloudPayload(true);
 
+            if (!PUBLIC_CLOUD_RELAY_URL) {
+                await createFreshCloudRelay(dataObj);
+            }
+
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 4000);
+                const timeoutId = setTimeout(() => controller.abort(), 6000);
 
                 let res = await fetch(PUBLIC_CLOUD_RELAY_URL, {
                     method: 'PUT',
@@ -1309,15 +1337,20 @@
                 clearTimeout(timeoutId);
 
                 if (res.status === 404) {
-                    const healed = await createFreshCloudRelay();
+                    const healed = await createFreshCloudRelay(dataObj);
                     if (healed && syncBadge) {
-                        syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> ☁️ ซิงก์คลาวด์สดสำเร็จ (${nowStr})`;
-                        return;
+                        syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> ☁️ ซิงก์คลาวด์สดสำเร็จ (${transactions.length} รายการ - ${nowStr})`;
+                        if (showSpinner) alert(`☁️ ดันข้อมูล ${transactions.length} รายการ ขึ้นคลาวด์สดสำเร็จแล้ว!\n\n📱 อุปกรณ์อื่นที่เชื่อมช่องซิงก์นี้จะได้รับข้อมูล ${transactions.length} รายการทันทีครับ`);
+                        return true;
                     }
                 }
 
-                if (res.ok && syncBadge) {
-                    syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> ☁️ ซิงก์คลาวด์สดสำเร็จ (${nowStr})`;
+                if (res.ok) {
+                    if (syncBadge) {
+                        syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> ☁️ ซิงก์คลาวด์สดสำเร็จ (${transactions.length} รายการ - ${nowStr})`;
+                    }
+                    if (showSpinner) alert(`☁️ ดันข้อมูล ${transactions.length} รายการ ขึ้นคลาวด์สดสำเร็จแล้ว!\n\n📱 อุปกรณ์อื่นที่เชื่อมช่องซิงก์นี้จะได้รับข้อมูล ${transactions.length} รายการทันทีครับ`);
+                    return true;
                 } else if (syncBadge) {
                     syncBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 🟢 บันทึกในเครื่องเรียบร้อย (${transactions.length} รายการ)`;
                 }
@@ -1326,6 +1359,11 @@
                     syncBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 🟢 บันทึกในเครื่องเรียบร้อย (${transactions.length} รายการ)`;
                 }
             }
+            return false;
+        }
+
+        async function syncPushToCloud(showSpinner = true) {
+            return await autoPushToCloud(showSpinner);
         }
 
         async function autoSyncFromCloud() {
