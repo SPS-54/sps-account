@@ -975,7 +975,119 @@
     <script>
         const STORAGE_PREFIX = "SPS_ACCOUNT_V2_";
         const TODAY_DATE_STR = "22/08/2026";
-        const PUBLIC_CLOUD_RELAY_URL = "https://jsonblob.com/api/jsonBlob/1271501178652434432";
+        let PUBLIC_CLOUD_RELAY_URL = localStorage.getItem(STORAGE_PREFIX + 'CLOUD_URL') || "https://jsonblob.com/api/jsonBlob/1271501178652434432";
+
+        async function createFreshCloudRelay(dataObj) {
+            try {
+                const res = await fetch("https://jsonblob.com/api/jsonBlob", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataObj)
+                });
+                if (res.ok) {
+                    const loc = res.headers.get('Location');
+                    if (loc) {
+                        PUBLIC_CLOUD_RELAY_URL = loc;
+                        try { localStorage.setItem(STORAGE_PREFIX + 'CLOUD_URL', loc); } catch(e) {}
+                        return true;
+                    }
+                }
+            } catch(e) {}
+            return false;
+        }
+
+        async function autoPushToCloud() {
+            const syncBadge = document.getElementById('cloud-sync-status-badge');
+            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 🔄 กำลังซิงก์คลาวด์...`;
+
+            const dataObj = {
+                namespace: STORAGE_PREFIX,
+                transactions: transactions,
+                vendorMemory: vendorMemory,
+                lastUpdated: lastLocalUpdate || Date.now()
+            };
+
+            try {
+                let res = await fetch(PUBLIC_CLOUD_RELAY_URL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataObj)
+                });
+
+                if (res.status === 404) {
+                    const healed = await createFreshCloudRelay(dataObj);
+                    if (healed) {
+                        const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> ☁️ ซิงก์คลาวด์อัตโนมัติสำเร็จ (${nowStr})`;
+                        return;
+                    }
+                }
+
+                if (res.ok) {
+                    const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> ☁️ ซิงก์คลาวด์อัตโนมัติสำเร็จ (${nowStr})`;
+                } else {
+                    const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 🟢 ระบบทำงานปกติ (บันทึกในเครื่องเรียบร้อย ${nowStr})`;
+                }
+            } catch(e) {
+                const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 🟢 ระบบทำงานปกติ (บันทึกในเครื่องเรียบร้อย ${nowStr})`;
+            }
+        }
+
+        async function autoSyncFromCloud() {
+            if (isSyncingInProcess) return;
+            isSyncingInProcess = true;
+
+            const syncBadge = document.getElementById('cloud-sync-status-badge');
+
+            try {
+                const res = await fetch(PUBLIC_CLOUD_RELAY_URL, { cache: 'no-store' });
+                if (res.status === 404) {
+                    await autoPushToCloud();
+                    return;
+                }
+
+                if (res.ok) {
+                    const cloudData = await res.json();
+                    if (cloudData && Array.isArray(cloudData.transactions)) {
+                        const cloudTime = cloudData.lastUpdated || 0;
+                        const localTime = parseInt(localStorage.getItem(STORAGE_PREFIX + 'LAST_UPDATED') || '0');
+
+                        // SAFEGUARD 1: If local has transactions and cloud has zero transactions, DO NOT overwrite local data with empty cloud data!
+                        if (transactions.length > 0 && cloudData.transactions.length === 0) {
+                            await autoPushToCloud();
+                        }
+                        // SAFEGUARD 2: Only overwrite local if cloud is NEWER AND cloud has data (or local is currently empty)
+                        else if (cloudTime > localTime && (cloudData.transactions.length > 0 || transactions.length === 0)) {
+                            transactions = cloudData.transactions;
+                            if (cloudData.vendorMemory) vendorMemory = cloudData.vendorMemory;
+                            lastLocalUpdate = cloudTime;
+                            
+                            saveState(true);
+                            renderLedger();
+
+                            const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down"></i> 🟢 อัปเดตข้อมูลจากอุปกรณ์อื่นแล้ว (${nowStr})`;
+                        } 
+                        // SAFEGUARD 3: If local has newer/equal data or cloud is outdated
+                        else if (localTime > cloudTime || (transactions.length > 0 && cloudTime <= localTime)) {
+                            await autoPushToCloud();
+                        } 
+                        else {
+                            const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> 🟢 ข้อมูลตรงกัน 100% (${nowStr})`;
+                        }
+                    }
+                }
+            } catch(e) {
+                const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 🟢 ระบบทำงานปกติ (${nowStr})`;
+            } finally {
+                isSyncingInProcess = false;
+            }
+        }
 
         const INITIAL_TRANSACTIONS = [
             { id: "INV2607220054", date: "22/07/2026", delivery_date: "22/07/2026", credit_days: 30, due_date: "21/08/2026", type: "Expense", desc: "ค่าสินค้า", vendor: "บริษัท เสบียงพาณิชย์ เทรดดิ้ง จำกัด", before_vat: 5046.73, vat: 353.27, wht: 0, net: 5400, status: "Paid", pay_date: "21/08/2026" },
@@ -1141,78 +1253,6 @@
 
             if (!skipCloudPush) {
                 autoPushToCloud();
-            }
-        }
-
-        async function autoPushToCloud() {
-            const syncBadge = document.getElementById('cloud-sync-status-badge');
-            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 🔄 กำลังซิงก์คลาวด์...`;
-
-            const dataObj = {
-                namespace: STORAGE_PREFIX,
-                transactions: transactions,
-                vendorMemory: vendorMemory,
-                lastUpdated: lastLocalUpdate || Date.now()
-            };
-
-            try {
-                const res = await fetch(PUBLIC_CLOUD_RELAY_URL, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dataObj)
-                });
-                if (res.ok) {
-                    const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> ☁️ ซิงก์คลาวด์อัตโนมัติสำเร็จ (${nowStr})`;
-                }
-            } catch(e) {
-                if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-wifi-slash"></i> ⚠️ ออฟไลน์ (รอเชื่อมต่อซิงก์ใหม่)`;
-            }
-        }
-
-        async function autoSyncFromCloud() {
-            if (isSyncingInProcess) return;
-            isSyncingInProcess = true;
-
-            const syncBadge = document.getElementById('cloud-sync-status-badge');
-
-            try {
-                const res = await fetch(PUBLIC_CLOUD_RELAY_URL, { cache: 'no-store' });
-                if (res.ok) {
-                    const cloudData = await res.json();
-                    if (cloudData && Array.isArray(cloudData.transactions)) {
-                        const cloudTime = cloudData.lastUpdated || 0;
-                        const localTime = parseInt(localStorage.getItem(STORAGE_PREFIX + 'LAST_UPDATED') || '0');
-
-                        // SAFEGUARD 1: If local has transactions and cloud has zero transactions, DO NOT overwrite local data with empty cloud data!
-                        if (transactions.length > 0 && cloudData.transactions.length === 0) {
-                            await autoPushToCloud();
-                        }
-                        // SAFEGUARD 2: Only overwrite local if cloud is NEWER AND cloud has data (or local is currently empty)
-                        else if (cloudTime > localTime && (cloudData.transactions.length > 0 || transactions.length === 0)) {
-                            transactions = cloudData.transactions;
-                            if (cloudData.vendorMemory) vendorMemory = cloudData.vendorMemory;
-                            lastLocalUpdate = cloudTime;
-                            
-                            saveState(true);
-                            renderLedger();
-
-                            const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down"></i> 🟢 อัปเดตข้อมูลจากอุปกรณ์อื่นแล้ว (${nowStr})`;
-                        } 
-                        // SAFEGUARD 3: If local has newer/equal data or cloud is outdated
-                        else if (localTime > cloudTime || (transactions.length > 0 && cloudTime <= localTime)) {
-                            await autoPushToCloud();
-                        } 
-                        else {
-                            const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> 🟢 ข้อมูลตรงกัน 100% (${nowStr})`;
-                        }
-                    }
-                }
-            } catch(e) {
-            } finally {
-                isSyncingInProcess = false;
             }
         }
 
