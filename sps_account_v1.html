@@ -1575,7 +1575,9 @@
             const vat = parseFloat(document.getElementById('ocr-vat').value) || 0;
             const wht = parseFloat(document.getElementById('ocr-wht').value) || 0;
             const date = document.getElementById('ocr-date').value || TODAY_DATE_STR;
-            const creditDays = parseInt(document.getElementById('ocr-credit').value) || 30;
+            const creditInputVal = document.getElementById('ocr-credit').value.trim();
+            const creditDays = (creditInputVal === '0' || creditInputVal === 0) ? 0 : (parseInt(creditInputVal) || 30);
+            const isInstantPaid = (creditDays === 0);
 
             if (!vendor || net <= 0) { alert('⚠️ กรุณากรอกชื่อคู่ค้าและยอดเงิน'); return; }
 
@@ -1589,7 +1591,22 @@
             vendorMemory[vendor] = { category: desc || "ค่าใช้จ่ายทั่วไป", credit: creditDays, confidence: 99 };
 
             transactions.unshift({
-                id: docNo, date, delivery_date: date, credit_days: creditDays, due_date: dueDate, type, desc: desc || "สแกนด้วย AI OCR", vendor, before_vat, vat, wht, net, status: "Unpaid", file_data: fileData
+                id: docNo,
+                date,
+                delivery_date: date,
+                credit_days: creditDays,
+                due_date: dueDate,
+                type,
+                desc: desc || "สแกนด้วย AI OCR",
+                vendor,
+                before_vat,
+                vat,
+                wht,
+                net,
+                status: isInstantPaid ? "Paid" : "Unpaid",
+                pay_date: isInstantPaid ? date : null,
+                pay_method: "Transfer",
+                file_data: fileData
             });
 
             lastLocalUpdate = Date.now();
@@ -1597,7 +1614,8 @@
             renderLedger();
             document.getElementById('ocr-preview-box').style.display = 'none';
             document.getElementById('ocr-result-form').style.display = 'none';
-            alert(`🎉 AI บันทึกรายการ [${docNo}] และจดจำรูปแบบคู่ค้า [${vendor}] เรียบร้อยแล้ว! (ซิงก์คลาวด์สดอัตโนมัติ)`);
+            const statusMsg = isInstantPaid ? ' (เครดิต 0 วัน - มีผลชำระเงินสำเร็จทันที!)' : '';
+            alert(`🎉 AI บันทึกรายการ [${docNo}] เรียบร้อยแล้ว${statusMsg} (ซิงก์คลาวด์สดอัตโนมัติ)`);
         }
 
         function updateVendorDatalist() {
@@ -2764,14 +2782,17 @@
             const vat = parseFloat(document.getElementById('m-vat')?.value) || 0;
             const wht = parseFloat(document.getElementById('m-wht')?.value) || 0;
             const date = document.getElementById('m-date').value || TODAY_DATE_STR;
-            const creditDays = parseInt(document.getElementById('m-credit-days').value) || 30;
+            const creditInputVal = document.getElementById('m-credit-days').value.trim();
+            const creditDays = (creditInputVal === '0' || creditInputVal === 0) ? 0 : (parseInt(creditInputVal) || 30);
             const payMethod = document.getElementById('m-pay-method')?.value || 'Transfer';
+            const isCheque = (payMethod === 'Cheque');
+            const isInstantPaid = (creditDays === 0 && !isCheque);
 
             if (!vendor || net <= 0) { alert('⚠️ กรุณากรอกชื่อคู่ค้าและยอดเงิน'); return; }
 
             const dObj = parseDDMMYYYY(date);
             dObj.setDate(dObj.getDate() + creditDays);
-            const dueDate = `${String(dObj.getDate()).padStart(2,'0')}/${String(dObj.getMonth()+1).padStart(2,'0')}/${dObj.getFullYear()}`;
+            let dueDate = `${String(dObj.getDate()).padStart(2,'0')}/${String(dObj.getMonth()+1).padStart(2,'0')}/${dObj.getFullYear()}`;
 
             const txObj = {
                 id: docNo,
@@ -2786,11 +2807,12 @@
                 vat,
                 wht,
                 net,
-                status: "Unpaid",
+                status: isInstantPaid ? "Paid" : "Unpaid",
+                pay_date: isInstantPaid ? date : null,
                 pay_method: payMethod
             };
 
-            if (payMethod === 'Cheque') {
+            if (isCheque) {
                 const chequeNo = document.getElementById('m-cheque-no')?.value.trim() || `CH-${Math.floor(100000 + Math.random() * 900000)}`;
                 const chequeBank = document.getElementById('m-cheque-bank')?.value || "กสิกรไทย (KBANK)";
                 const chequeDate = document.getElementById('m-cheque-date')?.value.trim() || date;
@@ -2799,6 +2821,9 @@
                 txObj.cheque_bank = chequeBank;
                 txObj.cheque_date = chequeDate;
                 txObj.cheque_status = "Pending";
+                txObj.due_date = chequeDate; // ยึดวันที่สั่งจ่ายบนหน้าเช็คเป็นวันครบกำหนดขึ้นเงิน
+                txObj.status = "Unpaid"; // เช็คต้องผ่านการรอกดยืนยันชำระเงินตามปกติ
+                txObj.pay_date = null;
             }
 
             transactions.unshift(txObj);
@@ -2807,7 +2832,8 @@
             saveState();
             renderLedger();
             closeModal('manual-entry-modal');
-            alert(`✅ บันทึกรายการ [${docNo}] เรียบร้อยแล้ว! (ซิงก์คลาวด์สดอัตโนมัติ)`);
+            const statusMsg = isCheque ? ' (ชำระด้วยเช็ค - เข้าสู่รายการรอขึ้นเงินตามวันที่บนหน้าเช็ค)' : (isInstantPaid ? ' (เครดิต 0 วัน - ชำระเงินสำเร็จทันที!)' : '');
+            alert(`✅ บันทึกรายการ [${docNo}]${statusMsg} เรียบร้อยแล้ว! (ซิงก์คลาวด์สดอัตโนมัติ)`);
         }
 
         function openPaymentModal(txId) {
