@@ -490,8 +490,12 @@
             
             <!-- RECONCILIATION CARD FOR PENDING RECEIVABLES & PAYABLES -->
             <div class="content-box" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff;">
-                <div class="box-title" style="color: #38bdf8; margin-bottom: 14px;">
-                    <i class="fa-solid fa-calculator"></i> ⚖️ สรุปกระทบยอดเงินสด รอรับ - รอจ่าย (Pending Cash Reconciliation)
+                <div class="box-title" style="color: #38bdf8; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div><i class="fa-solid fa-calculator"></i> ⚖️ สรุปกระทบยอดเงินสด รอรับ - รอจ่าย (Pending Cash Reconciliation)</div>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="copyLine7DaysAlertToClipboard()" class="btn btn-emerald btn-sm" style="font-size: 11px;"><i class="fa-brands fa-line" style="font-size: 14px;"></i> 🟢 คัดลอกเตือน Line 7 วัน</button>
+                        <button onclick="openLineNotifyModal()" class="btn btn-indigo btn-sm" style="font-size: 11px;"><i class="fa-solid fa-bell"></i> ⚙️ ตั้งค่าส่ง Line อัตโนมัติทุกวัน</button>
+                    </div>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
                     <div style="background: rgba(255,255,255,0.08); padding: 14px; border-radius: 10px; border-left: 4px solid #10b981;">
@@ -1236,6 +1240,36 @@
             <div class="modal-footer" style="background: #1e293b; border-top: 1px solid #334155;">
                 <button onclick="closeModal('ai-emergency-plan-modal')" class="btn btn-outline" style="color:#fff; border-color:#475569;">ปิด</button>
                 <button onclick="copyAIEmergencyPlanToClipboard()" class="btn btn-amber"><i class="fa-solid fa-copy"></i> 📋 คัดลอกแผนฉุกเฉินส่งเข้า Line บริหาร</button>
+            </div>
+        </div>
+    <!-- MODAL 6: LINE AUTOMATIC DAILY NOTIFICATIONS MODAL -->
+    <div id="line-notify-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 680px;">
+            <div class="modal-header" style="background: #065f46; color: #ecfdf5;">
+                <div class="modal-title" style="color: #6ee7b7;"><i class="fa-brands fa-line text-emerald-400" style="font-size: 20px;"></i> 🔔 ตั้งค่าระบบส่ง Line เตือนความจำอัตโนมัติ (ทุกวัน 08:00 น.)</div>
+                <button onclick="closeModal('line-notify-modal')" class="modal-close" style="color: #ecfdf5;">&times;</button>
+            </div>
+            <div class="modal-body" style="font-size: 12px; line-height: 1.6; color: #334155;">
+                <div style="background: #d1fae5; padding: 12px; border-radius: 8px; border: 1px solid #6ee7b7; color: #065f46; margin-bottom: 14px; font-weight: 600;">
+                    💡 ระบบสามารถส่งข้อความเตือนเข้า LINE กลุ่ม/ส่วนตัว อัตโนมัติทุกเช้า เวลา 08:00 น. ก่อนถึงวันครบกำหนด 7 วัน และเตือนทุกวันจนกว่าจะกด "ยืนยันชำระเงิน" ในระบบ (ฟรี 100% ไม่ต้องเปิดคอมพิวเตอร์ทิ้งไว้)
+                </div>
+
+                <div style="font-weight: 700; color: #0f172a; margin-bottom: 6px;">📋 ขั้นตอนการเปิดใช้งานง่ายๆ ใน 2 นาที:</div>
+                <ol style="margin-left: 20px; margin-bottom: 14px; color: #475569;">
+                    <li>ไปที่เว็บ <a href="https://script.google.com/" target="_blank" style="color: #2563eb; font-weight: 700; text-decoration: underline;">Google Apps Script (script.google.com)</a> แล้วกด <strong>"โครงการใหม่ (New Project)"</strong></li>
+                    <li>คัดลอกโค้ดสคริปต์ด้านล่างนี้ไปวางใน Google Apps Script แล้วใส่ <code>LINE_NOTIFY_TOKEN</code> ของคุณ</li>
+                    <li>กดปุ่ม <strong>"นาฬิกา (Triggers / ตัวกระตุ้น)"</strong> ด้านซ้าย เลือกให้รัน <code>sendDailyLineAlert</code> ทุกวัน เวลา 08:00 - 09:00 น. เป็นอันเสร็จสิ้น!</li>
+                </ol>
+
+                <div style="font-weight: 700; color: #0f172a; margin-bottom: 4px;">คีย์ช่องซิงก์ข้อมูลคลาวด์ของคุณ (Cloud Data URL):</div>
+                <input type="text" id="line-modal-cloud-url" readonly class="form-control" style="background: #f1f5f9; font-family: monospace; font-size: 11px; margin-bottom: 12px;" onclick="this.select();">
+
+                <div style="font-weight: 700; color: #0f172a; margin-bottom: 4px;">โค้ดสคริปต์ Google Apps Script (พร้อมใช้งานทันที):</div>
+                <textarea id="line-gas-script-code" readonly class="form-control" style="height: 180px; font-family: monospace; font-size: 11px; background: #0f172a; color: #38bdf8;"></textarea>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+                <button onclick="copyGASScriptToClipboard()" class="btn btn-emerald"><i class="fa-solid fa-copy"></i> 📋 คัดลอกโค้ดสคริปต์ LINE ไปใช้งาน</button>
+                <button onclick="closeModal('line-notify-modal')" class="btn btn-outline">ปิดหน้าต่าง</button>
             </div>
         </div>
     </div>
@@ -2732,12 +2766,157 @@
                 </body>
                 </html>
             `;
-            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = `Voucher_${t.id.replace(/[/]/g, '_')}.html`;
             a.click();
+        }
+
+        function copyLine7DaysAlertToClipboard() {
+            const today = parseDDMMYYYY(TODAY_DATE_STR);
+            const activeTxs = getFilteredTransactions(false);
+            
+            // Pending items due <= 7 days or overdue
+            const pendingIncomes = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Income').filter(t => {
+                const targetDate = (t.pay_method === 'Cheque' && t.cheque_date) ? t.cheque_date : t.due_date;
+                const diffDays = Math.ceil((parseDDMMYYYY(targetDate).getTime() - today.getTime()) / (1000 * 3600 * 24));
+                return diffDays <= 7;
+            });
+
+            const pendingExpenses = activeTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense').filter(t => {
+                const targetDate = (t.pay_method === 'Cheque' && t.cheque_date) ? t.cheque_date : t.due_date;
+                const diffDays = Math.ceil((parseDDMMYYYY(targetDate).getTime() - today.getTime()) / (1000 * 3600 * 24));
+                return diffDays <= 7;
+            });
+
+            if (pendingIncomes.length === 0 && pendingExpenses.length === 0) {
+                alert('🎉 ไม่พบรายการรอรับ/รอจ่ายเงินที่ครบกำหนดภายใน 7 วันข้างหน้าครับ');
+                return;
+            }
+
+            let msg = `📢 [SPS Account V2] แจ้งเตือนรายการรอรับ-รอจ่าย (ภายใน 7 วัน & เกินกำหนด)\n`;
+            msg += `📅 ประจำวันที่: ${TODAY_DATE_STR}\n`;
+            msg += `-----------------------------------\n`;
+
+            if (pendingIncomes.length > 0) {
+                msg += `🟢 รายการรอรับเงิน (${pendingIncomes.length} รายการ):\n`;
+                pendingIncomes.forEach(t => {
+                    const targetDate = (t.pay_method === 'Cheque' && t.cheque_date) ? t.cheque_date : t.due_date;
+                    const diffDays = Math.ceil((parseDDMMYYYY(targetDate).getTime() - today.getTime()) / (1000 * 3600 * 24));
+                    const statusText = diffDays < 0 ? `⚠️ เกินกำหนด ${Math.abs(diffDays)} วัน` : (diffDays === 0 ? `🔥 วันนี้!` : `เหลือ ${diffDays} วัน`);
+                    msg += `• [${t.id}] ${t.vendor} | ยอด: ${formatTHB(t.net)} | กำหนด: ${targetDate} (${statusText})\n`;
+                });
+                msg += `\n`;
+            }
+
+            if (pendingExpenses.length > 0) {
+                msg += `🔴 รายการรอจ่ายเงิน (${pendingExpenses.length} รายการ):\n`;
+                pendingExpenses.forEach(t => {
+                    const targetDate = (t.pay_method === 'Cheque' && t.cheque_date) ? t.cheque_date : t.due_date;
+                    const diffDays = Math.ceil((parseDDMMYYYY(targetDate).getTime() - today.getTime()) / (1000 * 3600 * 24));
+                    const statusText = diffDays < 0 ? `⚠️ เกินกำหนด ${Math.abs(diffDays)} วัน` : (diffDays === 0 ? `🔥 วันนี้!` : `เหลือ ${diffDays} วัน`);
+                    msg += `• [${t.id}] ${t.vendor} | ยอด: ${formatTHB(t.net)} | กำหนด: ${targetDate} (${statusText})\n`;
+                });
+                msg += `\n`;
+            }
+
+            const incSum = pendingIncomes.reduce((a,b) => a + (b.net||0), 0);
+            const expSum = pendingExpenses.reduce((a,b) => a + (b.net||0), 0);
+
+            msg += `-----------------------------------\n`;
+            msg += `💰 สรุปรวม 7 วันข้างหน้า: รอรับ ${formatTHB(incSum)} | รอจ่าย ${formatTHB(expSum)}\n`;
+            msg += `🌐 ตรวจสอบและบันทึกชำระเงิน: https://sps-54.github.io/sps-account/`;
+
+            navigator.clipboard.writeText(msg).then(() => {
+                alert(`✅ คัดลอกข้อความแจ้งเตือน 7 วันข้างหน้า ลง Clipboard เรียบร้อยแล้ว!\nคุณสามารถวาง (Paste) ส่งเข้ากลุ่ม Line หรือ Line ส่วนตัวได้ทันทีครับ`);
+            }).catch(() => {
+                alert(`ข้อความแจ้งเตือน:\n\n` + msg);
+            });
+        }
+
+        function openLineNotifyModal() {
+            const cloudUrl = PUBLIC_CLOUD_RELAY_URL || getOrGenerateCloudUrl();
+            if (document.getElementById('line-modal-cloud-url')) {
+                document.getElementById('line-modal-cloud-url').value = cloudUrl;
+            }
+
+            const gasScript = `// Google Apps Script - ระบบส่ง LINE แจ้งเตือนยอดค้างชำระอัตโนมัติทุกเช้า 08:00 น.
+const LINE_NOTIFY_TOKEN = "ใส่_LINE_NOTIFY_TOKEN_ของคุณที่นี่";
+const CLOUD_URL = "${cloudUrl}";
+
+function sendDailyLineAlert() {
+  const response = UrlFetchApp.fetch(CLOUD_URL, { muteHttpExceptions: true });
+  if (response.getResponseCode() !== 200) return;
+  
+  const data = JSON.parse(response.getContentText());
+  const transactions = data.transactions || [];
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  let alertIncomes = [];
+  let alertExpenses = [];
+
+  transactions.forEach(t => {
+    if (t.status !== 'Paid') {
+      const targetDateStr = (t.pay_method === 'Cheque' && t.cheque_date) ? t.cheque_date : t.due_date;
+      if (targetDateStr && targetDateStr.includes('/')) {
+        const parts = targetDateStr.split('/');
+        if (parts.length === 3) {
+          const dueDate = new Date(parts[2], parts[1]-1, parts[0]);
+          const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+          if (diffDays <= 7) {
+            if (t.type === 'Income') alertIncomes.push({...t, diffDays, targetDateStr});
+            else alertExpenses.push({...t, diffDays, targetDateStr});
+          }
+        }
+      }
+    }
+  });
+
+  if (alertIncomes.length === 0 && alertExpenses.length === 0) return;
+
+  let message = "\\n📢 [SPS V2] เตือนรายการค้างชำระ (ภายใน 7 วัน & เกินกำหนด)\\n-----------------------------------\\n";
+  
+  if (alertIncomes.length > 0) {
+    message += "🟢 รายรับรอรับเงิน:\\n";
+    alertIncomes.forEach(t => {
+      const tag = t.diffDays < 0 ? \`⚠️ เกิน \${Math.abs(t.diffDays)} วัน\` : (t.diffDays === 0 ? "🔥 วันนี้!" : \`เหลือ \${t.diffDays} วัน\`);
+      message += \`• [\${t.id}] \${t.vendor} | ฿\${Number(t.net).toLocaleString()} | กำหนด: \${t.targetDateStr} (\${tag})\\n\`;
+    });
+  }
+
+  if (alertExpenses.length > 0) {
+    message += "\\n🔴 รายจ่ายรอจ่ายเงิน:\\n";
+    alertExpenses.forEach(t => {
+      const tag = t.diffDays < 0 ? \`⚠️ เกิน \${Math.abs(t.diffDays)} วัน\` : (t.diffDays === 0 ? "🔥 วันนี้!" : \`เหลือ \${t.diffDays} วัน\`);
+      message += \`• [\${t.id}] \${t.vendor} | ฿\${Number(t.net).toLocaleString()} | กำหนด: \${t.targetDateStr} (\${tag})\\n\`;
+    });
+  }
+
+  message += "\\n🌐 บันทึกชำระเงิน: https://sps-54.github.io/sps-account/";
+
+  UrlFetchApp.fetch("https://notify-api.line.me/api/notify", {
+    method: "post",
+    headers: { "Authorization": "Bearer " + LINE_NOTIFY_TOKEN },
+    payload: { "message": message }
+  });
+}`;
+
+            if (document.getElementById('line-gas-script-code')) {
+                document.getElementById('line-gas-script-code').value = gasScript;
+            }
+
+            openModal('line-notify-modal');
+        }
+
+        function copyGASScriptToClipboard() {
+            const code = document.getElementById('line-gas-script-code')?.value;
+            if (!code) return;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ คัดลอกโค้ด Google Apps Script ลง Clipboard เรียบร้อยแล้ว!\nนำไปวางใน script.google.com ได้ทันทีครับ');
+            }).catch(() => {
+                alert('โปรดคัดลอกโค้ดในช่องด้านล่าง');
+            });
         }
 
         function attachDocToTx(txId, evt) {
