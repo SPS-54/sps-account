@@ -415,20 +415,43 @@
                                 <input type="text" id="ocr-desc" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label>ก่อน VAT:</label>
+                                <label>รูปแบบภาษี VAT:</label>
+                                <select id="ocr-vat-mode" onchange="calcOCRAmounts()" class="form-control">
+                                    <option value="EXC_VAT">แยก VAT 7% / บวกเพิ่ม (Vat Excluded)</option>
+                                    <option value="INC_VAT">รวม VAT 7% แล้ว (Vat Included)</option>
+                                    <option value="NO_VAT">ไม่มี VAT (0%)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>หัก ณ ที่จ่าย (WHT):</label>
+                                <select id="ocr-wht-mode" onchange="calcOCRAmounts()" class="form-control">
+                                    <option value="3">หัก 3% (ค่าบริการ / ค่าจ้าง / ค่าแรง)</option>
+                                    <option value="1">หัก 1% (ค่าขนส่ง)</option>
+                                    <option value="2">หัก 2% (ค่าโฆษณา)</option>
+                                    <option value="5">หัก 5% (ค่าเช่า)</option>
+                                    <option value="0">ไม่มีหัก ณ ที่จ่าย (0%)</option>
+                                    <option value="CUSTOM">ระบุ % เอง</option>
+                                </select>
+                            </div>
+                            <div class="form-group full" id="ocr-wht-custom-box" style="display:none;">
+                                <label>ระบุ % หัก ณ ที่จ่าย:</label>
+                                <input type="number" id="ocr-wht-custom-rate" value="3" step="0.1" oninput="calcOCRAmounts()" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>ยอดเงินตั้งต้น (ก่อน VAT หรือรวม VAT):</label>
                                 <input type="number" id="ocr-before-vat" class="form-control" oninput="calcOCRAmounts()">
                             </div>
                             <div class="form-group">
-                                <label>VAT 7%:</label>
+                                <label>ภาษี VAT 7%:</label>
                                 <input type="number" id="ocr-vat" class="form-control" oninput="calcOCRAmounts()">
                             </div>
                             <div class="form-group">
-                                <label>หัก ณ ที่จ่าย 3%:</label>
+                                <label>หัก ณ ที่จ่าย (บาท):</label>
                                 <input type="number" id="ocr-wht" class="form-control" oninput="calcOCRAmounts()">
                             </div>
-                            <div class="form-group">
+                            <div class="form-group full">
                                 <label>ยอดสุทธิ (บาท):</label>
-                                <input type="number" id="ocr-net" class="form-control" style="font-weight: 700; color: #047857;">
+                                <input type="number" id="ocr-net" class="form-control" style="font-weight: 700; color: #047857; font-size: 16px;">
                             </div>
                         </div>
 
@@ -949,9 +972,48 @@
                         <label>รายละเอียด:</label>
                         <input type="text" id="m-desc" placeholder="เช่น ค่าสินค้าวัตถุดิบงวดที่ 1" class="form-control">
                     </div>
+                    <div class="form-group">
+                        <label>รูปแบบภาษี VAT:</label>
+                        <select id="m-vat-mode" onchange="calcManualAmounts()" class="form-control">
+                            <option value="INC_VAT">รวม VAT 7% แล้ว (Vat Included)</option>
+                            <option value="EXC_VAT">แยก VAT 7% / บวกเพิ่ม (Vat Excluded)</option>
+                            <option value="NO_VAT">ไม่มี VAT (0%)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>หัก ณ ที่จ่าย (WHT):</label>
+                        <select id="m-wht-mode" onchange="calcManualAmounts()" class="form-control">
+                            <option value="0">ไม่มีหัก ณ ที่จ่าย (0%)</option>
+                            <option value="3">หัก 3% (ค่าบริการ / ค่าจ้าง / ค่าแรง)</option>
+                            <option value="1">หัก 1% (ค่าขนส่ง)</option>
+                            <option value="2">หัก 2% (ค่าโฆษณา)</option>
+                            <option value="5">หัก 5% (ค่าเช่า)</option>
+                            <option value="CUSTOM">ระบุ % เอง</option>
+                        </select>
+                    </div>
+                    <div class="form-group full" id="m-wht-custom-box" style="display:none;">
+                        <label>ระบุ % หัก ณ ที่จ่าย:</label>
+                        <input type="number" id="m-wht-custom-rate" value="3" step="0.1" oninput="calcManualAmounts()" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>ยอดเงินตั้งต้น (บาท):</label>
+                        <input type="number" id="m-base-amount" value="10000" oninput="calcManualAmounts()" class="form-control" style="font-weight: 700;">
+                    </div>
+                    <div class="form-group">
+                        <label>มูลค่าก่อน VAT:</label>
+                        <input type="number" id="m-before-vat" value="9345.79" readonly class="form-control" style="background:#f1f5f9;">
+                    </div>
+                    <div class="form-group">
+                        <label>ภาษี VAT 7%:</label>
+                        <input type="number" id="m-vat" value="654.21" readonly class="form-control" style="background:#f1f5f9;">
+                    </div>
+                    <div class="form-group">
+                        <label>หัก ณ ที่จ่าย (บาท):</label>
+                        <input type="number" id="m-wht" value="0.00" readonly class="form-control" style="background:#f1f5f9;">
+                    </div>
                     <div class="form-group full">
-                        <label>ยอดเงินสุทธิ (บาท):</label>
-                        <input type="number" id="m-net" value="10000" class="form-control" style="font-weight: 700; color: #059669;">
+                        <label>ยอดจ่ายจริงสุทธิ (บาท):</label>
+                        <input type="number" id="m-net" value="10000" class="form-control" style="font-weight: 700; color: #059669; font-size: 16px;">
                     </div>
                 </div>
             </div>
@@ -1467,13 +1529,40 @@
         }
 
         function calcOCRAmounts() {
-            const before = parseFloat(document.getElementById('ocr-before-vat').value) || 0;
-            const vat = before * 0.07;
-            const wht = before * 0.03;
-            const net = before + vat - wht;
-            document.getElementById('ocr-vat').value = vat.toFixed(2);
-            document.getElementById('ocr-wht').value = wht.toFixed(2);
-            document.getElementById('ocr-net').value = net.toFixed(2);
+            const vatMode = document.getElementById('ocr-vat-mode')?.value || 'EXC_VAT';
+            const whtMode = document.getElementById('ocr-wht-mode')?.value || '3';
+            
+            const customBox = document.getElementById('ocr-wht-custom-box');
+            let whtRate = 0;
+            if (whtMode === 'CUSTOM') {
+                if (customBox) customBox.style.display = 'block';
+                whtRate = parseFloat(document.getElementById('ocr-wht-custom-rate')?.value) || 0;
+            } else {
+                if (customBox) customBox.style.display = 'none';
+                whtRate = parseFloat(whtMode) || 0;
+            }
+
+            let rawVal = parseFloat(document.getElementById('ocr-before-vat')?.value) || 0;
+            let beforeVat = 0;
+            let vat = 0;
+
+            if (vatMode === 'NO_VAT') {
+                beforeVat = rawVal;
+                vat = 0;
+            } else if (vatMode === 'INC_VAT') {
+                beforeVat = rawVal / 1.07;
+                vat = rawVal - beforeVat;
+            } else { // EXC_VAT
+                beforeVat = rawVal;
+                vat = beforeVat * 0.07;
+            }
+
+            const wht = beforeVat * (whtRate / 100);
+            const net = beforeVat + vat - wht;
+
+            if (document.getElementById('ocr-vat')) document.getElementById('ocr-vat').value = vat.toFixed(2);
+            if (document.getElementById('ocr-wht')) document.getElementById('ocr-wht').value = wht.toFixed(2);
+            if (document.getElementById('ocr-net')) document.getElementById('ocr-net').value = net.toFixed(2);
         }
 
         function saveOCRTransactionToLedger() {
@@ -2627,12 +2716,53 @@
             }
         }
 
+        function calcManualAmounts() {
+            const vatMode = document.getElementById('m-vat-mode')?.value || 'INC_VAT';
+            const whtMode = document.getElementById('m-wht-mode')?.value || '0';
+            
+            const customBox = document.getElementById('m-wht-custom-box');
+            let whtRate = 0;
+            if (whtMode === 'CUSTOM') {
+                if (customBox) customBox.style.display = 'block';
+                whtRate = parseFloat(document.getElementById('m-wht-custom-rate')?.value) || 0;
+            } else {
+                if (customBox) customBox.style.display = 'none';
+                whtRate = parseFloat(whtMode) || 0;
+            }
+
+            let baseVal = parseFloat(document.getElementById('m-base-amount')?.value) || 0;
+            let beforeVat = 0;
+            let vat = 0;
+
+            if (vatMode === 'NO_VAT') {
+                beforeVat = baseVal;
+                vat = 0;
+            } else if (vatMode === 'INC_VAT') {
+                beforeVat = baseVal / 1.07;
+                vat = baseVal - beforeVat;
+            } else { // EXC_VAT
+                beforeVat = baseVal;
+                vat = baseVal * 0.07;
+            }
+
+            const wht = beforeVat * (whtRate / 100);
+            const net = beforeVat + vat - wht;
+
+            if (document.getElementById('m-before-vat')) document.getElementById('m-before-vat').value = beforeVat.toFixed(2);
+            if (document.getElementById('m-vat')) document.getElementById('m-vat').value = vat.toFixed(2);
+            if (document.getElementById('m-wht')) document.getElementById('m-wht').value = wht.toFixed(2);
+            if (document.getElementById('m-net')) document.getElementById('m-net').value = net.toFixed(2);
+        }
+
         function saveManualEntryToLedger() {
             const docNo = document.getElementById('m-doc-no').value || `SPS-INV/00${transactions.length + 1}`;
             const vendor = document.getElementById('m-vendor').value.trim();
             const desc = document.getElementById('m-desc').value.trim();
             const type = document.getElementById('m-type').value;
             const net = parseFloat(document.getElementById('m-net').value) || 0;
+            const beforeVat = parseFloat(document.getElementById('m-before-vat')?.value) || net;
+            const vat = parseFloat(document.getElementById('m-vat')?.value) || 0;
+            const wht = parseFloat(document.getElementById('m-wht')?.value) || 0;
             const date = document.getElementById('m-date').value || TODAY_DATE_STR;
             const creditDays = parseInt(document.getElementById('m-credit-days').value) || 30;
             const payMethod = document.getElementById('m-pay-method')?.value || 'Transfer';
@@ -2652,9 +2782,9 @@
                 type,
                 desc: desc || "บันทึกด้วยตนเอง",
                 vendor,
-                before_vat: net,
-                vat: 0,
-                wht: 0,
+                before_vat: beforeVat,
+                vat,
+                wht,
                 net,
                 status: "Unpaid",
                 pay_method: payMethod
