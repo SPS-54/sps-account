@@ -876,12 +876,50 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label>ช่องทางชำระเงิน:</label>
+                        <select id="m-pay-method" onchange="toggleChequeInputs('m')" class="form-control">
+                            <option value="Transfer">💳 เงินโอนผ่านธนาคาร</option>
+                            <option value="Cash">💵 เงินสด</option>
+                            <option value="Cheque">📜 เช็ครับ / เช็คจ่าย</option>
+                        </select>
+                    </div>
+                    <div id="m-cheque-box" class="form-group full" style="display: none; background: #e0e7ff; padding: 12px; border-radius: 8px; border: 1px solid #818cf8;">
+                        <div style="font-weight: 700; color: #3730a3; margin-bottom: 8px; font-size: 12px;"><i class="fa-solid fa-money-check"></i> รายละเอียดเช็ค:</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div>
+                                <label style="font-size: 11px;">เลขที่เช็ค (Cheque No.):</label>
+                                <input type="text" id="m-cheque-no" placeholder="เช่น CH-8894201" class="form-control" style="background:#fff;">
+                            </div>
+                            <div>
+                                <label style="font-size: 11px;">ธนาคารสั่งจ่าย:</label>
+                                <select id="m-cheque-bank" class="form-control" style="background:#fff;">
+                                    <option value="กสิกรไทย (KBANK)">กสิกรไทย (KBANK)</option>
+                                    <option value="กรุงเทพ (BBL)">กรุงเทพ (BBL)</option>
+                                    <option value="ไทยพาณิชย์ (SCB)">ไทยพาณิชย์ (SCB)</option>
+                                    <option value="กรุงไทย (KTB)">กรุงไทย (KTB)</option>
+                                    <option value="กรุงศรี (BAY)">กรุงศรี (BAY)</option>
+                                    <option value="ทหารไทยธนชาต (ttb)">ทหารไทยธนชาต (ttb)</option>
+                                    <option value="ออมสิน (GSB)">ออมสิน (GSB)</option>
+                                    <option value="อื่นๆ">อื่นๆ</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <label style="font-size: 11px;">วันที่สั่งจ่ายบนหน้าเช็ค (วันขึ้นเงิน/เคลียริ่ง):</label>
+                            <input type="text" id="m-cheque-date" value="30/08/2026" class="form-control" style="background:#fff;">
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <label style="font-size: 11px;"><i class="fa-solid fa-image"></i> แนบรูปภาพเช็คฉบับจริง / หน้าเช็ค:</label>
+                            <input type="file" id="m-cheque-file" accept="image/*,.pdf" class="form-control" style="background:#fff; font-size:11px;">
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label>เลขที่เอกสาร:</label>
                         <input type="text" id="m-doc-no" placeholder="SPS-INV/001" class="form-control">
                     </div>
                     <div class="form-group">
                         <label>วันที่เอกสาร:</label>
-                        <input type="text" id="m-date" value="22/08/2026" class="form-control">
+                        <input type="text" id="m-date" value="24/08/2026" class="form-control">
                     </div>
                     <div class="form-group">
                         <label>เครดิต (วัน):</label>
@@ -912,24 +950,29 @@
     <div id="payment-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <div class="modal-title"><i class="fa-solid fa-credit-card text-emerald-400"></i> แจ้งชำระเงิน SPS V2</div>
+                <div class="modal-title" id="pay-modal-title"><i class="fa-solid fa-credit-card text-emerald-400"></i> แจ้งชำระเงิน / ขึ้นเงินเช็ค SPS V2</div>
                 <button onclick="closeModal('payment-modal')" class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="pay-tx-id">
                 <p style="margin-bottom: 12px; font-weight: 600;">เลขที่เอกสาร: <span id="pay-doc-no" style="color: #4f46e5;"></span></p>
+                <div id="pay-cheque-info-box" style="display: none; background: #e0e7ff; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; color: #3730a3; font-size: 12px;"></div>
                 <div class="form-group">
-                    <label>วันที่ชำระเงิน:</label>
-                    <input type="text" id="pay-date" value="22/08/2026" class="form-control">
+                    <label id="pay-date-label">วันที่ชำระเงิน / เงินเข้าจริง:</label>
+                    <input type="text" id="pay-date" value="24/08/2026" class="form-control">
                 </div>
                 <div class="form-group">
-                    <label>อ้างอิงหลักฐานการโอน / เลขสลิป:</label>
+                    <label>อ้างอิงหลักฐาน / เลขสลิป / สลิปเช็คผ่าน:</label>
                     <input type="text" id="pay-ref" placeholder="SLIP-SPS-998811" class="form-control">
+                </div>
+                <div class="form-group" style="margin-top: 8px;">
+                    <label style="font-size: 12px;"><i class="fa-solid fa-paperclip"></i> แนบรูปเช็คผ่าน / สลิปโอน / เอกสารจริงเพิ่มเติม:</label>
+                    <input type="file" id="pay-file" accept="image/*,.pdf" class="form-control" style="font-size: 11px;">
                 </div>
             </div>
             <div class="modal-footer">
                 <button onclick="closeModal('payment-modal')" class="btn btn-outline">ยกเลิก</button>
-                <button onclick="confirmPayment()" class="btn btn-emerald">✅ ยืนยันชำระเงิน</button>
+                <button onclick="confirmPayment()" id="pay-confirm-btn" class="btn btn-emerald">✅ ยืนยันชำระเงิน</button>
             </div>
         </div>
     </div>
@@ -1565,19 +1608,29 @@
                     tbodyPendingInc.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอรับเงินในขณะนี้</td></tr>`;
                 } else {
                     tbodyPendingInc.innerHTML = pendingIncomes.map(t => {
-                        const diffDays = Math.ceil((parseDDMMYYYY(t.due_date).getTime() - today.getTime()) / (1000 * 3600 * 24));
+                        const targetDate = (t.pay_method === 'Cheque' && t.cheque_date) ? t.cheque_date : t.due_date;
+                        const diffDays = Math.ceil((parseDDMMYYYY(targetDate).getTime() - today.getTime()) / (1000 * 3600 * 24));
                         let countdown = diffDays > 0 ? `<span class="badge-status badge-pending">เหลือ ${diffDays} วัน</span>` : `<span class="badge-status badge-overdue">เกินกำหนด ${Math.abs(diffDays)} วัน</span>`;
+                        
+                        let chequeBadge = '';
+                        let actionBtn = `<button onclick="openPaymentModal('${t.id}')" class="btn btn-emerald btn-sm">💵 รับชำระแล้ว</button>`;
+
+                        if (t.pay_method === 'Cheque') {
+                            chequeBadge = `<br><span class="badge-status" style="background:#e0e7ff; color:#3730a3; border:1px solid #c7d2fe; font-size:10px; margin-top:2px;"><i class="fa-solid fa-money-check"></i> เช็ครับ: ${t.cheque_no || '-'} (${t.cheque_bank || 'ธนาคาร'})</span>`;
+                            actionBtn = `<button onclick="openPaymentModal('${t.id}')" class="btn btn-amber btn-sm">📜 ยืนยันเช็คผ่าน</button>`;
+                        }
+
                         return `
                             <tr>
                                 <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:bold; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
-                                <td style="font-family:monospace; font-weight:bold; color:#047857; background:#d1fae5;">${t.due_date}</td>
+                                <td style="font-family:monospace; font-weight:bold; color:#047857; background:#d1fae5;">${targetDate}${chequeBadge}</td>
                                 <td style="text-align:center;">${countdown}</td>
                                 <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
                                 <td style="font-family:monospace; font-weight:bold; color:#d97706;">${t.credit_days || 30} วัน</td>
                                 <td style="font-weight:600;">${t.vendor}</td>
                                 <td>${t.desc}</td>
                                 <td style="text-align:right; font-family:monospace; font-weight:bold; color:#047857;">${formatTHB(t.net)}</td>
-                                <td style="text-align:center;"><button onclick="openPaymentModal('${t.id}')" class="btn btn-emerald btn-sm">💵 รับชำระแล้ว</button></td>
+                                <td style="text-align:center;">${actionBtn}</td>
                             </tr>
                         `;
                     }).join('');
@@ -1589,19 +1642,29 @@
                     tbodyPendingExp.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">🎉 ไม่มีรายการรอจ่ายเงินในขณะนี้</td></tr>`;
                 } else {
                     tbodyPendingExp.innerHTML = pendingExpenses.map(t => {
-                        const diffDays = Math.ceil((parseDDMMYYYY(t.due_date).getTime() - today.getTime()) / (1000 * 3600 * 24));
+                        const targetDate = (t.pay_method === 'Cheque' && t.cheque_date) ? t.cheque_date : t.due_date;
+                        const diffDays = Math.ceil((parseDDMMYYYY(targetDate).getTime() - today.getTime()) / (1000 * 3600 * 24));
                         let countdown = diffDays > 0 ? `<span class="badge-status badge-pending">เหลือ ${diffDays} วัน</span>` : `<span class="badge-status badge-overdue">เกินกำหนด ${Math.abs(diffDays)} วัน</span>`;
+                        
+                        let chequeBadge = '';
+                        let actionBtn = `<button onclick="openPaymentModal('${t.id}')" class="btn btn-rose btn-sm">💳 แจ้งจ่ายเงิน</button>`;
+
+                        if (t.pay_method === 'Cheque') {
+                            chequeBadge = `<br><span class="badge-status" style="background:#ffe4e6; color:#be123c; border:1px solid #fca5a5; font-size:10px; margin-top:2px;"><i class="fa-solid fa-money-check"></i> เช็คจ่าย: ${t.cheque_no || '-'} (${t.cheque_bank || 'ธนาคาร'})</span>`;
+                            actionBtn = `<button onclick="openPaymentModal('${t.id}')" class="btn btn-amber btn-sm">📜 ยืนยันเช็คผ่าน</button>`;
+                        }
+
                         return `
                             <tr>
                                 <td onclick="viewDocumentModal('${t.id}')" style="font-family:monospace; font-weight:bold; color:#4f46e5; cursor:pointer; text-decoration:underline;" title="คลิกเพื่อดูเอกสาร">${t.id}</td>
-                                <td style="font-family:monospace; font-weight:bold; color:#e11d48; background:#ffe4e6;">${t.due_date}</td>
+                                <td style="font-family:monospace; font-weight:bold; color:#e11d48; background:#ffe4e6;">${targetDate}${chequeBadge}</td>
                                 <td style="text-align:center;">${countdown}</td>
                                 <td style="font-family:monospace;">${t.delivery_date || t.date}</td>
                                 <td style="font-family:monospace; font-weight:bold; color:#d97706;">${t.credit_days || 30} วัน</td>
                                 <td style="font-weight:600;">${t.vendor}</td>
                                 <td>${t.desc}</td>
                                 <td style="text-align:right; font-family:monospace; font-weight:bold; color:#e11d48;">${formatTHB(t.net)}</td>
-                                <td style="text-align:center;"><button onclick="openPaymentModal('${t.id}')" class="btn btn-rose btn-sm">💳 แจ้งจ่ายเงิน</button></td>
+                                <td style="text-align:center;">${actionBtn}</td>
                             </tr>
                         `;
                     }).join('');
@@ -2114,6 +2177,43 @@
                 const wht = t.wht || 0;
                 const net = t.net || 0;
 
+                let filePreviewHtml = '';
+                const attachedFile = t.cheque_file_data || t.file_data;
+
+                if (attachedFile) {
+                    if (attachedFile.startsWith('data:image')) {
+                        filePreviewHtml = `
+                            <div style="margin-top: 14px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; text-align: center;">
+                                <div style="font-size: 12px; font-weight: 700; color: #3730a3; margin-bottom: 8px;"><i class="fa-solid fa-image"></i> รูปเช็ค / เอกสารตัวจริงในระบบ:</div>
+                                <img src="${attachedFile}" style="max-width: 100%; max-height: 350px; border-radius: 8px; border: 1px solid #94a3b8; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" alt="รูปเช็คฉบับจริง">
+                                <div style="margin-top: 8px;">
+                                    <a href="${attachedFile}" download="Cheque_${(t.cheque_no || t.id).replace(/[/]/g, '_')}.png" class="btn btn-emerald btn-sm" style="font-size:11px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                                        <i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดรูปเช็คฉบับจริงลงเครื่อง
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    } else if (attachedFile.startsWith('data:application/pdf')) {
+                        filePreviewHtml = `
+                            <div style="margin-top: 14px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; text-align: center;">
+                                <div style="font-size: 12px; font-weight: 700; color: #3730a3; margin-bottom: 8px;"><i class="fa-solid fa-file-pdf"></i> เอกสาร PDF ตัวจริงในระบบ:</div>
+                                <a href="${attachedFile}" download="Cheque_Doc_${(t.cheque_no || t.id).replace(/[/]/g, '_')}.pdf" class="btn btn-emerald btn-sm" style="font-size:11px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                                    <i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดไฟล์ PDF เช็ค/เอกสารฉบับจริง
+                                </a>
+                            </div>
+                        `;
+                    }
+                }
+
+                let chequeDetailInfo = '';
+                if (t.pay_method === 'Cheque') {
+                    chequeDetailInfo = `
+                        <div style="margin-top: 10px; background: #e0e7ff; padding: 8px 12px; border-radius: 6px; color: #3730a3; font-size: 11px;">
+                            <i class="fa-solid fa-money-check"></i> <strong>รายละเอียดเช็ค:</strong> เลขที่ <code>${t.cheque_no || '-'}</code> | ธนาคาร: ${t.cheque_bank || '-'} | วันสั่งจ่ายหน้าเช็ค: <code>${t.cheque_date || t.due_date}</code> (${t.cheque_status === 'Cleared' ? '✅ เคลียริ่งผ่านแล้ว' : '⏳ รอขึ้นเงิน'})
+                        </div>
+                    `;
+                }
+
                 previewContainer.innerHTML = `
                     <div id="digital-voucher-card" style="background: #ffffff; border: 2px solid #0f172a; border-radius: 12px; padding: 20px; color: #0f172a; font-family: 'Prompt', sans-serif;">
                         <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px;">
@@ -2138,7 +2238,9 @@
                             </div>
                         </div>
 
-                        <div style="margin-bottom: 14px;">
+                        ${chequeDetailInfo}
+
+                        <div style="margin-bottom: 14px; margin-top: 10px;">
                             <strong>รายละเอียด:</strong>
                             <div style="border-bottom: 1px solid #cbd5e1; padding: 6px 0; font-size: 13px;">${t.desc}</div>
                         </div>
@@ -2159,16 +2261,29 @@
                             <div style="font-size: 10px; color: #94a3b8; font-family: monospace;">VERIFIED BY SPS V2 AI</div>
                         </div>
                     </div>
+
+                    ${filePreviewHtml}
                     
                     <div style="margin-top: 14px; background: #eff6ff; padding: 12px; border-radius: 8px; border: 1px solid #bfdbfe; text-align: center;">
-                        <p style="font-size: 11px; color: #1e40af; margin-bottom: 6px;"><i class="fa-solid fa-paperclip"></i> ต้องการแนบรูปภาพสลิป/สแกนเอกสารตัวจริงให้รายการนี้?</p>
+                        <p style="font-size: 11px; color: #1e40af; margin-bottom: 6px;"><i class="fa-solid fa-paperclip"></i> แนบรูปภาพเช็ค / สลิป / สแกนเอกสารตัวจริงเพิ่มเติม:</p>
                         <input type="file" accept="image/*,.pdf" onchange="attachDocToTx('${t.id}', event)" style="font-size: 11px;">
                     </div>
                 `;
 
-                downloadBtn.onclick = function() {
-                    downloadGeneratedVoucher(t);
-                };
+                if (attachedFile) {
+                    downloadBtn.onclick = function() {
+                        const a = document.createElement('a');
+                        a.href = attachedFile;
+                        a.download = `Cheque_Doc_${(t.cheque_no || t.id).replace(/[/]/g, '_')}.png`;
+                        a.click();
+                    };
+                    downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดรูปเช็ค/เอกสารฉบับจริง`;
+                } else {
+                    downloadBtn.onclick = function() {
+                        downloadGeneratedVoucher(t);
+                    };
+                    downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดเอกสารดิจิทัล`;
+                }
                 downloadBtn.style.display = 'inline-flex';
             }
 
@@ -2418,6 +2533,14 @@
             updateAILiquidityAlertsAndRecommendations();
         }
 
+        function toggleChequeInputs(prefix) {
+            const val = document.getElementById(prefix + '-pay-method')?.value;
+            const box = document.getElementById(prefix + '-cheque-box');
+            if (box) {
+                box.style.display = (val === 'Cheque') ? 'block' : 'none';
+            }
+        }
+
         function saveManualEntryToLedger() {
             const docNo = document.getElementById('m-doc-no').value || `SPS-INV/00${transactions.length + 1}`;
             const vendor = document.getElementById('m-vendor').value.trim();
@@ -2426,6 +2549,7 @@
             const net = parseFloat(document.getElementById('m-net').value) || 0;
             const date = document.getElementById('m-date').value || TODAY_DATE_STR;
             const creditDays = parseInt(document.getElementById('m-credit-days').value) || 30;
+            const payMethod = document.getElementById('m-pay-method')?.value || 'Transfer';
 
             if (!vendor || net <= 0) { alert('⚠️ กรุณากรอกชื่อคู่ค้าและยอดเงิน'); return; }
 
@@ -2433,9 +2557,52 @@
             dObj.setDate(dObj.getDate() + creditDays);
             const dueDate = `${String(dObj.getDate()).padStart(2,'0')}/${String(dObj.getMonth()+1).padStart(2,'0')}/${dObj.getFullYear()}`;
 
-            transactions.unshift({
-                id: docNo, date, delivery_date: date, credit_days: creditDays, due_date: dueDate, type, desc: desc || "บันทึกด้วยตนเอง", vendor, before_vat: net, vat: 0, wht: 0, net, status: "Unpaid"
-            });
+            const txObj = {
+                id: docNo,
+                date,
+                delivery_date: date,
+                credit_days: creditDays,
+                due_date: dueDate,
+                type,
+                desc: desc || "บันทึกด้วยตนเอง",
+                vendor,
+                before_vat: net,
+                vat: 0,
+                wht: 0,
+                net,
+                status: "Unpaid",
+                pay_method: payMethod
+            };
+
+            if (payMethod === 'Cheque') {
+                const chequeNo = document.getElementById('m-cheque-no')?.value.trim() || `CH-${Math.floor(100000 + Math.random() * 900000)}`;
+                const chequeBank = document.getElementById('m-cheque-bank')?.value || "กสิกรไทย (KBANK)";
+                const chequeDate = document.getElementById('m-cheque-date')?.value.trim() || date;
+
+                txObj.cheque_no = chequeNo;
+                txObj.cheque_bank = chequeBank;
+                txObj.cheque_date = chequeDate;
+                txObj.cheque_status = "Pending";
+            }
+
+            const chequeFileInput = document.getElementById('m-cheque-file');
+            if (chequeFileInput && chequeFileInput.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    txObj.cheque_file_data = e.target.result;
+                    txObj.file_data = e.target.result;
+                    transactions.unshift(txObj);
+                    lastLocalUpdate = Date.now();
+                    saveState();
+                    renderLedger();
+                    closeModal('manual-entry-modal');
+                    alert(`✅ บันทึกรายการ [${docNo}] พร้อมรูปเช็คฉบับจริงเรียบร้อยแล้ว! (ซิงก์คลาวด์สดอัตโนมัติ)`);
+                };
+                reader.readAsDataURL(chequeFileInput.files[0]);
+                return;
+            }
+
+            transactions.unshift(txObj);
 
             lastLocalUpdate = Date.now();
             saveState();
@@ -2449,6 +2616,27 @@
             if (!t) return;
             document.getElementById('pay-tx-id').value = t.id;
             document.getElementById('pay-doc-no').innerText = `${t.id} (${t.vendor}) - ${formatTHB(t.net)}`;
+
+            const infoBox = document.getElementById('pay-cheque-info-box');
+            const confirmBtn = document.getElementById('pay-confirm-btn');
+            const dateLabel = document.getElementById('pay-date-label');
+            const payDateInput = document.getElementById('pay-date');
+
+            if (t.pay_method === 'Cheque') {
+                if (infoBox) {
+                    infoBox.style.display = 'block';
+                    infoBox.innerHTML = `<strong>📜 ข้อมูลเช็ค:</strong> เลขที่ <code>${t.cheque_no || '-'}</code> | ธนาคาร: ${t.cheque_bank || '-'} | วันสั่งจ่ายหน้าเช็ค: <code>${t.cheque_date || t.due_date}</code>`;
+                }
+                if (confirmBtn) confirmBtn.innerText = '📜 ยืนยันเช็คผ่าน (Cleared)';
+                if (dateLabel) dateLabel.innerText = 'วันที่เช็คตัดบัญชี / เงินเข้าจริง:';
+                if (payDateInput) payDateInput.value = t.cheque_date || TODAY_DATE_STR;
+            } else {
+                if (infoBox) infoBox.style.display = 'none';
+                if (confirmBtn) confirmBtn.innerText = '✅ ยืนยันชำระเงิน';
+                if (dateLabel) dateLabel.innerText = 'วันที่ชำระเงิน / เงินเข้าจริง:';
+                if (payDateInput) payDateInput.value = TODAY_DATE_STR;
+            }
+
             openModal('payment-modal');
         }
 
@@ -2456,13 +2644,31 @@
             const txId = document.getElementById('pay-tx-id').value;
             const t = transactions.find(x => x.id === txId);
             if (t) {
-                t.status = "Paid";
-                t.pay_date = document.getElementById('pay-date').value || TODAY_DATE_STR;
-                lastLocalUpdate = Date.now();
-                saveState();
-                renderLedger();
-                closeModal('payment-modal');
-                alert(`🎉 บันทึกแจ้งชำระเงินสำหรับ [${txId}] เรียบร้อยแล้ว! (ซิงก์คลาวด์สดอัตโนมัติ)`);
+                const payFileInput = document.getElementById('pay-file');
+                const finalizePayment = () => {
+                    t.status = "Paid";
+                    t.pay_date = document.getElementById('pay-date').value || TODAY_DATE_STR;
+                    if (t.pay_method === 'Cheque') {
+                        t.cheque_status = "Cleared";
+                    }
+                    lastLocalUpdate = Date.now();
+                    saveState();
+                    renderLedger();
+                    closeModal('payment-modal');
+                    alert(`🎉 บันทึกยืนยันชำระเงินสำหรับ [${txId}] เรียบร้อยแล้ว! (ซิงก์คลาวด์สดอัตโนมัติ)`);
+                };
+
+                if (payFileInput && payFileInput.files.length > 0) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        t.file_data = e.target.result;
+                        if (t.pay_method === 'Cheque') t.cheque_file_data = e.target.result;
+                        finalizePayment();
+                    };
+                    reader.readAsDataURL(payFileInput.files[0]);
+                } else {
+                    finalizePayment();
+                }
             }
         }
 
@@ -2606,6 +2812,12 @@
             } else {
                 transactions = [];
             }
+
+            // Ensure backward compatibility and zero data loss for existing records
+            transactions.forEach(t => {
+                if (!t.pay_method) t.pay_method = 'Transfer';
+                if (!t.cheque_status) t.cheque_status = (t.status === 'Paid' ? 'Cleared' : 'Pending');
+            });
 
             const savedTime = localStorage.getItem(STORAGE_PREFIX + 'LAST_UPDATED');
             if (savedTime) {
