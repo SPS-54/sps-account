@@ -2492,40 +2492,87 @@
             if (searchInc) {
                 paidIncomes = paidIncomes.filter(t => 
                     (t.vendor && t.vendor.toLowerCase().includes(searchInc)) ||
-                    (t.desc && t.desc.toLowerCase().includes(searchInc)) ||
-                    (t.id && t.id.toLowerCase().includes(searchInc)) ||
-                    (t.cheque_no && t.cheque_no.toLowerCase().includes(searchInc))
-                );
+                    (t.desc &        function openLineNotifyModal() {
+            const cloudUrl = PUBLIC_CLOUD_RELAY_URL || getOrGenerateCloudUrl();
+            if (document.getElementById('line-modal-cloud-url')) {
+                document.getElementById('line-modal-cloud-url').value = cloudUrl;
             }
 
-            if (searchExp) {
-                paidExpenses = paidExpenses.filter(t => 
-                    (t.vendor && t.vendor.toLowerCase().includes(searchExp)) ||
-                    (t.desc && t.desc.toLowerCase().includes(searchExp)) ||
-                    (t.id && t.id.toLowerCase().includes(searchExp)) ||
-                    (t.cheque_no && t.cheque_no.toLowerCase().includes(searchExp))
-                );
-            }
+            const gasScript = `// Google Apps Script - ระบบส่ง LINE แจ้งเตือนยอดค้างชำระอัตโนมัติ (LINE Messaging API / LINE Official Account)
+const LINE_CHANNEL_ACCESS_TOKEN = "ใส่_CHANNEL_ACCESS_TOKEN_ของคุณที่นี่";
+const CLOUD_URL = "${cloudUrl}";
 
-            const totalIncNet = paidIncomes.reduce((a,b) => a + (b.net || 0), 0);
-            const totalExpNet = paidExpenses.reduce((a,b) => a + (b.net || 0), 0);
-            const vatSales = paidIncomes.reduce((a,b) => a + (b.vat || 0), 0);
-            const vatBuys = paidExpenses.reduce((a,b) => a + (b.vat || 0), 0);
-            const whtTotal = paidIncomes.reduce((a,b) => a + (b.wht || 0), 0) + paidExpenses.reduce((a,b) => a + (b.wht || 0), 0);
-            const cashProfit = totalIncNet - totalExpNet;
-            const vatNet = vatSales - vatBuys;
-            const margin = totalIncNet > 0 ? ((cashProfit / totalIncNet) * 100).toFixed(1) : "0.0";
+function sendDailyLineAlert() {
+  const response = UrlFetchApp.fetch(CLOUD_URL, { muteHttpExceptions: true });
+  if (response.getResponseCode() !== 200) return;
+  
+  const data = JSON.parse(response.getContentText());
+  const transactions = data.transactions || [];
+  const today = new Date();
+  today.setHours(0,0,0,0);
 
-            if (document.getElementById('recon-inout-inc-net')) document.getElementById('recon-inout-inc-net').innerText = formatTHB(totalIncNet);
-            if (document.getElementById('recon-inout-vat-sale')) document.getElementById('recon-inout-vat-sale').innerText = `ภาษีขาย 7%: ${formatTHB(vatSales)}`;
-            if (document.getElementById('recon-inout-exp-net')) document.getElementById('recon-inout-exp-net').innerText = formatTHB(totalExpNet);
-            if (document.getElementById('recon-inout-vat-buy')) document.getElementById('recon-inout-vat-buy').innerText = `ภาษีซื้อ 7%: ${formatTHB(vatBuys)}`;
-            if (document.getElementById('recon-inout-cash-profit')) document.getElementById('recon-inout-cash-profit').innerText = (cashProfit >= 0 ? '+' : '') + formatTHB(cashProfit);
-            if (document.getElementById('recon-inout-margin')) document.getElementById('recon-inout-margin').innerText = `Net Margin: ${margin}%`;
-            if (document.getElementById('recon-inout-vat-net')) document.getElementById('recon-inout-vat-net').innerText = vatNet >= 0 ? `นำส่งภาษี ${formatTHB(vatNet)}` : `ขอคืนภาษี ${formatTHB(Math.abs(vatNet))}`;
-            if (document.getElementById('recon-inout-wht-total')) document.getElementById('recon-inout-wht-total').innerText = `หัก ณ ที่จ่าย 3% รวม: ${formatTHB(whtTotal)}`;
+  let alertIncomes = [];
+  let alertExpenses = [];
 
-            if (document.getElementById('inout-inc-summary')) {
+  transactions.forEach(t => {
+    if (t.status !== 'Paid') {
+      const targetDateStr = (t.pay_method === 'Cheque' && t.cheque_date) ? t.cheque_date : t.due_date;
+      if (targetDateStr && targetDateStr.includes('/')) {
+        const parts = targetDateStr.split('/');
+        if (parts.length === 3) {
+          const dueDate = new Date(parts[2], parts[1]-1, parts[0]);
+          const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+          if (diffDays <= 7) {
+            if (t.type === 'Income') alertIncomes.push({...t, diffDays, targetDateStr});
+            else alertExpenses.push({...t, diffDays, targetDateStr});
+          }
+        }
+      }
+    }
+  });
+
+  if (alertIncomes.length === 0 && alertExpenses.length === 0) return;
+
+  let messageText = "📢 [SPS V2] เตือนรายการค้างชำระ (ภายใน 7 วัน & เกินกำหนด)\\n-----------------------------------\\n";
+  
+  if (alertIncomes.length > 0) {
+    messageText += "🟢 รายรับรอรับเงิน:\\n";
+    alertIncomes.forEach(t => {
+      const tag = t.diffDays < 0 ? \`⚠️ เกิน \${Math.abs(t.diffDays)} วัน\` : (t.diffDays === 0 ? "🔥 วันนี้!" : \`เหลือ \${t.diffDays} วัน\`);
+      messageText += \`• [\${t.id}] \${t.vendor} | ฿\${Number(t.net).toLocaleString()} | กำหนด: \${t.targetDateStr} (\${tag})\\n\`;
+    });
+  }
+
+  if (alertExpenses.length > 0) {
+    messageText += "\\n🔴 รายจ่ายรอจ่ายเงิน:\\n";
+    alertExpenses.forEach(t => {
+      const tag = t.diffDays < 0 ? \`⚠️ เกิน \${Math.abs(t.diffDays)} วัน\` : (t.diffDays === 0 ? "🔥 วันนี้!" : \`เหลือ \${t.diffDays} วัน\`);
+      messageText += \`• [\${t.id}] \${t.vendor} | ฿\${Number(t.net).toLocaleString()} | กำหนด: \${t.targetDateStr} (\${tag})\\n\`;
+    });
+  }
+
+  messageText += "\\n🌐 บันทึกชำระเงิน: https://sps-54.github.io/sps-account/";
+
+  // Send Broadcast Push Message via LINE Official Account Messaging API
+  const url = "https://api.line.me/v2/bot/message/broadcast";
+  const payload = {
+    messages: [
+      {
+        type: "text",
+        text: messageText
+      }
+    ]
+  };
+
+  UrlFetchApp.fetch(url, {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + LINE_CHANNEL_ACCESS_TOKEN
+    },
+    payload: JSON.stringify(payload)
+  });
+}`;inout-inc-summary')) {
                 document.getElementById('inout-inc-summary').innerText = `รวม ${paidIncomes.length} รายการ (รับชำระแล้ว: ${formatTHB(totalIncNet)})`;
             }
             if (document.getElementById('inout-exp-summary')) {
@@ -2840,8 +2887,8 @@
                 document.getElementById('line-modal-cloud-url').value = cloudUrl;
             }
 
-            const gasScript = `// Google Apps Script - ระบบส่ง LINE แจ้งเตือนยอดค้างชำระอัตโนมัติทุกเช้า 08:00 น.
-const LINE_NOTIFY_TOKEN = "ใส่_LINE_NOTIFY_TOKEN_ของคุณที่นี่";
+            const gasScript = `// Google Apps Script - ระบบส่ง LINE แจ้งเตือนยอดค้างชำระอัตโนมัติ (LINE Messaging API / LINE Official Account)
+const LINE_CHANNEL_ACCESS_TOKEN = "ใส่_CHANNEL_ACCESS_TOKEN_ของคุณที่นี่";
 const CLOUD_URL = "${cloudUrl}";
 
 function sendDailyLineAlert() {
@@ -2875,30 +2922,44 @@ function sendDailyLineAlert() {
 
   if (alertIncomes.length === 0 && alertExpenses.length === 0) return;
 
-  let message = "\\n📢 [SPS V2] เตือนรายการค้างชำระ (ภายใน 7 วัน & เกินกำหนด)\\n-----------------------------------\\n";
+  let messageText = "📢 [SPS V2] เตือนรายการค้างชำระ (ภายใน 7 วัน & เกินกำหนด)\\n-----------------------------------\\n";
   
   if (alertIncomes.length > 0) {
-    message += "🟢 รายรับรอรับเงิน:\\n";
+    messageText += "🟢 รายรับรอรับเงิน:\\n";
     alertIncomes.forEach(t => {
       const tag = t.diffDays < 0 ? \`⚠️ เกิน \${Math.abs(t.diffDays)} วัน\` : (t.diffDays === 0 ? "🔥 วันนี้!" : \`เหลือ \${t.diffDays} วัน\`);
-      message += \`• [\${t.id}] \${t.vendor} | ฿\${Number(t.net).toLocaleString()} | กำหนด: \${t.targetDateStr} (\${tag})\\n\`;
+      messageText += \`• [\${t.id}] \${t.vendor} | ฿\${Number(t.net).toLocaleString()} | กำหนด: \${t.targetDateStr} (\${tag})\\n\`;
     });
   }
 
   if (alertExpenses.length > 0) {
-    message += "\\n🔴 รายจ่ายรอจ่ายเงิน:\\n";
+    messageText += "\\n🔴 รายจ่ายรอจ่ายเงิน:\\n";
     alertExpenses.forEach(t => {
       const tag = t.diffDays < 0 ? \`⚠️ เกิน \${Math.abs(t.diffDays)} วัน\` : (t.diffDays === 0 ? "🔥 วันนี้!" : \`เหลือ \${t.diffDays} วัน\`);
-      message += \`• [\${t.id}] \${t.vendor} | ฿\${Number(t.net).toLocaleString()} | กำหนด: \${t.targetDateStr} (\${tag})\\n\`;
+      messageText += \`• [\${t.id}] \${t.vendor} | ฿\${Number(t.net).toLocaleString()} | กำหนด: \${t.targetDateStr} (\${tag})\\n\`;
     });
   }
 
-  message += "\\n🌐 บันทึกชำระเงิน: https://sps-54.github.io/sps-account/";
+  messageText += "\\n🌐 บันทึกชำระเงิน: https://sps-54.github.io/sps-account/";
 
-  UrlFetchApp.fetch("https://notify-api.line.me/api/notify", {
+  // Send Broadcast Push Message via LINE Official Account Messaging API
+  const url = "https://api.line.me/v2/bot/message/broadcast";
+  const payload = {
+    messages: [
+      {
+        type: "text",
+        text: messageText
+      }
+    ]
+  };
+
+  UrlFetchApp.fetch(url, {
     method: "post",
-    headers: { "Authorization": "Bearer " + LINE_NOTIFY_TOKEN },
-    payload: { "message": message }
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + LINE_CHANNEL_ACCESS_TOKEN
+    },
+    payload: JSON.stringify(payload)
   });
 }`;
 
