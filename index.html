@@ -970,8 +970,8 @@
 
     <!-- APPLICATION SCRIPT -->
     <script>
-        const STORAGE_PREFIX = "SPS_ACCOUNT_V2_";
-        const TODAY_DATE_STR = "22/08/2026";
+        const STORAGE_PREFIX = "SPS_ACCOUNT_LIVE_";
+        const TODAY_DATE_STR = "24/08/2026";
         let PUBLIC_CLOUD_RELAY_URL = localStorage.getItem(STORAGE_PREFIX + 'CLOUD_URL') || "https://jsonblob.com/api/jsonBlob/1271501178652434432";
 
         async function createFreshCloudRelay(dataObj) {
@@ -1086,44 +1086,8 @@
             }
         }
 
-        const INITIAL_TRANSACTIONS = [
-            { id: "INV2607220054", date: "22/07/2026", delivery_date: "22/07/2026", credit_days: 30, due_date: "21/08/2026", type: "Expense", desc: "ค่าสินค้า", vendor: "บริษัท เสบียงพาณิชย์ เทรดดิ้ง จำกัด", before_vat: 5046.73, vat: 353.27, wht: 0, net: 5400, status: "Paid", pay_date: "21/08/2026" },
-            { id: "INV2607270023", date: "27/07/2026", delivery_date: "27/07/2026", credit_days: 30, due_date: "26/08/2026", type: "Expense", desc: "ค่าสินค้า", vendor: "บริษัท เสบียงพาณิชย์ เทรดดิ้ง จำกัด", before_vat: 5644.86, vat: 395.14, wht: 0, net: 6040, status: "Unpaid" },
-            { id: "IN69000160", date: "28/07/2026", delivery_date: "28/07/2026", credit_days: 30, due_date: "27/08/2026", type: "Expense", desc: "ค่าสินค้า", vendor: "ตราดาวบางใหญ่", before_vat: 43233.64, vat: 3026.35, wht: 0, net: 46259.99, status: "Unpaid" },
-            { id: "IN69000161", date: "28/07/2026", delivery_date: "28/07/2026", credit_days: 30, due_date: "27/08/2026", type: "Expense", desc: "ค่าสินค้า", vendor: "ตราดาวบางใหญ่", before_vat: 35495.33, vat: 2484.67, wht: 0, net: 37980.00, status: "Unpaid" },
-            { id: "INV2607290037", date: "29/07/2026", delivery_date: "29/07/2026", credit_days: 30, due_date: "28/08/2026", type: "Expense", desc: "ค่าสินค้า", vendor: "บริษัท เสบียงพาณิชย์ เทรดดิ้ง จำกัด", before_vat: 196.26, vat: 13.74, wht: 0, net: 210.00, status: "Unpaid" },
-            { id: "INV-2026/001", date: "01/08/2026", delivery_date: "01/08/2026", credit_days: 30, due_date: "31/08/2026", type: "Income", desc: "ค่าบริการที่ปรึกษาพัฒนาระบบซอฟต์แวร์", vendor: "บริษัท เอพีซีไอ จำกัด", before_vat: 100000, vat: 7000, wht: 3000, net: 107000, status: "Paid", pay_date: "01/08/2026" },
-            { id: "INV-2026/002", date: "03/08/2026", delivery_date: "01/08/2026", credit_days: 14, due_date: "15/08/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000, vat: 2450, wht: 1750, net: 37450, status: "Paid", pay_date: "03/08/2026" },
-            { id: "INV-2026/003", date: "05/08/2026", delivery_date: "05/08/2026", credit_days: 30, due_date: "04/09/2026", type: "Expense", desc: "ค่าบริการระบบ Cloud Server", vendor: "บริษัท คลาวด์ เทคโนโลยี จำกัด", before_vat: 15000, vat: 1050, wht: 450, net: 16050, status: "Unpaid" },
-            { id: "INV-2026/004", date: "10/08/2026", delivery_date: "09/08/2026", credit_days: 31, due_date: "09/09/2026", type: "Income", desc: "ค่าส่งมอบงานระยะที่ 1 ระบบ AI Chatbot", vendor: "บริษัท ไทยการค้า อินเตอร์ จำกัด", before_vat: 150000, vat: 10500, wht: 4500, net: 160500, status: "Paid", pay_date: "10/08/2026" },
-            { id: "INV-2026/005", date: "15/08/2026", delivery_date: "15/08/2026", credit_days: 0, due_date: "15/08/2026", type: "Expense", desc: "เงินเดือนพนักงานประจำเดือน สิงหาคม 2026", vendor: "ฝ่ายทรัพยากรบุคคล (Payroll)", before_vat: 85000, vat: 0, wht: 0, net: 85000, status: "Paid", pay_date: "15/08/2026" },
-            { id: "INV-2026/006", date: "18/08/2026", delivery_date: "18/08/2026", credit_days: 30, due_date: "17/09/2026", type: "Expense", desc: "ค่าโฆษณา Facebook & Google Ads", vendor: "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด", before_vat: 20000, vat: 1400, wht: 400, net: 21400, status: "Unpaid" },
-            { id: "INV-2026/007", date: "20/08/2026", delivery_date: "19/08/2026", credit_days: 31, due_date: "19/09/2026", type: "Expense", desc: "ซื้ออุปกรณ์คอมพิวเตอร์และจอมอนิเตอร์", vendor: "บริษัท ไอที ซิตี้ จำกัด (มหาชน)", before_vat: 28000, vat: 1960, wht: 0, net: 29960, status: "Unpaid" },
-            { id: "INV-2026/008", date: "28/08/2026", delivery_date: "28/08/2026", credit_days: 30, due_date: "27/09/2026", type: "Income", desc: "ค่าสัญญาบริการรายเดือน (SLA Maintenance)", vendor: "บริษัท โกลบอล โลจิสติกส์ จำกัด", before_vat: 50000, vat: 3500, wht: 1500, net: 53500, status: "Unpaid" },
-            { id: "INV-2026/009", date: "05/09/2026", delivery_date: "05/09/2026", credit_days: 15, due_date: "20/09/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000, vat: 2450, wht: 1750, net: 37450, status: "Unpaid" },
-            { id: "INV-2026/010", date: "15/09/2026", delivery_date: "15/09/2026", credit_days: 30, due_date: "15/10/2026", type: "Income", desc: "ค่าส่งมอบงานระยะที่ 2 ระบบ AI Chatbot", vendor: "บริษัท ไทยการค้า อินเตอร์ จำกัด", before_vat: 180000, vat: 12600, wht: 5400, net: 187200, status: "Unpaid" },
-            { id: "INV2608010012", date: "01/08/2026", delivery_date: "01/08/2026", credit_days: 30, due_date: "31/08/2026", type: "Expense", desc: "ค่าวัตถุดิบอาหารและบรรจุภัณฑ์", vendor: "บริษัท เสบียงพาณิชย์ เทรดดิ้ง จำกัด", before_vat: 12500, vat: 875, wht: 0, net: 13375, status: "Unpaid" },
-            { id: "IN69000185", date: "02/08/2026", delivery_date: "02/08/2026", credit_days: 30, due_date: "01/09/2026", type: "Expense", desc: "ค่าสินค้าบรรจุภัณฑ์กระดาษ", vendor: "ตราดาวบางใหญ่", before_vat: 18400, vat: 1288, wht: 0, net: 19688, status: "Unpaid" },
-            { id: "INV-2026/011", date: "04/08/2026", delivery_date: "04/08/2026", credit_days: 30, due_date: "03/09/2026", type: "Income", desc: "ค่าซอฟต์แวร์สำเร็จรูปโซลูชันบัญชี", vendor: "บริษัท เอพีซีไอ จำกัด", before_vat: 75000, vat: 5250, wht: 2250, net: 80250, status: "Paid", pay_date: "04/08/2026" },
-            { id: "INV2608100045", date: "10/08/2026", delivery_date: "10/08/2026", credit_days: 30, due_date: "09/09/2026", type: "Expense", desc: "ค่าสินค้าวัตถุดิบและส่วนประกอบ", vendor: "บริษัท เสบียงพาณิชย์ เทรดดิ้ง จำกัด", before_vat: 8200, vat: 574, wht: 0, net: 8774, status: "Unpaid" },
-            { id: "IN69000210", date: "12/08/2026", delivery_date: "12/08/2026", credit_days: 30, due_date: "11/09/2026", type: "Expense", desc: "ค่าสินค้ารวมส่ง", vendor: "ตราดาวบางใหญ่", before_vat: 22100, vat: 1547, wht: 0, net: 23647, status: "Unpaid" },
-            { id: "INV-2026/012", date: "14/08/2026", delivery_date: "14/08/2026", credit_days: 30, due_date: "13/09/2026", type: "Income", desc: "ค่าอบรมการใช้งานระบบ AI", vendor: "บริษัท บิ๊กคอร์ป จำกัด (มหาชน)", before_vat: 45000, vat: 3150, wht: 1350, net: 48150, status: "Paid", pay_date: "14/08/2026" },
-            { id: "INV-2026/013", date: "16/08/2026", delivery_date: "16/08/2026", credit_days: 15, due_date: "31/08/2026", type: "Expense", desc: "ค่าขนส่งสินค้าและโลจิสติกส์", vendor: "บริษัท โกลบอล โลจิสติกส์ จำกัด", before_vat: 9500, vat: 665, wht: 95, net: 10165, status: "Paid", pay_date: "16/08/2026" },
-            { id: "INV2608180088", date: "18/08/2026", delivery_date: "18/08/2026", credit_days: 30, due_date: "17/09/2026", type: "Expense", desc: "ค่าสินค้าวัตถุดิบชุดที่ 2", vendor: "บริษัท เสบียงพาณิชย์ เทรดดิ้ง จำกัด", before_vat: 14200, vat: 994, wht: 0, net: 15194, status: "Unpaid" },
-            { id: "IN69000245", date: "19/08/2026", delivery_date: "19/08/2026", credit_days: 30, due_date: "18/09/2026", type: "Expense", desc: "ค่ากล่องและถุงบรรจุภัณฑ์", vendor: "ตราดาวบางใหญ่", before_vat: 31000, vat: 2170, wht: 0, net: 33170, status: "Unpaid" },
-            { id: "INV-2026/014", date: "21/08/2026", delivery_date: "21/08/2026", credit_days: 30, due_date: "20/09/2026", type: "Income", desc: "ค่าที่ปรึกษาปรับปรุงประสิทธิภาพงาน", vendor: "บริษัท บิ๊กคอร์ป จำกัด (มหาชน)", before_vat: 60000, vat: 4200, wht: 1800, net: 64200, status: "Unpaid" },
-            { id: "INV2608220099", date: "22/08/2026", delivery_date: "22/08/2026", credit_days: 30, due_date: "21/09/2026", type: "Expense", desc: "ค่าสินค้าและอุปกรณ์เพิ่มเติม", vendor: "บริษัท เสบียงพาณิชย์ เทรดดิ้ง จำกัด", before_vat: 6800, vat: 476, wht: 0, net: 7276, status: "Unpaid" },
-            { id: "IN69000290", date: "23/08/2026", delivery_date: "23/08/2026", credit_days: 30, due_date: "22/09/2026", type: "Expense", desc: "ค่าสินค้ารอบส่งเสริมการขาย", vendor: "ตราดาวบางใหญ่", before_vat: 15500, vat: 1085, wht: 0, net: 16585, status: "Unpaid" }
-        ];
-
-        let vendorMemory = {
-            "บริษัท สาทร เรียลเอสเตท จำกัด": { category: "ค่าเช่าสำนักงาน", credit: 14, confidence: 99 },
-            "บริษัท คลาวด์ เทคโนโลยี จำกัด": { category: "ค่าเซิร์ฟเวอร์คลาวด์", credit: 30, confidence: 98 },
-            "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด": { category: "ค่าโฆษณาออนไลน์", credit: 30, confidence: 97 },
-            "บริษัท ไอที ซิตี้ จำกัด (มหาชน)": { category: "ซื้ออุปกรณ์คอมพิวเตอร์", credit: 31, confidence: 96 },
-            "บริษัท เสบียงพาณิชย์ เทรดดิ้ง จำกัด": { category: "ค่าสินค้าวัตถุดิบ", credit: 30, confidence: 98 },
-            "ตราดาวบางใหญ่": { category: "บรรจุภัณฑ์และสินค้า", credit: 30, confidence: 98 }
-        };
+        const INITIAL_TRANSACTIONS = [];
+        let vendorMemory = {};
 
         let transactions = [];
         let expenseChartObj = null;
@@ -2515,16 +2479,16 @@
             if (saved) {
                 try { 
                     transactions = JSON.parse(saved); 
-                    if (!Array.isArray(transactions) || transactions.length === 0) {
-                        transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+                    if (!Array.isArray(transactions)) {
+                        transactions = [];
                         saveState();
                     }
                 } catch(e) { 
-                    transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS)); 
+                    transactions = []; 
                     saveState();
                 }
             } else {
-                transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+                transactions = [];
                 saveState();
             }
 
