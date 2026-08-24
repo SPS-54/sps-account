@@ -974,7 +974,18 @@
     <script>
         const STORAGE_PREFIX = "SPS_ACCOUNT_LIVE_";
         const TODAY_DATE_STR = "24/08/2026";
-        let PUBLIC_CLOUD_RELAY_URL = localStorage.getItem(STORAGE_PREFIX + 'CLOUD_URL') || "";
+        
+        function getOrGenerateCloudUrl() {
+            let url = localStorage.getItem(STORAGE_PREFIX + 'CLOUD_URL');
+            if (!url || url.length < 20) {
+                const uniqueId = "139281" + Math.floor(10000000 + Math.random() * 90000000) + Date.now().toString(36);
+                url = "https://jsonblob.com/api/jsonBlob/" + uniqueId;
+                try { localStorage.setItem(STORAGE_PREFIX + 'CLOUD_URL', url); } catch(e) {}
+            }
+            return url;
+        }
+
+        let PUBLIC_CLOUD_RELAY_URL = getOrGenerateCloudUrl();
 
         function prepareCloudPayload(isSanitized = true) {
             let txList = transactions;
@@ -991,34 +1002,14 @@
                 namespace: STORAGE_PREFIX,
                 transactions: txList,
                 vendorMemory: vendorMemory,
+                cloudUrl: PUBLIC_CLOUD_RELAY_URL,
                 lastUpdated: lastLocalUpdate || Date.now()
             };
         }
 
         async function createFreshCloudRelay() {
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 4000);
-                const dataObj = prepareCloudPayload(true);
-
-                const res = await fetch("https://jsonblob.com/api/jsonBlob", {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dataObj),
-                    signal: controller.signal
-                });
-                clearTimeout(timeoutId);
-
-                if (res.ok) {
-                    const loc = res.headers.get('Location');
-                    if (loc) {
-                        PUBLIC_CLOUD_RELAY_URL = loc;
-                        try { localStorage.setItem(STORAGE_PREFIX + 'CLOUD_URL', loc); } catch(e) {}
-                        return true;
-                    }
-                }
-            } catch(e) {}
-            return false;
+            PUBLIC_CLOUD_RELAY_URL = getOrGenerateCloudUrl();
+            return true;
         }
 
         async function autoPushToCloud(showSpinner = false) {
@@ -2493,24 +2484,34 @@
                 }
                 return t;
             });
-            const codeStr = JSON.stringify(sanitizedTxs);
+            const payload = {
+                transactions: sanitizedTxs,
+                cloudUrl: PUBLIC_CLOUD_RELAY_URL,
+                vendorMemory: vendorMemory
+            };
+            const codeStr = JSON.stringify(payload);
             navigator.clipboard.writeText(codeStr).then(() => {
-                alert("📋 คัดลอกรหัสข้อมูลเรียบร้อยแล้ว!\n(บีบอัดรหัสสั้นเรียบร้อย ไม่ถูก Line ตัดทอนแน่นอน)\n\nนำรหัสนี้ไปวางที่ช่อง 'นำเข้า/สำรองข้อมูล' บนมือถือ แล้วกด 'กู้คืนข้อมูล' ได้เลยครับ!");
+                alert("📋 คัดลอกรหัสข้อมูลเรียบร้อยแล้ว!\n(รวมคีย์ซิงก์สดอัตโนมัติ นำไปวางในมือถือเพียงครั้งเดียว ทั้งสองเครื่องจะซิงก์หากันตลอดไป!)\n\nนำรหัสนี้ไปวางที่ช่อง 'นำเข้า/สำรองข้อมูล' บนมือถือ แล้วกด 'กู้คืนข้อมูล' ได้เลยครับ!");
             }).catch(e => {
                 prompt("📋 คัดลอกรหัสข้อมูลด้านล่างนี้ไปส่งใน Line:", codeStr);
             });
         }
 
         async function copyCloudRelayUrl() {
-            if (!PUBLIC_CLOUD_RELAY_URL) {
-                await autoPushToCloud(true);
-            }
-            if (PUBLIC_CLOUD_RELAY_URL) {
-                navigator.clipboard.writeText(PUBLIC_CLOUD_RELAY_URL).then(() => {
-                    alert(`🔑 คัดลอกคีย์ซิงก์คลาวด์เรียบร้อยแล้ว!\n(ลิงก์สั้นเพียง 60 ตัวอักษร นำไปวางในมือถือได้ 100%)\n\nนำลิงก์นี้ไปวางที่ช่อง "นำเข้า/สำรองข้อมูล" บนมือถือ แล้วกดกู้คืนข้อมูลได้เลยครับ!`);
+            const urlToCopy = getOrGenerateCloudUrl();
+            PUBLIC_CLOUD_RELAY_URL = urlToCopy;
+
+            // Push current state to cloud so it's ready for mobile
+            autoPushToCloud(false);
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(urlToCopy).then(() => {
+                    alert(`🔑 คัดลอกคีย์ซิงก์คลาวด์เรียบร้อยแล้ว!\n(${urlToCopy})\n\nนำลิงก์นี้ไปวางที่ช่อง "นำเข้า/สำรองข้อมูล" บนมือถือ แล้วกดกู้คืนข้อมูล อุปกรณ์ทั้งสองจะซิงก์หากัน 100% ครับ!`);
                 }).catch(e => {
-                    prompt("🔑 คัดลอกคีย์ซิงก์คลาวด์ด้านล่างนี้:", PUBLIC_CLOUD_RELAY_URL);
+                    prompt("🔑 คัดลอกคีย์ซิงก์คลาวด์ด้านล่างนี้ (กด Ctrl+C หรือ คัดลอก):", urlToCopy);
                 });
+            } else {
+                prompt("🔑 คัดลอกคีย์ซิงก์คลาวด์ด้านล่างนี้ (กด Ctrl+C หรือ คัดลอก):", urlToCopy);
             }
         }
 
@@ -2533,35 +2534,51 @@
                 PUBLIC_CLOUD_RELAY_URL = raw;
                 try { localStorage.setItem(STORAGE_PREFIX + 'CLOUD_URL', raw); } catch(e) {}
                 autoSyncFromCloud().then(() => {
-                    alert(`🔗 เชื่อมต่อคีย์ช่องซิงก์สดสำเร็จ! ดึงข้อมูล ${transactions.length} รายการลงอุปกรณ์นี้เรียบร้อยครับ!`);
+                    alert(`🔗 เชื่อมต่อคีย์ช่องซิงก์สดสำเร็จ! ดึงข้อมูล ${transactions.length} รายการลงอุปกรณ์นี้เรียบร้อยครับ! (อุปกรณ์ซิงก์หากันอัตโนมัติเรียบร้อย)`);
                 });
                 return;
             }
 
             try {
                 const parsed = JSON.parse(raw);
+                let importedCloudUrl = null;
+
                 if (Array.isArray(parsed)) {
                     transactions = parsed;
-                    lastLocalUpdate = Date.now();
-                    saveState();
-                    renderLedger();
-                    alert(`🎉 กู้คืนข้อมูลสำเร็จ! โหลดข้อมูล ${transactions.length} รายการลงระบบแล้วครับ! (ซิงก์คลาวด์สดอัตโนมัติ)`);
                 } else if (parsed && parsed.transactions && Array.isArray(parsed.transactions)) {
                     transactions = parsed.transactions;
-                    lastLocalUpdate = Date.now();
-                    saveState();
-                    renderLedger();
-                    alert(`🎉 กู้คืนข้อมูลสำเร็จ! โหลดข้อมูล ${transactions.length} รายการลงระบบแล้วครับ! (ซิงก์คลาวด์สดอัตโนมัติ)`);
+                    if (parsed.cloudUrl) importedCloudUrl = parsed.cloudUrl;
+                    if (parsed.vendorMemory) vendorMemory = parsed.vendorMemory;
                 } else {
                     alert('❌ รูปแบบข้อมูลแบ็กอัพไม่ถูกต้อง');
+                    return;
                 }
+
+                lastLocalUpdate = Date.now();
+                saveState();
+                renderLedger();
+
+                if (importedCloudUrl) {
+                    PUBLIC_CLOUD_RELAY_URL = importedCloudUrl;
+                    try { localStorage.setItem(STORAGE_PREFIX + 'CLOUD_URL', importedCloudUrl); } catch(e) {}
+                    autoPushToCloud(true);
+                } else if (PUBLIC_CLOUD_RELAY_URL) {
+                    autoPushToCloud(true);
+                }
+
+                alert(`🎉 กู้คืนข้อมูลสำเร็จ! โหลดข้อมูล ${transactions.length} รายการและผูกช่องซิงก์คลาวด์สดเรียบร้อยแล้วครับ! (จากนี้ไปจะซิงก์อัตโนมัติหากันตลอดเวลา)`);
             } catch(err) {
                 alert('❌ เกิดข้อผิดพลาดในการอ่านรหัสแบ็กอัพ: ' + err.message);
             }
         }
 
         function downloadBackupFile() {
-            const txt = JSON.stringify(transactions, null, 2);
+            const payload = {
+                transactions: transactions,
+                cloudUrl: PUBLIC_CLOUD_RELAY_URL,
+                vendorMemory: vendorMemory
+            };
+            const txt = JSON.stringify(payload, null, 2);
             const blob = new Blob([txt], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
