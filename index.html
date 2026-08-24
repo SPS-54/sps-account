@@ -1007,7 +1007,6 @@
                     <div class="form-group">
                         <label>หัก ณ ที่จ่าย (บาท):</label>
                         <input type="number" id="m-wht" value="0.00" readonly class="form-control" style="background:#f1f5f9;">
-                    </div>
                     <div class="form-group full">
                         <label>ยอดจ่ายจริงสุทธิ (บาท):</label>
                         <input type="number" id="m-net" value="10000" class="form-control" style="font-weight: 700; color: #059669; font-size: 16px;">
@@ -1017,6 +1016,155 @@
             <div class="modal-footer">
                 <button onclick="closeModal('manual-entry-modal')" class="btn btn-outline">ยกเลิก</button>
                 <button onclick="saveManualEntryToLedger()" class="btn btn-emerald">💾 บันทึกรายการ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT TRANSACTION MODAL -->
+    <div id="edit-transaction-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fa-solid fa-pen-to-square text-amber-400"></i> แก้ไขรายการบัญชี (Edit Transaction)</div>
+                <button onclick="closeModal('edit-transaction-modal')" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-tx-id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>ประเภทรายการ:</label>
+                        <select id="edit-type" class="form-control">
+                            <option value="Expense">🔴 รายจ่าย (Expense)</option>
+                            <option value="Income">🟢 รายรับ (Income)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>สถานะการชำระเงิน:</label>
+                        <select id="edit-status" class="form-control">
+                            <option value="Unpaid">⏳ รอชำระเงิน (Unpaid)</option>
+                            <option value="Paid">🟢 ชำระแล้ว / รับชำระแล้ว (Paid)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>เลขที่เอกสาร:</label>
+                        <input type="text" id="edit-doc-no" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>ช่องทางชำระเงิน:</label>
+                        <select id="edit-pay-method" onchange="toggleChequeInputs('edit')" class="form-control">
+                            <option value="Transfer">💳 เงินโอนผ่านธนาคาร</option>
+                            <option value="Cash">💵 เงินสด</option>
+                            <option value="Cheque">📜 เช็ครับ / เช็คจ่าย</option>
+                        </select>
+                    </div>
+
+                    <div id="edit-cheque-box" class="form-group full" style="display: none; background: #e0e7ff; padding: 12px; border-radius: 8px; border: 1px solid #818cf8;">
+                        <div style="font-weight: 700; color: #3730a3; margin-bottom: 8px; font-size: 12px;"><i class="fa-solid fa-money-check"></i> รายละเอียดเช็ค:</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div>
+                                <label style="font-size: 11px;">เลขที่เช็ค (Cheque No.):</label>
+                                <input type="text" id="edit-cheque-no" class="form-control" style="background:#fff;">
+                            </div>
+                            <div>
+                                <label style="font-size: 11px;">ธนาคารสั่งจ่าย:</label>
+                                <select id="edit-cheque-bank" class="form-control" style="background:#fff;">
+                                    <option value="กสิกรไทย (KBANK)">กสิกรไทย (KBANK)</option>
+                                    <option value="กรุงเทพ (BBL)">กรุงเทพ (BBL)</option>
+                                    <option value="ไทยพาณิชย์ (SCB)">ไทยพาณิชย์ (SCB)</option>
+                                    <option value="กรุงไทย (KTB)">กรุงไทย (KTB)</option>
+                                    <option value="กรุงศรี (BAY)">กรุงศรี (BAY)</option>
+                                    <option value="ทหารไทยธนชาต (ttb)">ทหารไทยธนชาต (ttb)</option>
+                                    <option value="ออมสิน (GSB)">ออมสิน (GSB)</option>
+                                    <option value="อื่นๆ">อื่นๆ</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div>
+                                <label style="font-size: 11px;">วันที่สั่งจ่ายบนหน้าเช็ค:</label>
+                                <input type="text" id="edit-cheque-date" class="form-control" style="background:#fff;">
+                            </div>
+                            <div>
+                                <label style="font-size: 11px;">สถานะเช็ค:</label>
+                                <select id="edit-cheque-status" class="form-control" style="background:#fff;">
+                                    <option value="Pending">⏳ รอเคลียริ่ง / รอขึ้นเงิน</option>
+                                    <option value="Cleared">🟢 เคลียริ่งผ่านแล้ว</option>
+                                    <option value="Bounced">🔴 เช็คเด้ง / คืนเช็ค</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <label style="font-size: 11px;"><i class="fa-solid fa-image"></i> เปลี่ยนรูปภาพเช็คฉบับจริง (ถ้ามี):</label>
+                            <input type="file" id="edit-cheque-file" accept="image/*,.pdf" class="form-control" style="background:#fff; font-size:11px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>วันที่เอกสาร:</label>
+                        <input type="text" id="edit-date" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>เครดิต (วัน):</label>
+                        <input type="number" id="edit-credit-days" class="form-control">
+                    </div>
+                    <div class="form-group full">
+                        <label>ชื่อคู่ค้า / ซัพพลายเออร์:</label>
+                        <input type="text" id="edit-vendor" class="form-control">
+                    </div>
+                    <div class="form-group full">
+                        <label>รายละเอียด:</label>
+                        <input type="text" id="edit-desc" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>รูปแบบภาษี VAT:</label>
+                        <select id="edit-vat-mode" onchange="calcEditAmounts()" class="form-control">
+                            <option value="INC_VAT">รวม VAT 7% แล้ว (Vat Included)</option>
+                            <option value="EXC_VAT">แยก VAT 7% / บวกเพิ่ม (Vat Excluded)</option>
+                            <option value="NO_VAT">ไม่มี VAT (0%)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>หัก ณ ที่จ่าย (WHT):</label>
+                        <select id="edit-wht-mode" onchange="calcEditAmounts()" class="form-control">
+                            <option value="0">ไม่มีหัก ณ ที่จ่าย (0%)</option>
+                            <option value="3">หัก 3% (ค่าบริการ / ค่าจ้าง / ค่าแรง)</option>
+                            <option value="1">หัก 1% (ค่าขนส่ง)</option>
+                            <option value="2">หัก 2% (ค่าโฆษณา)</option>
+                            <option value="5">หัก 5% (ค่าเช่า)</option>
+                            <option value="CUSTOM">ระบุ % เอง</option>
+                        </select>
+                    </div>
+                    <div class="form-group full" id="edit-wht-custom-box" style="display:none;">
+                        <label>ระบุ % หัก ณ ที่จ่าย:</label>
+                        <input type="number" id="edit-wht-custom-rate" value="3" step="0.1" oninput="calcEditAmounts()" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>ยอดเงินตั้งต้น (บาท):</label>
+                        <input type="number" id="edit-base-amount" oninput="calcEditAmounts()" class="form-control" style="font-weight: 700;">
+                    </div>
+                    <div class="form-group">
+                        <label>มูลค่าก่อน VAT:</label>
+                        <input type="number" id="edit-before-vat" readonly class="form-control" style="background:#f1f5f9;">
+                    </div>
+                    <div class="form-group">
+                        <label>ภาษี VAT 7%:</label>
+                        <input type="number" id="edit-vat" readonly class="form-control" style="background:#f1f5f9;">
+                    </div>
+                    <div class="form-group">
+                        <label>หัก ณ ที่จ่าย (บาท):</label>
+                        <input type="number" id="edit-wht" readonly class="form-control" style="background:#f1f5f9;">
+                    </div>
+                    <div class="form-group full">
+                        <label>ยอดจ่ายจริงสุทธิ (บาท):</label>
+                        <input type="number" id="edit-net" class="form-control" style="font-weight: 700; color: #059669; font-size: 16px;">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center;">
+                <button onclick="deleteTransactionFromEdit()" class="btn btn-rose btn-sm"><i class="fa-solid fa-trash"></i> 🗑️ ลบรายการนี้</button>
+                <div style="display:flex; gap:8px;">
+                    <button onclick="closeModal('edit-transaction-modal')" class="btn btn-outline">ยกเลิก</button>
+                    <button onclick="saveTransactionEdit()" class="btn btn-emerald">💾 บันทึกการแก้ไข</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1063,9 +1211,12 @@
                 <input type="hidden" id="doc-modal-tx-id">
                 <div id="doc-modal-preview-container"></div>
             </div>
-            <div class="modal-footer">
-                <button onclick="closeModal('doc-view-modal')" class="btn btn-outline">ปิด</button>
-                <button id="doc-modal-download-btn" class="btn btn-emerald"><i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดเอกสาร</button>
+            <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center;">
+                <button onclick="editTxFromDocModal()" class="btn btn-amber btn-sm"><i class="fa-solid fa-pen-to-square"></i> ✏️ แก้ไขข้อมูลรายการนี้</button>
+                <div style="display:flex; gap:8px;">
+                    <button onclick="closeModal('doc-view-modal')" class="btn btn-outline">ปิด</button>
+                    <button id="doc-modal-download-btn" class="btn btn-emerald"><i class="fa-solid fa-download"></i> 📥 ดาวน์โหลดเอกสาร</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1710,7 +1861,10 @@
                                 ${t.status === 'Paid' ? '<span class="badge-status badge-paid">ชำระแล้ว</span>' : '<span class="badge-status badge-pending">รอชำระ</span>'}
                             </td>
                             <td style="text-align:center;">
-                                ${t.status === 'Paid' ? '<button class="btn btn-outline btn-sm" disabled>เรียบร้อย</button>' : `<button onclick="openPaymentModal('${t.id}')" class="btn btn-amber btn-sm">แจ้งชำระ</button>`}
+                                <div style="display:flex; gap:4px; justify-content:center;">
+                                    <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                    ${t.status === 'Paid' ? '<button class="btn btn-outline btn-sm" disabled>เรียบร้อย</button>' : `<button onclick="openPaymentModal('${t.id}')" class="btn btn-amber btn-sm">แจ้งชำระ</button>`}
+                                </div>
                             </td>
                         </tr>
                     `).join('');
@@ -1799,7 +1953,12 @@
                                 <td style="font-weight:600;">${t.vendor}</td>
                                 <td>${t.desc}</td>
                                 <td style="text-align:right; font-family:monospace; font-weight:bold; color:#047857;">${formatTHB(t.net)}</td>
-                                <td style="text-align:center;">${actionBtn}</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex; gap:4px; justify-content:center;">
+                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                        ${actionBtn}
+                                    </div>
+                                </td>
                             </tr>
                         `;
                     }).join('');
@@ -1833,7 +1992,12 @@
                                 <td style="font-weight:600;">${t.vendor}</td>
                                 <td>${t.desc}</td>
                                 <td style="text-align:right; font-family:monospace; font-weight:bold; color:#e11d48;">${formatTHB(t.net)}</td>
-                                <td style="text-align:center;">${actionBtn}</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex; gap:4px; justify-content:center;">
+                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                        ${actionBtn}
+                                    </div>
+                                </td>
                             </tr>
                         `;
                     }).join('');
@@ -2177,7 +2341,10 @@
                                 <td style="text-align:right; font-family:monospace; font-weight:700;">${formatTHB(t.net)}</td>
                                 <td style="text-align:center;">${isPaid ? '<span class="badge-status badge-paid">ชำระแล้ว</span>' : '<span class="badge-status badge-pending">ค้างชำระ</span>'}</td>
                                 <td style="text-align:center;">
-                                    <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                    <div style="display:flex; gap:4px; justify-content:center;">
+                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                        <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                    </div>
                                 </td>
                             </tr>
                         `;
@@ -2206,7 +2373,10 @@
                                 <td style="text-align:right; font-family:monospace; font-weight:700;">${formatTHB(t.net)}</td>
                                 <td style="text-align:center;">${isPaid ? '<span class="badge-status badge-paid">รับชำระแล้ว</span>' : '<span class="badge-status badge-pending">ค้างรับ</span>'}</td>
                                 <td style="text-align:center;">
-                                    <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                    <div style="display:flex; gap:4px; justify-content:center;">
+                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                        <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                    </div>
                                 </td>
                             </tr>
                         `;
@@ -2298,7 +2468,10 @@
                                 <td style="text-align:right; font-family:monospace; font-weight:700; color:#047857;">${formatTHB(t.net)}</td>
                                 <td style="text-align:center;"><span class="badge-status badge-paid">รับชำระแล้ว</span></td>
                                 <td style="text-align:center;">
-                                    <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                    <div style="display:flex; gap:4px; justify-content:center;">
+                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                        <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                    </div>
                                 </td>
                             </tr>
                         `;
@@ -2328,7 +2501,10 @@
                                 <td style="text-align:right; font-family:monospace; font-weight:700; color:#be123c;">${formatTHB(t.net)}</td>
                                 <td style="text-align:center;"><span class="badge-status badge-paid">ชำระแล้ว</span></td>
                                 <td style="text-align:center;">
-                                    <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                    <div style="display:flex; gap:4px; justify-content:center;">
+                                        <button onclick="openEditModal('${t.id}')" class="btn btn-outline btn-sm" title="แก้ไขรายการ"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                                        <button onclick="viewDocumentModal('${t.id}')" class="btn ${docBtnClass} btn-sm"><i class="fa-solid ${docBtnIcon}"></i> ${docBtnLabel}</button>
+                                    </div>
                                 </td>
                             </tr>
                         `;
@@ -2767,6 +2943,199 @@
             if (document.getElementById('m-vat')) document.getElementById('m-vat').value = vat.toFixed(2);
             if (document.getElementById('m-wht')) document.getElementById('m-wht').value = wht.toFixed(2);
             if (document.getElementById('m-net')) document.getElementById('m-net').value = net.toFixed(2);
+        }
+
+        function calcEditAmounts() {
+            const vatMode = document.getElementById('edit-vat-mode')?.value || 'INC_VAT';
+            const whtMode = document.getElementById('edit-wht-mode')?.value || '0';
+            
+            const customBox = document.getElementById('edit-wht-custom-box');
+            let whtRate = 0;
+            if (whtMode === 'CUSTOM') {
+                if (customBox) customBox.style.display = 'block';
+                whtRate = parseFloat(document.getElementById('edit-wht-custom-rate')?.value) || 0;
+            } else {
+                if (customBox) customBox.style.display = 'none';
+                whtRate = parseFloat(whtMode) || 0;
+            }
+
+            let baseVal = parseFloat(document.getElementById('edit-base-amount')?.value) || 0;
+            let beforeVat = 0;
+            let vat = 0;
+
+            if (vatMode === 'NO_VAT') {
+                beforeVat = baseVal;
+                vat = 0;
+            } else if (vatMode === 'INC_VAT') {
+                beforeVat = baseVal / 1.07;
+                vat = baseVal - beforeVat;
+            } else { // EXC_VAT
+                beforeVat = baseVal;
+                vat = baseVal * 0.07;
+            }
+
+            const wht = beforeVat * (whtRate / 100);
+            const net = beforeVat + vat - wht;
+
+            if (document.getElementById('edit-before-vat')) document.getElementById('edit-before-vat').value = beforeVat.toFixed(2);
+            if (document.getElementById('edit-vat')) document.getElementById('edit-vat').value = vat.toFixed(2);
+            if (document.getElementById('edit-wht')) document.getElementById('edit-wht').value = wht.toFixed(2);
+            if (document.getElementById('edit-net')) document.getElementById('edit-net').value = net.toFixed(2);
+        }
+
+        function openEditModal(txId) {
+            const t = transactions.find(x => x.id === txId);
+            if (!t) { alert('⚠️ ไม่พบรายการที่ต้องการแก้ไข'); return; }
+
+            document.getElementById('edit-tx-id').value = t.id;
+            document.getElementById('edit-doc-no').value = t.id;
+            document.getElementById('edit-type').value = t.type || 'Expense';
+            document.getElementById('edit-status').value = t.status || 'Unpaid';
+            document.getElementById('edit-pay-method').value = t.pay_method || 'Transfer';
+            document.getElementById('edit-date').value = t.date || TODAY_DATE_STR;
+            document.getElementById('edit-credit-days').value = (t.credit_days !== undefined) ? t.credit_days : 30;
+            document.getElementById('edit-vendor').value = t.vendor || '';
+            document.getElementById('edit-desc').value = t.desc || '';
+
+            toggleChequeInputs('edit');
+
+            if (t.pay_method === 'Cheque') {
+                if (document.getElementById('edit-cheque-no')) document.getElementById('edit-cheque-no').value = t.cheque_no || '';
+                if (document.getElementById('edit-cheque-bank')) document.getElementById('edit-cheque-bank').value = t.cheque_bank || 'กสิกรไทย (KBANK)';
+                if (document.getElementById('edit-cheque-date')) document.getElementById('edit-cheque-date').value = t.cheque_date || t.due_date || t.date;
+                if (document.getElementById('edit-cheque-status')) document.getElementById('edit-cheque-status').value = t.cheque_status || 'Pending';
+            }
+
+            let bVat = t.before_vat || t.net || 0;
+            let vatVal = t.vat || 0;
+            let whtVal = t.wht || 0;
+
+            if (vatVal > 0) {
+                document.getElementById('edit-vat-mode').value = 'EXC_VAT';
+            } else {
+                document.getElementById('edit-vat-mode').value = 'NO_VAT';
+            }
+
+            if (whtVal > 0 && bVat > 0) {
+                let estRate = Math.round((whtVal / bVat) * 100);
+                if ([1, 2, 3, 5].includes(estRate)) {
+                    document.getElementById('edit-wht-mode').value = String(estRate);
+                } else {
+                    document.getElementById('edit-wht-mode').value = 'CUSTOM';
+                    if (document.getElementById('edit-wht-custom-rate')) {
+                        document.getElementById('edit-wht-custom-rate').value = ((whtVal / bVat) * 100).toFixed(1);
+                    }
+                }
+            } else {
+                document.getElementById('edit-wht-mode').value = '0';
+            }
+
+            document.getElementById('edit-base-amount').value = bVat;
+            calcEditAmounts();
+
+            if (t.before_vat !== undefined) document.getElementById('edit-before-vat').value = bVat.toFixed(2);
+            if (t.vat !== undefined) document.getElementById('edit-vat').value = vatVal.toFixed(2);
+            if (t.wht !== undefined) document.getElementById('edit-wht').value = whtVal.toFixed(2);
+            if (t.net !== undefined) document.getElementById('edit-net').value = t.net.toFixed(2);
+
+            openModal('edit-transaction-modal');
+        }
+
+        function saveTransactionEdit() {
+            const oldId = document.getElementById('edit-tx-id').value;
+            const idx = transactions.findIndex(x => x.id === oldId);
+            if (idx === -1) { alert('⚠️ ไม่พบรายการในระบบ'); return; }
+
+            const newDocNo = document.getElementById('edit-doc-no').value.trim() || oldId;
+            const vendor = document.getElementById('edit-vendor').value.trim();
+            const desc = document.getElementById('edit-desc').value.trim();
+            const type = document.getElementById('edit-type').value;
+            const status = document.getElementById('edit-status').value;
+            const payMethod = document.getElementById('edit-pay-method').value;
+            const date = document.getElementById('edit-date').value.trim() || TODAY_DATE_STR;
+            const creditInputVal = document.getElementById('edit-credit-days').value.trim();
+            const creditDays = (creditInputVal === '0' || creditInputVal === 0) ? 0 : (parseInt(creditInputVal) || 30);
+
+            const net = parseFloat(document.getElementById('edit-net').value) || 0;
+            const beforeVat = parseFloat(document.getElementById('edit-before-vat').value) || net;
+            const vat = parseFloat(document.getElementById('edit-vat').value) || 0;
+            const wht = parseFloat(document.getElementById('edit-wht').value) || 0;
+
+            if (!vendor || net <= 0) { alert('⚠️ กรุณากรอกชื่อคู่ค้าและยอดเงินให้ถูกต้อง'); return; }
+
+            const dObj = parseDDMMYYYY(date);
+            dObj.setDate(dObj.getDate() + creditDays);
+            let dueDate = `${String(dObj.getDate()).padStart(2,'0')}/${String(dObj.getMonth()+1).padStart(2,'0')}/${dObj.getFullYear()}`;
+
+            const t = transactions[idx];
+            t.id = newDocNo;
+            t.type = type;
+            t.status = status;
+            t.pay_method = payMethod;
+            t.date = date;
+            t.delivery_date = date;
+            t.credit_days = creditDays;
+            t.due_date = dueDate;
+            t.vendor = vendor;
+            t.desc = desc;
+            t.before_vat = beforeVat;
+            t.vat = vat;
+            t.wht = wht;
+            t.net = net;
+
+            if (status === 'Paid' && !t.pay_date) {
+                t.pay_date = date;
+            }
+
+            if (payMethod === 'Cheque') {
+                t.cheque_no = document.getElementById('edit-cheque-no')?.value.trim() || t.cheque_no;
+                t.cheque_bank = document.getElementById('edit-cheque-bank')?.value || t.cheque_bank;
+                t.cheque_date = document.getElementById('edit-cheque-date')?.value.trim() || t.cheque_date;
+                t.cheque_status = document.getElementById('edit-cheque-status')?.value || t.cheque_status;
+                t.due_date = t.cheque_date;
+            }
+
+            const chequeFileInput = document.getElementById('edit-cheque-file');
+            if (chequeFileInput && chequeFileInput.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    t.cheque_file_data = e.target.result;
+                    t.file_data = e.target.result;
+                    finishSaveEdit();
+                };
+                reader.readAsDataURL(chequeFileInput.files[0]);
+                return;
+            }
+
+            finishSaveEdit();
+
+            function finishSaveEdit() {
+                lastLocalUpdate = Date.now();
+                saveState();
+                renderLedger();
+                renderInOutLedger();
+                closeModal('edit-transaction-modal');
+                alert(`✅ อัปเดตการแก้ไขรายการ [${newDocNo}] เรียบร้อยแล้ว! (ซิงก์คลาวด์สดอัตโนมัติ)`);
+            }
+        }
+
+        function editTxFromDocModal() {
+            const txId = document.getElementById('doc-modal-tx-id').value;
+            closeModal('doc-view-modal');
+            openEditModal(txId);
+        }
+
+        function deleteTransactionFromEdit() {
+            const oldId = document.getElementById('edit-tx-id').value;
+            if (!confirm(`⚠️ คุณแน่ใจหรือไม่ที่จะลบรายการ [${oldId}] นี้ออกจากระบบบัญชี?`)) return;
+
+            transactions = transactions.filter(x => x.id !== oldId);
+            lastLocalUpdate = Date.now();
+            saveState();
+            renderLedger();
+            renderInOutLedger();
+            closeModal('edit-transaction-modal');
+            alert(`🗑️ ลบรายการ [${oldId}] ออกจากระบบเรียบร้อยแล้ว`);
         }
 
         function saveManualEntryToLedger() {
