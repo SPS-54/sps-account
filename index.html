@@ -972,15 +972,41 @@
     <script>
         const STORAGE_PREFIX = "SPS_ACCOUNT_LIVE_";
         const TODAY_DATE_STR = "24/08/2026";
-        let PUBLIC_CLOUD_RELAY_URL = localStorage.getItem(STORAGE_PREFIX + 'CLOUD_URL') || "https://jsonblob.com/api/jsonBlob/1271501178652434432";
+        let PUBLIC_CLOUD_RELAY_URL = localStorage.getItem(STORAGE_PREFIX + 'CLOUD_URL') || "";
 
-        async function createFreshCloudRelay(dataObj) {
+        function prepareCloudPayload(isSanitized = true) {
+            let txList = transactions;
+            if (isSanitized) {
+                txList = transactions.map(t => {
+                    if (t.file_data && t.file_data.length > 500) {
+                        const { file_data, ...rest } = t;
+                        return rest;
+                    }
+                    return t;
+                });
+            }
+            return {
+                namespace: STORAGE_PREFIX,
+                transactions: txList,
+                vendorMemory: vendorMemory,
+                lastUpdated: lastLocalUpdate || Date.now()
+            };
+        }
+
+        async function createFreshCloudRelay() {
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
+                const dataObj = prepareCloudPayload(true);
+
                 const res = await fetch("https://jsonblob.com/api/jsonBlob", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dataObj)
+                    body: JSON.stringify(dataObj),
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
+
                 if (res.ok) {
                     const loc = res.headers.get('Location');
                     if (loc) {
@@ -993,43 +1019,49 @@
             return false;
         }
 
-        async function autoPushToCloud() {
+        async function autoPushToCloud(showSpinner = false) {
             const syncBadge = document.getElementById('cloud-sync-status-badge');
-            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 🔄 กำลังซิงก์คลาวด์...`;
+            const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-            const dataObj = {
-                namespace: STORAGE_PREFIX,
-                transactions: transactions,
-                vendorMemory: vendorMemory,
-                lastUpdated: lastLocalUpdate || Date.now()
-            };
+            if (showSpinner && syncBadge) {
+                syncBadge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 🔄 กำลังซิงก์คลาวด์...`;
+            }
+
+            if (!PUBLIC_CLOUD_RELAY_URL) {
+                await createFreshCloudRelay();
+            }
+
+            const dataObj = prepareCloudPayload(true);
 
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
+
                 let res = await fetch(PUBLIC_CLOUD_RELAY_URL, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dataObj)
+                    body: JSON.stringify(dataObj),
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
 
                 if (res.status === 404) {
-                    const healed = await createFreshCloudRelay(dataObj);
-                    if (healed) {
-                        const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                        if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> ☁️ ซิงก์คลาวด์อัตโนมัติสำเร็จ (${nowStr})`;
+                    const healed = await createFreshCloudRelay();
+                    if (healed && syncBadge) {
+                        syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> ☁️ ซิงก์คลาวด์สดสำเร็จ (${nowStr})`;
                         return;
                     }
                 }
 
-                if (res.ok) {
-                    const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> ☁️ ซิงก์คลาวด์อัตโนมัติสำเร็จ (${nowStr})`;
-                } else {
-                    const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 🟢 ระบบทำงานปกติ (บันทึกในเครื่องเรียบร้อย ${nowStr})`;
+                if (res.ok && syncBadge) {
+                    syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> ☁️ ซิงก์คลาวด์สดสำเร็จ (${nowStr})`;
+                } else if (syncBadge) {
+                    syncBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 🟢 บันทึกในเครื่องเรียบร้อย (${transactions.length} รายการ)`;
                 }
             } catch(e) {
-                const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 🟢 ระบบทำงานปกติ (บันทึกในเครื่องเรียบร้อย ${nowStr})`;
+                if (syncBadge) {
+                    syncBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 🟢 บันทึกในเครื่องเรียบร้อย (${transactions.length} รายการ)`;
+                }
             }
         }
 
@@ -1038,11 +1070,23 @@
             isSyncingInProcess = true;
 
             const syncBadge = document.getElementById('cloud-sync-status-badge');
+            const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            if (!PUBLIC_CLOUD_RELAY_URL) {
+                await autoPushToCloud(false);
+                isSyncingInProcess = false;
+                return;
+            }
 
             try {
-                const res = await fetch(PUBLIC_CLOUD_RELAY_URL, { cache: 'no-store' });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+                const res = await fetch(PUBLIC_CLOUD_RELAY_URL, { cache: 'no-store', signal: controller.signal });
+                clearTimeout(timeoutId);
+
                 if (res.status === 404) {
-                    await autoPushToCloud();
+                    await autoPushToCloud(false);
                     return;
                 }
 
@@ -1052,35 +1096,41 @@
                         const cloudTime = cloudData.lastUpdated || 0;
                         const localTime = parseInt(localStorage.getItem(STORAGE_PREFIX + 'LAST_UPDATED') || '0');
 
-                        // SAFEGUARD 1: If local has transactions and cloud has zero transactions, DO NOT overwrite local data with empty cloud data!
+                        // SAFEGUARD 1: If local has transactions and cloud has zero, push local data!
                         if (transactions.length > 0 && cloudData.transactions.length === 0) {
-                            await autoPushToCloud();
+                            await autoPushToCloud(false);
                         }
-                        // SAFEGUARD 2: Only overwrite local if cloud is NEWER AND cloud has data (or local is currently empty)
-                        else if (cloudTime > localTime && (cloudData.transactions.length > 0 || transactions.length === 0)) {
-                            transactions = cloudData.transactions;
+                        // SAFEGUARD 2: Overwrite local only if cloud is strictly newer and has data
+                        else if (cloudTime > localTime && cloudData.transactions.length > 0) {
+                            const fileMap = {};
+                            transactions.forEach(t => { if (t.id && t.file_data) fileMap[t.id] = t.file_data; });
+
+                            transactions = cloudData.transactions.map(t => {
+                                if (!t.file_data && fileMap[t.id]) t.file_data = fileMap[t.id];
+                                return t;
+                            });
+
                             if (cloudData.vendorMemory) vendorMemory = cloudData.vendorMemory;
                             lastLocalUpdate = cloudTime;
                             
                             saveState(true);
                             renderLedger();
 
-                            const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down"></i> 🟢 อัปเดตข้อมูลจากอุปกรณ์อื่นแล้ว (${nowStr})`;
+                            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down"></i> 🟢 อัปเดตข้อมูลล่าสุดแล้ว (${nowStr})`;
                         } 
-                        // SAFEGUARD 3: If local has newer/equal data or cloud is outdated
+                        // SAFEGUARD 3: If local is newer/equal, push local
                         else if (localTime > cloudTime || (transactions.length > 0 && cloudTime <= localTime)) {
-                            await autoPushToCloud();
+                            await autoPushToCloud(false);
                         } 
-                        else {
-                            const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                            if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> 🟢 ข้อมูลตรงกัน 100% (${nowStr})`;
+                        else if (syncBadge) {
+                            syncBadge.innerHTML = `<i class="fa-solid fa-cloud"></i> 🟢 ข้อมูลบันทึกเรียบร้อย (${transactions.length} รายการ)`;
                         }
                     }
                 }
             } catch(e) {
-                const nowStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                if (syncBadge) syncBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 🟢 ระบบทำงานปกติ (${nowStr})`;
+                if (syncBadge && (!syncBadge.innerText || syncBadge.innerText.includes('กำลังซิงก์'))) {
+                    syncBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 🟢 บันทึกในเครื่องเรียบร้อย (${transactions.length} รายการ)`;
+                }
             } finally {
                 isSyncingInProcess = false;
             }
@@ -1209,11 +1259,16 @@
                 localStorage.setItem(STORAGE_PREFIX + 'VENDOR_MEMORY', JSON.stringify(vendorMemory));
                 localStorage.setItem(STORAGE_PREFIX + 'LAST_UPDATED', lastLocalUpdate.toString());
                 localStorage.setItem(STORAGE_PREFIX + 'HAS_INITIALIZED', 'true');
+
+                const syncBadge = document.getElementById('cloud-sync-status-badge');
+                if (syncBadge) {
+                    syncBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 🟢 บันทึกในเครื่องสำเร็จ (${transactions.length} รายการ)`;
+                }
             } catch(e) {}
             updateGlobalYearOptions();
 
             if (!skipCloudPush) {
-                autoPushToCloud();
+                autoPushToCloud(false);
             }
         }
 
