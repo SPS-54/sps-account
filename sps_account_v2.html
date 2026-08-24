@@ -326,7 +326,8 @@
             <div class="content-box">
                 <div class="box-header">
                     <div class="box-title"><i class="fa-solid fa-list-check"></i> ตารางรายการบัญชี SPS V2 ล่าสุด</div>
-                    <div>
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <input type="text" id="search-name-ledger" list="vendor-suggestions" oninput="renderLedger()" placeholder="🔍 ตัวกรองค้นหาตามชื่อ..." class="form-control" style="width: 200px; font-size: 12px; display: inline-block;">
                         <button onclick="openModal('manual-entry-modal')" class="btn btn-indigo btn-sm">➕ เพิ่มรายการใหม่</button>
                     </div>
                 </div>
@@ -499,8 +500,11 @@
                     <div class="box-title" style="color: #047857;">
                         <i class="fa-solid fa-circle-down text-emerald-600"></i> 🟢 ตารางรายการรอรับเงิน (Pending Receivables) - ยึดตามวันครบกำหนดชำระ
                     </div>
-                    <div id="pending-inc-summary" style="font-weight: 700; font-size: 13px; color: #047857; background: #d1fae5; padding: 4px 12px; border-radius: 12px;">
-                        รวม 0 รายการ (฿0.00)
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <input type="text" id="search-name-pending-inc" list="vendor-suggestions" oninput="renderLedger()" placeholder="🔍 กรองชื่อลูกหนี้..." class="form-control" style="width: 170px; font-size: 12px; display: inline-block;">
+                        <div id="pending-inc-summary" style="font-weight: 700; font-size: 13px; color: #047857; background: #d1fae5; padding: 4px 12px; border-radius: 12px;">
+                            รวม 0 รายการ (฿0.00)
+                        </div>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -529,8 +533,11 @@
                     <div class="box-title" style="color: #be123c;">
                         <i class="fa-solid fa-circle-up text-rose-600"></i> 🔴 ตารางรายการรอจ่ายเงิน (Pending Payables) - ยึดตามวันครบกำหนดชำระ
                     </div>
-                    <div id="pending-exp-summary" style="font-weight: 700; font-size: 13px; color: #be123c; background: #ffe4e6; padding: 4px 12px; border-radius: 12px;">
-                        รวม 0 รายการ (฿0.00)
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <input type="text" id="search-name-pending-exp" list="vendor-suggestions" oninput="renderLedger()" placeholder="🔍 กรองชื่อเจ้าหนี้..." class="form-control" style="width: 170px; font-size: 12px; display: inline-block;">
+                        <div id="pending-exp-summary" style="font-weight: 700; font-size: 13px; color: #be123c; background: #ffe4e6; padding: 4px 12px; border-radius: 12px;">
+                            รวม 0 รายการ (฿0.00)
+                        </div>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -689,8 +696,11 @@
                     <div class="box-title" style="color: #047857;">
                         <i class="fa-solid fa-circle-down text-emerald-600"></i> 🟢 ตารางรายการรายรับ (เฉพาะรับชำระเงินแล้ว) - เรียงจากอดีตไปปัจจุบันและอนาคต
                     </div>
-                    <div id="inout-inc-summary" style="font-weight: 700; font-size: 13px; color: #047857; background: #d1fae5; padding: 4px 12px; border-radius: 12px;">
-                        รวม 0 รายการ (ยอดรับชำระแล้ว: ฿0.00)
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <input type="text" id="search-name-inout-inc" list="vendor-suggestions" oninput="renderInOutLedger()" placeholder="🔍 กรองชื่อลูกค้ารับชำระ..." class="form-control" style="width: 170px; font-size: 12px; display: inline-block;">
+                        <div id="inout-inc-summary" style="font-weight: 700; font-size: 13px; color: #047857; background: #d1fae5; padding: 4px 12px; border-radius: 12px;">
+                            รวม 0 รายการ (ยอดรับชำระแล้ว: ฿0.00)
+                        </div>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -721,8 +731,11 @@
                     <div class="box-title" style="color: #be123c;">
                         <i class="fa-solid fa-circle-up text-rose-600"></i> 🔴 ตารางรายการรายจ่าย (เฉพาะจ่ายเงินแล้ว) - เรียงจากอดีตไปปัจจุบันและอนาคต
                     </div>
-                    <div id="inout-exp-summary" style="font-weight: 700; font-size: 13px; color: #be123c; background: #ffe4e6; padding: 4px 12px; border-radius: 12px;">
-                        รวม 0 รายการ (ยอดจ่ายแล้ว: ฿0.00)
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <input type="text" id="search-name-inout-exp" list="vendor-suggestions" oninput="renderInOutLedger()" placeholder="🔍 กรองชื่อซัพพลายเออร์..." class="form-control" style="width: 170px; font-size: 12px; display: inline-block;">
+                        <div id="inout-exp-summary" style="font-weight: 700; font-size: 13px; color: #be123c; background: #ffe4e6; padding: 4px 12px; border-radius: 12px;">
+                            รวม 0 รายการ (ยอดจ่ายแล้ว: ฿0.00)
+                        </div>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -1498,15 +1511,43 @@
             alert(`🎉 AI บันทึกรายการ [${docNo}] และจดจำรูปแบบคู่ค้า [${vendor}] เรียบร้อยแล้ว! (ซิงก์คลาวด์สดอัตโนมัติ)`);
         }
 
+        function updateVendorDatalist() {
+            let datalist = document.getElementById('vendor-suggestions');
+            if (!datalist) {
+                datalist = document.createElement('datalist');
+                datalist.id = 'vendor-suggestions';
+                document.body.appendChild(datalist);
+            }
+            const uniqueVendors = new Set();
+            transactions.forEach(t => { if (t.vendor) uniqueVendors.add(t.vendor); });
+            if (typeof vendorMemory !== 'undefined') {
+                Object.keys(vendorMemory).forEach(v => uniqueVendors.add(v));
+            }
+            datalist.innerHTML = Array.from(uniqueVendors).map(v => `<option value="${v}">`).join('');
+        }
+
         function renderLedger() {
+            updateVendorDatalist();
+
             const monthVal = document.getElementById('global-filter-month')?.value || 'ALL';
             const yearVal = document.getElementById('global-filter-year')?.value || 'ALL';
             
             // GENERAL LEDGER FILTER (BY DOCUMENT DATE)
-            const activeTxs = getFilteredTransactions(false);
+            let activeTxs = getFilteredTransactions(false);
             
             // PENDING LEDGER FILTER (BY DUE DATE - วันครบกำหนดชำระ)
-            const activePendingTxs = getFilteredTransactions(true);
+            let activePendingTxs = getFilteredTransactions(true);
+
+            // SEARCH FILTER FOR TAB 1 LEDGER TABLE
+            const searchLedger = document.getElementById('search-name-ledger')?.value.trim().toLowerCase() || '';
+            if (searchLedger) {
+                activeTxs = activeTxs.filter(t => 
+                    (t.vendor && t.vendor.toLowerCase().includes(searchLedger)) ||
+                    (t.desc && t.desc.toLowerCase().includes(searchLedger)) ||
+                    (t.id && t.id.toLowerCase().includes(searchLedger)) ||
+                    (t.cheque_no && t.cheque_no.toLowerCase().includes(searchLedger))
+                );
+            }
 
             // UPDATE STATUS BADGE IN FILTER BAR
             const badge = document.getElementById('global-filter-badge');
@@ -1549,7 +1590,7 @@
             const tbodyDash = document.getElementById('ledger-table-body');
             if (tbodyDash) {
                 if (activeTxs.length === 0) {
-                    tbodyDash.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:30px; color:#64748b;">📭 ยังไม่มีรายการบัญชีในระบบ (กดปุ่ม "➕ เพิ่มรายการใหม่" หรือ "🧠 สแกนเอกสาร AI" เพื่อเริ่มใช้งาน)</td></tr>`;
+                    tbodyDash.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:30px; color:#64748b;">📭 ไม่พบรายการที่ตรงกับตัวกรองค้นหา</td></tr>`;
                 } else {
                     tbodyDash.innerHTML = activeTxs.map(t => `
                         <tr>
@@ -1576,13 +1617,34 @@
             const tbodyPendingExp = document.getElementById('pending-exp-table-body');
 
             // PENDING TABLES USE activePendingTxs (FILTERED BY DUE DATE)
-            const pendingIncomes = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Income').sort((a, b) => {
+            let pendingIncomes = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Income').sort((a, b) => {
                 return parseDDMMYYYY(a.due_date || a.date) - parseDDMMYYYY(b.due_date || b.date);
             });
 
-            const pendingExpenses = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense').sort((a, b) => {
+            let pendingExpenses = activePendingTxs.filter(t => t.status !== 'Paid' && t.type === 'Expense').sort((a, b) => {
                 return parseDDMMYYYY(a.due_date || a.date) - parseDDMMYYYY(b.due_date || b.date);
             });
+
+            const searchPendingInc = document.getElementById('search-name-pending-inc')?.value.trim().toLowerCase() || '';
+            const searchPendingExp = document.getElementById('search-name-pending-exp')?.value.trim().toLowerCase() || '';
+
+            if (searchPendingInc) {
+                pendingIncomes = pendingIncomes.filter(t => 
+                    (t.vendor && t.vendor.toLowerCase().includes(searchPendingInc)) ||
+                    (t.desc && t.desc.toLowerCase().includes(searchPendingInc)) ||
+                    (t.id && t.id.toLowerCase().includes(searchPendingInc)) ||
+                    (t.cheque_no && t.cheque_no.toLowerCase().includes(searchPendingInc))
+                );
+            }
+
+            if (searchPendingExp) {
+                pendingExpenses = pendingExpenses.filter(t => 
+                    (t.vendor && t.vendor.toLowerCase().includes(searchPendingExp)) ||
+                    (t.desc && t.desc.toLowerCase().includes(searchPendingExp)) ||
+                    (t.id && t.id.toLowerCase().includes(searchPendingExp)) ||
+                    (t.cheque_no && t.cheque_no.toLowerCase().includes(searchPendingExp))
+                );
+            }
 
             const incTotal = pendingIncomes.reduce((a,b) => a + (b.net || 0), 0);
             const expTotal = pendingExpenses.reduce((a,b) => a + (b.net || 0), 0);
@@ -2056,13 +2118,34 @@
 
             const activeTxs = getFilteredTransactions(false);
 
-            const paidIncomes = activeTxs.filter(t => t.status === 'Paid' && t.type === 'Income').sort((a, b) => {
+            let paidIncomes = activeTxs.filter(t => t.status === 'Paid' && t.type === 'Income').sort((a, b) => {
                 return parseDDMMYYYY(a.date || a.pay_date) - parseDDMMYYYY(b.date || b.pay_date);
             });
 
-            const paidExpenses = activeTxs.filter(t => t.status === 'Paid' && t.type === 'Expense').sort((a, b) => {
+            let paidExpenses = activeTxs.filter(t => t.status === 'Paid' && t.type === 'Expense').sort((a, b) => {
                 return parseDDMMYYYY(a.date || a.pay_date) - parseDDMMYYYY(b.date || b.pay_date);
             });
+
+            const searchInc = document.getElementById('search-name-inout-inc')?.value.trim().toLowerCase() || '';
+            const searchExp = document.getElementById('search-name-inout-exp')?.value.trim().toLowerCase() || '';
+
+            if (searchInc) {
+                paidIncomes = paidIncomes.filter(t => 
+                    (t.vendor && t.vendor.toLowerCase().includes(searchInc)) ||
+                    (t.desc && t.desc.toLowerCase().includes(searchInc)) ||
+                    (t.id && t.id.toLowerCase().includes(searchInc)) ||
+                    (t.cheque_no && t.cheque_no.toLowerCase().includes(searchInc))
+                );
+            }
+
+            if (searchExp) {
+                paidExpenses = paidExpenses.filter(t => 
+                    (t.vendor && t.vendor.toLowerCase().includes(searchExp)) ||
+                    (t.desc && t.desc.toLowerCase().includes(searchExp)) ||
+                    (t.id && t.id.toLowerCase().includes(searchExp)) ||
+                    (t.cheque_no && t.cheque_no.toLowerCase().includes(searchExp))
+                );
+            }
 
             const totalIncNet = paidIncomes.reduce((a,b) => a + (b.net || 0), 0);
             const totalExpNet = paidExpenses.reduce((a,b) => a + (b.net || 0), 0);
