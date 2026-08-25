@@ -177,6 +177,7 @@
                     </div>
 
                     <button onclick="resetGlobalDateFilter()" class="btn btn-indigo btn-sm" style="padding: 8px 14px;"><i class="fa-solid fa-arrows-rotate"></i> ⚡ ข้อมูลรวมทั้งหมด (All Data)</button>
+                    <button onclick="emergencyRestoreSystem(true)" class="btn btn-rose btn-sm" style="padding: 8px 14px;"><i class="fa-solid fa-rotate-left"></i> 🔄 กู้คืนระบบฉุกเฉิน (Restore System)</button>
                 </div>
             </div>
             
@@ -3691,22 +3692,41 @@ function sendDailyLineAlert() {
             res.innerHTML = `<strong>🤖 AI SPS Advisor:</strong> <br>ระบบกำลังประมวลผลคำถามของคุณ "${input || 'ภาษีการเงิน'}"... <br><br>💡 <strong>คำแนะนำ:</strong> ในระบบภาษีไทย ใบกำกับภาษีซื้อต้องยื่น ภ.พ.30 ภายในวันที่ 15 ของเดือนถัดไป ส่วนภาษีหัก ณ ที่จ่าย (ภ.ง.ด.3/53) ยื่นภายในวันที่ 7 ของเดือนถัดไปครับ`;
         }
 
+        function emergencyRestoreSystem(showPrompt = true) {
+            try {
+                localStorage.clear();
+                transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
+                vendorMemory = {};
+                lastLocalUpdate = Date.now();
+                saveState(false);
+                updateGlobalYearOptions();
+                renderLedger();
+                switchTab('dashboard');
+                ['quick-sync-modal', 'manual-entry-modal', 'edit-transaction-modal', 'payment-modal', 'doc-view-modal', 'ai-emergency-plan-modal', 'line-notify-modal'].forEach(closeModal);
+                if (showPrompt) {
+                    alert('✅ กู้คืนระบบและรายการบัญชีเริ่มต้นเรียบร้อยแล้ว!\n\nทุกปุ่มกดกลับมาทำงานได้ 100% ตามปกติเรียบร้อยครับ');
+                }
+            } catch(err) {
+                console.error("Emergency restore error:", err);
+            }
+        }
+
         window.onload = function() {
+            // Force close all modals on page startup to guarantee zero screen freeze
+            ['quick-sync-modal', 'manual-entry-modal', 'edit-transaction-modal', 'payment-modal', 'doc-view-modal', 'ai-emergency-plan-modal', 'line-notify-modal'].forEach(closeModal);
+
             const saved = localStorage.getItem(STORAGE_PREFIX + 'TRANSACTIONS');
             if (saved) {
                 try { 
                     transactions = JSON.parse(saved); 
                     if (!Array.isArray(transactions) || transactions.length === 0) {
-                        transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
-                        saveState(false);
+                        emergencyRestoreSystem(false);
                     }
                 } catch(e) { 
-                    transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS)); 
-                    saveState(false);
+                    emergencyRestoreSystem(false);
                 }
             } else {
-                transactions = JSON.parse(JSON.stringify(INITIAL_TRANSACTIONS));
-                saveState(false);
+                emergencyRestoreSystem(false);
             }
 
             // Ensure backward compatibility and zero data loss for existing records
