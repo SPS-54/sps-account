@@ -1285,6 +1285,26 @@
         const STORAGE_PREFIX = "SPS_ACCOUNT_LIVE_";
         const TODAY_DATE_STR = "24/08/2026";
         
+        let transactions = [];
+        let vendorMemory = {};
+        let lastLocalUpdate = Date.now();
+        let isSyncingInProcess = false;
+        let currentLoadedFile = null;
+        let expenseChartObj = null;
+        let revenueExpenseChartObj = null;
+        let cashflowChartObj = null;
+
+        const INITIAL_TRANSACTIONS = [
+            { id: "INV-2026/008", date: "28/08/2026", delivery_date: "28/08/2026", credit_days: 30, due_date: "27/09/2026", type: "Income", desc: "ค่าสัญญาบริการรายเดือน (SLA Maintenance)", vendor: "บริษัท โกลบอล โลจิสติกส์ จำกัด", before_vat: 50000, vat: 3500, wht: 1500, net: 52000, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "INV-2026/007", date: "20/08/2026", delivery_date: "19/08/2026", credit_days: 31, due_date: "19/09/2026", type: "Expense", desc: "ซื้ออุปกรณ์คอมพิวเตอร์และจอมอนิเตอร์", vendor: "บริษัท ไอที ซิตี้ จำกัด (มหาชน)", before_vat: 28000, vat: 1960, wht: 0, net: 29960, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "INV-2026/006", date: "18/08/2026", delivery_date: "18/08/2026", credit_days: 7, due_date: "25/08/2026", type: "Expense", desc: "ค่าโฆษณา Facebook & Google Ads", vendor: "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด", before_vat: 20000, vat: 1400, wht: 400, net: 21000, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "INV-2026/005", date: "15/08/2026", delivery_date: "15/08/2026", credit_days: 0, due_date: "15/08/2026", type: "Expense", desc: "เงินเดือนพนักงานประจำเดือน สิงหาคม 2026", vendor: "ฝ่ายทรัพยากรบุคคล (Payroll)", before_vat: 85000, vat: 0, wht: 0, net: 85000, status: "Paid", file_data: null, slip_data: null, pay_date: "15/08/2026" },
+            { id: "INV-2026/004", date: "10/08/2026", delivery_date: "09/08/2026", credit_days: 31, due_date: "09/09/2026", type: "Income", desc: "ค่าส่งมอบงานระยะที่ 1 ระบบ AI Chatbot", vendor: "บริษัท ไทยการค้า อินเตอร์ จำกัด", before_vat: 150000, vat: 10500, wht: 4500, net: 156000, status: "Paid", file_data: null, slip_data: null, pay_date: "10/08/2026" },
+            { id: "INV-2026/003", date: "05/08/2026", delivery_date: "05/08/2026", credit_days: 30, due_date: "04/09/2026", type: "Expense", desc: "ค่าบริการระบบ Cloud Server", vendor: "บริษัท คลาวด์ เทคโนโลยี จำกัด", before_vat: 15000, vat: 1050, wht: 450, net: 15600, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "INV-2026/002", date: "03/08/2026", delivery_date: "01/08/2026", credit_days: 14, due_date: "15/08/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000, vat: 2450, wht: 1750, net: 35700, status: "Paid", file_data: null, slip_data: null, pay_date: "03/08/2026" },
+            { id: "INV-2026/001", date: "01/08/2026", delivery_date: "01/08/2026", credit_days: 30, due_date: "31/08/2026", type: "Income", desc: "ค่าบริการที่ปรึกษาพัฒนาระบบซอฟต์แวร์", vendor: "บริษัท เอพีซีไอ จำกัด", before_vat: 100000, vat: 7000, wht: 3000, net: 104000, status: "Paid", file_data: null, slip_data: null, pay_date: "01/08/2026" }
+        ];
+
         function getOrGenerateCloudUrl() {
             let url = localStorage.getItem(STORAGE_PREFIX + 'CLOUD_URL');
             if (!url || url.length < 20) {
@@ -1475,27 +1495,6 @@
                 isSyncingInProcess = false;
             }
         }
-
-        const INITIAL_TRANSACTIONS = [
-            { id: "INV-2026/008", date: "28/08/2026", delivery_date: "28/08/2026", credit_days: 30, due_date: "27/09/2026", type: "Income", desc: "ค่าสัญญาบริการรายเดือน (SLA Maintenance)", vendor: "บริษัท โกลบอล โลจิสติกส์ จำกัด", before_vat: 50000, vat: 3500, wht: 1500, net: 52000, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/007", date: "20/08/2026", delivery_date: "19/08/2026", credit_days: 31, due_date: "19/09/2026", type: "Expense", desc: "ซื้ออุปกรณ์คอมพิวเตอร์และจอมอนิเตอร์", vendor: "บริษัท ไอที ซิตี้ จำกัด (มหาชน)", before_vat: 28000, vat: 1960, wht: 0, net: 29960, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/006", date: "18/08/2026", delivery_date: "18/08/2026", credit_days: 7, due_date: "25/08/2026", type: "Expense", desc: "ค่าโฆษณา Facebook & Google Ads", vendor: "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด", before_vat: 20000, vat: 1400, wht: 400, net: 21000, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/005", date: "15/08/2026", delivery_date: "15/08/2026", credit_days: 0, due_date: "15/08/2026", type: "Expense", desc: "เงินเดือนพนักงานประจำเดือน สิงหาคม 2026", vendor: "ฝ่ายทรัพยากรบุคคล (Payroll)", before_vat: 85000, vat: 0, wht: 0, net: 85000, status: "Paid", file_data: null, slip_data: null, pay_date: "15/08/2026" },
-            { id: "INV-2026/004", date: "10/08/2026", delivery_date: "09/08/2026", credit_days: 31, due_date: "09/09/2026", type: "Income", desc: "ค่าส่งมอบงานระยะที่ 1 ระบบ AI Chatbot", vendor: "บริษัท ไทยการค้า อินเตอร์ จำกัด", before_vat: 150000, vat: 10500, wht: 4500, net: 160500, status: "Paid", file_data: null, slip_data: null, pay_date: "10/08/2026" },
-            { id: "INV-2026/003", date: "05/08/2026", delivery_date: "05/08/2026", credit_days: 30, due_date: "04/09/2026", type: "Expense", desc: "ค่าบริการระบบ Cloud Server", vendor: "บริษัท คลาวด์ เทคโนโลยี จำกัด", before_vat: 15000, vat: 1050, wht: 450, net: 15600, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/002", date: "03/08/2026", delivery_date: "01/08/2026", credit_days: 14, due_date: "15/08/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000, vat: 2450, wht: 1750, net: 37450, status: "Paid", file_data: null, slip_data: null, pay_date: "03/08/2026" },
-            { id: "INV-2026/001", date: "01/08/2026", delivery_date: "01/08/2026", credit_days: 30, due_date: "31/08/2026", type: "Income", desc: "ค่าบริการที่ปรึกษาพัฒนาระบบซอฟต์แวร์", vendor: "บริษัท เอพีซีไอ จำกัด", before_vat: 100000, vat: 7000, wht: 3000, net: 104000, status: "Paid", file_data: null, slip_data: null, pay_date: "01/08/2026" }
-        ];
-        let vendorMemory = {};
-
-        let transactions = [];
-        let expenseChartObj = null;
-        let revenueExpenseChartObj = null;
-        let cashflowChartObj = null;
-        let currentLoadedFile = null;
-
-        let lastLocalUpdate = 0;
-        let isSyncingInProcess = false;
 
         function formatTHB(num) {
             return '฿' + (num || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
