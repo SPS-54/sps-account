@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Anti-Cache Meta Tags to force instant updates on browser -->
+    <!-- Anti-Cache Meta Tags to prevent browser freeze on stale JS -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>SPS บัญชี-การเงิน V2.0 (Financial Accounting & Multi-Device Cloud Sync)</title>
+    <title>SPS บัญชี-การเงิน V1.1 (Financial & Accounting AI Agent)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -28,39 +28,34 @@
     <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <div class="bg-gradient-to-tr from-indigo-600 to-purple-600 p-2.5 rounded-xl text-white shadow-md">
-                    <i class="fa-solid fa-cloud-bolt text-2xl"></i>
+                <div class="bg-indigo-600 p-2.5 rounded-xl text-white shadow-md">
+                    <i class="fa-solid fa-robot text-2xl"></i>
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
-                        SPS บัญชี-การเงิน AI Agent
-                        <span class="bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow border border-amber-300">V.2.0 Cloud & LINE Edition</span>
+                        AI Agent สำหรับงานบัญชี-การเงิน
+                        <span class="bg-indigo-500 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow border border-indigo-400">V.1.1 Release</span>
                     </h1>
-                    <p class="text-xs text-indigo-300">Financial Accounting & Multi-Device Cloud Sync + LINE Group Notification</p>
+                    <p class="text-xs text-indigo-300">Financial & Accounting Autonomous Agent (System-wide Monthly Filter Enabled)</p>
                 </div>
             </div>
 
-            <!-- HEADER CONTROLS (GLOBAL MONTH FILTER / CLOUD STATUS / DEMO BUTTONS) -->
-            <div class="flex flex-wrap items-center gap-2">
-                <!-- CLOUD SYNC BADGE & TRIGGER -->
-                <button onclick="manualCloudSync()" title="คลิกเพื่อซิงค์ข้อมูลกับคลาวด์" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-750 px-3 py-1.5 rounded-xl border border-slate-700 shadow-sm transition-all">
-                    <span id="cloud-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span id="cloud-status-text" class="text-xs text-emerald-300 font-bold whitespace-nowrap">☁️ คลาวด์ซิงค์พร้อมใช้งาน</span>
-                </button>
-
+            <!-- HEADER SYSTEM CONTROLS (GLOBAL MONTH FILTER / RESET / DEMO BUTTONS) -->
+            <div class="flex flex-wrap items-center gap-3">
                 <!-- GLOBAL MONTH FILTER DROPDOWN -->
-                <div class="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 shadow-sm">
+                <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 shadow-sm">
                     <i class="fa-solid fa-calendar-days text-amber-400 text-sm"></i>
-                    <select id="global-month-filter" onchange="onGlobalMonthFilterChange()" class="bg-slate-900 text-amber-300 font-bold text-xs p-1 rounded-lg border border-slate-700 outline-none focus:ring-2 focus:ring-amber-400 cursor-pointer">
+                    <span class="text-xs text-slate-300 font-semibold whitespace-nowrap">ตัวกรองเดือน:</span>
+                    <select id="global-month-filter" onchange="onGlobalMonthFilterChange()" class="bg-slate-900 text-amber-300 font-bold text-xs p-1.5 rounded-lg border border-slate-700 outline-none focus:ring-2 focus:ring-amber-400 cursor-pointer">
                         <option value="ALL">🗓️ ทุกเดือน (All Months)</option>
                     </select>
                 </div>
 
                 <button onclick="clearAllData()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shadow flex items-center gap-1.5 border border-rose-500">
-                    <i class="fa-solid fa-trash-can"></i> ล้างข้อมูล
+                    <i class="fa-solid fa-trash-can"></i> 🗑️ ล้างข้อมูลทั้งหมด (Clean System)
                 </button>
                 <button onclick="loadDemoData()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shadow flex items-center gap-1.5 border border-indigo-500">
-                    <i class="fa-solid fa-rotate-right"></i> โหลดข้อมูล V.2
+                    <i class="fa-solid fa-rotate-right"></i> 🔄 โหลดข้อมูลตัวอย่าง (Demo Data V.1)
                 </button>
             </div>
         </div>
@@ -81,12 +76,12 @@
         </div>
 
         <!-- Simulation State Banner -->
-        <div id="sim-status-banner" class="bg-slate-900 text-slate-100 p-3 rounded-xl text-xs flex flex-col md:flex-row justify-between items-center gap-2 mb-6 border border-slate-800 shadow-sm">
+        <div id="sim-status-banner" class="bg-indigo-900 text-indigo-100 p-3 rounded-xl text-xs flex flex-col md:flex-row justify-between items-center gap-2 mb-6 border border-indigo-700 shadow-sm">
             <div class="flex items-center gap-2">
-                <i class="fa-solid fa-cloud text-amber-400 text-base"></i>
-                <span><strong>ระบบ SPS บัญชี-การเงิน V2.0 พร้อมใช้งาน:</strong> รองรับการเชื่อมโยงคลาวด์หลายอุปกรณ์, สแกน OCR AI, รายงานรายเดือน และระบบส่งการแจ้งเตือนเข้ากลุ่ม LINE</span>
+                <i class="fa-solid fa-database text-amber-300 text-base"></i>
+                <span><strong>ระบบพร้อมใช้งานพร้อมชุดข้อมูลทดสอบ V.1:</strong> แสดงรายการสมุดบัญชีแบบครอบคลุมหลายเดือนและคลังความรู้ AI พร้อมทดสอบทุกเมนูทันที</span>
             </div>
-            <span class="bg-amber-400 text-slate-900 font-bold px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider">V2.0 Cloud Active</span>
+            <span class="bg-amber-400 text-slate-900 font-bold px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider">Demo Data Active</span>
         </div>
 
         <!-- Navigation Tabs -->
@@ -108,9 +103,6 @@
             </button>
             <button onclick="switchTab('forecast')" id="btn-forecast" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all">
                 <i class="fa-solid fa-chart-line text-purple-600"></i> พยากรณ์เงินสด (Cash Flow)
-            </button>
-            <button onclick="switchTab('line-cloud')" id="btn-line-cloud" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all bg-emerald-50 text-emerald-800 border border-emerald-200">
-                <i class="fa-comment-dots fa-brands text-emerald-600 text-base"></i> LINE แจ้งเตือน & ซิงค์คลาวด์
             </button>
             <button onclick="switchTab('advisor')" id="btn-advisor" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all">
                 <i class="fa-solid fa-comments text-rose-600"></i> ผู้ช่วย AI ภาษี (Advisor)
@@ -208,7 +200,7 @@
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-list-check text-indigo-600 text-base"></i>
                         <div>
-                            <h4 class="font-bold text-slate-800 text-sm">รายการสมุดบัญชีทั่วไปทั้งหมด (General Ledger V2.0)</h4>
+                            <h4 class="font-bold text-slate-800 text-sm">รายการสมุดบัญชีทั่วไปทั้งหมด (General Ledger)</h4>
                             <p class="text-xs text-slate-400">เรียงลำดับจากปัจจุบันย้อนกลับไปสู่อดีต (Newest / Current Date -> Past Date)</p>
                         </div>
                     </div>
@@ -547,7 +539,7 @@
                                     <input id="form-desc" type="text" class="w-full bg-slate-800 text-white border border-slate-700 rounded-lg p-2 mt-1 outline-none">
                                 </div>
 
-                                <div class="md:col-span-2 bg-indigo-950/60 p-2.5 rounded-lg border border-indigo-800/80">
+                                <div class="md:col-span-2 bg-indigo-950/60 p-2.5 rounded-lg border border-indigo-808/80">
                                     <label class="text-indigo-300 font-semibold flex items-center gap-1">
                                         <i class="fa-solid fa-percent text-amber-400 text-xs"></i> การคิดภาษีมูลค่าเพิ่ม (VAT 7%):
                                     </label>
@@ -745,92 +737,10 @@
             </div>
         </section>
 
-        <!-- TAB 7: LINE GROUP NOTIFICATION & CLOUD SYNC SETTINGS (V2 SPECIAL FEATURE) -->
-        <section id="tab-line-cloud" class="hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- LINE NOTIFICATION IN GROUP SETTINGS -->
-                <div class="bg-white p-6 rounded-xl border border-emerald-200 shadow-sm border-t-4 border-t-emerald-500 space-y-4">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-emerald-600 text-white p-3 rounded-xl shadow">
-                            <i class="fa-brands fa-line text-2xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-base font-bold text-slate-900">ตั้งค่าการแจ้งเตือนการเงินเข้ากลุ่ม LINE (LINE Group Alert)</h3>
-                            <p class="text-xs text-slate-500">ส่งแจ้งเตือนรายการรอชำระ สรุปประจำวัน หรือยอดเกินกำหนดไปยังกลุ่มไลน์อัตโนมัติ</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 text-xs space-y-2">
-                        <p class="font-bold text-emerald-900 flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-question text-emerald-600 text-sm"></i>
-                            คำถาม: นำบอท/แจ้งเตือนไปไว้ในกลุ่มไลน์ จะแจ้งเตือนในกลุ่มไหม?
-                        </p>
-                        <p class="text-emerald-800 leading-relaxed">
-                            <strong>เตือนแน่นอน 100%!</strong> หากนำ <strong>LINE Notify (หรือ LINE Official Account)</strong> ดึงเข้าร่วมในกลุ่มไลน์ที่คุณต้องการ เพียงแค่นำ Token ของ LINE Notify มากรอกในช่องด้านล่างนี้ ระบบจะส่งข้อความแจ้งเตือนสรุปยอดการเงินและรายการค้างชำระเข้าไปในกลุ่มไลน์ทันที
-                        </p>
-                    </div>
-
-                    <div class="space-y-3 text-xs">
-                        <div>
-                            <label class="block font-bold text-slate-700 mb-1">🔑 LINE Notify Token (สำหรับกลุ่มไลน์):</label>
-                            <input id="line-notify-token" type="text" placeholder="วาง LINE Notify Token ของกลุ่มที่นี่..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500">
-                            <p class="text-[11px] text-slate-400 mt-1">สามารถสร้าง Token ฟรีได้ที่ <a href="https://notify-bot.line.me/" target="_blank" class="text-emerald-600 underline font-semibold">notify-bot.line.me</a> เลือกกลุ่มไลน์ที่ต้องการให้แจ้งเตือน</p>
-                        </div>
-
-                        <div class="pt-2 flex flex-col sm:flex-row gap-2">
-                            <button onclick="saveLineSettings()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl transition-all shadow flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-floppy-disk"></i> 💾 บันทึก Token
-                            </button>
-                            <button onclick="sendTestLineNotify()" class="bg-slate-900 hover:bg-slate-800 text-emerald-400 font-bold px-4 py-2.5 rounded-xl transition-all shadow flex items-center justify-center gap-2 border border-slate-700">
-                                <i class="fa-paper-plane fa-solid text-emerald-400"></i> 📲 ทดสอบส่งการแจ้งเตือนเข้ากลุ่มไลน์
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CLOUD SYNC CONFIGURATION -->
-                <div class="bg-white p-6 rounded-xl border border-indigo-200 shadow-sm border-t-4 border-t-indigo-500 space-y-4">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-indigo-600 text-white p-3 rounded-xl shadow">
-                            <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-base font-bold text-slate-900">ตั้งค่าระบบคลาวด์ซิงค์หลายอุปกรณ์ (Multi-Device Cloud Sync)</h3>
-                            <p class="text-xs text-slate-500">เชื่อมโยงเปิดใช้งานบนมือถือ แท็บเล็ต และคอมพิวเตอร์ด้วยชื่อระบบเดียวกัน</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-200 text-xs space-y-2">
-                        <p class="font-bold text-indigo-900"><i class="fa-solid fa-mobile-screen mr-1"></i> ซิงค์ข้อมูลข้ามเครื่องเรียลไทม์:</p>
-                        <p class="text-indigo-800">เมื่อกรอก <strong>Cloud Namespace</strong> รหัสเดียวกันในคอมพิวเตอร์และโทรศัพท์มือถือ ข้อมูลบัญชีจะถูกซิงค์ตรงกันทั้งสองเครื่องโดยอัตโนมัติ</p>
-                    </div>
-
-                    <div class="space-y-3 text-xs">
-                        <div>
-                            <label class="block font-bold text-slate-700 mb-1">🏷️ ชื่อประจำระบบ (Cloud Namespace Key):</label>
-                            <input id="cloud-namespace-input" type="text" value="SPS_ACCOUNT_V2_PROD" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono font-bold text-indigo-700 outline-none">
-                        </div>
-
-                        <div class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200">
-                            <div>
-                                <p class="font-bold text-slate-800">เปิดใช้งาน Auto Cloud Sync เบื้องหลัง</p>
-                                <p class="text-[11px] text-slate-500">ซิงค์อัตโนมัติอย่างปลอดภัย ไม่ทำให้หน้าจอค้าง 100%</p>
-                            </div>
-                            <input type="checkbox" id="auto-sync-toggle" onchange="toggleAutoSyncSetting()" class="w-5 h-5 text-indigo-600 rounded cursor-pointer" checked>
-                        </div>
-
-                        <button onclick="manualCloudSync()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-rotate"></i> 🔄 สั่งซิงค์ข้อมูลกับคลาวด์ทันที (Force Sync Now)
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 8: AI ADVISOR -->
+        <!-- TAB 6: AI ADVISOR -->
         <section id="tab-advisor" class="hidden space-y-6">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <h3 class="text-lg font-bold text-slate-800 mb-1"><i class="fa-solid fa-robot text-rose-600 mr-2"></i> ผู้ช่วย AI ปรึกษาด้านบัญชีและภาษีไทย (AI Advisor V2)</h3>
+                <h3 class="text-lg font-bold text-slate-800 mb-1"><i class="fa-solid fa-robot text-rose-600 mr-2"></i> ผู้ช่วย AI ปรึกษาด้านบัญชีและภาษีไทย (AI Advisor)</h3>
                 <p class="text-xs text-slate-500 mb-6">สอบถามข้อสงสัยเกี่ยวกับ ภ.พ. 30, ภ.ง.ด. 3/53, อัตราภาษีหัก ณ ที่จ่าย หรือวิเคราะห์งบการเงินได้ทันที</p>
 
                 <div class="space-y-4 max-w-3xl">
@@ -1266,47 +1176,9 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT ENGINE (TOP-LEVEL SCOPE DECLARATIONS - ZERO TDZ / ZERO FREEZE GUARANTEED) -->
     <script>
-        // 1. TOP LEVEL GLOBAL CONSTANTS & STATE VARIABLES DECLARATIONS FIRST!
         const TODAY_DATE_STR = "22/08/2026";
         const TODAY_ISO = "2026-08-22";
-
-        let selectedMonthFilter = "ALL";
-        let autoSyncActive = true;
-        let isSyncing = false;
-        let lineNotifyToken = localStorage.getItem('LINE_NOTIFY_TOKEN') || "";
-        let cloudNamespace = localStorage.getItem('CLOUD_NAMESPACE') || "SPS_ACCOUNT_V2_PROD";
-
-        // OFFICIAL V2 DEMO TEST DATA SET
-        const demoTransactions = [
-            { id: "INV-2026/010", date: "15/09/2026", delivery_date: "15/09/2026", credit_days: 30, due_date: "15/10/2026", type: "Income", desc: "ค่าส่งมอบงานระยะที่ 2 ระบบ AI Chatbot", vendor: "บริษัท ไทยการค้า อินเตอร์ จำกัด", before_vat: 180000, vat: 12600, wht: 5400, net: 187200, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/009", date: "05/09/2026", delivery_date: "05/09/2026", credit_days: 15, due_date: "20/09/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000, vat: 2450, wht: 1750, net: 37450, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/008", date: "28/08/2026", delivery_date: "28/08/2026", credit_days: 30, due_date: "27/09/2026", type: "Income", desc: "ค่าสัญญาบริการรายเดือน (SLA Maintenance)", vendor: "บริษัท โกลบอล โลจิสติกส์ จำกัด", before_vat: 50000, vat: 3500, wht: 1500, net: 53500, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/007", date: "20/08/2026", delivery_date: "19/08/2026", credit_days: 31, due_date: "19/09/2026", type: "Expense", desc: "ซื้ออุปกรณ์คอมพิวเตอร์และจอมอนิเตอร์", vendor: "บริษัท ไอที ซิตี้ จำกัด (มหาชน)", before_vat: 28000, vat: 1960, wht: 0, net: 29960, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/006", date: "18/08/2026", delivery_date: "18/08/2026", credit_days: 30, due_date: "17/09/2026", type: "Expense", desc: "ค่าโฆษณา Facebook & Google Ads", vendor: "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด", before_vat: 20000, vat: 1400, wht: 400, net: 21400, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/005", date: "15/08/2026", delivery_date: "15/08/2026", credit_days: 0, due_date: "15/08/2026", type: "Expense", desc: "เงินเดือนพนักงานประจำเดือน สิงหาคม 2026", vendor: "ฝ่ายทรัพยากรบุคคล (Payroll)", before_vat: 85000, vat: 0, wht: 0, net: 85000, status: "Paid", file_data: null, slip_data: null, pay_date: "15/08/2026" },
-            { id: "INV-2026/004", date: "10/08/2026", delivery_date: "09/08/2026", credit_days: 31, due_date: "09/09/2026", type: "Income", desc: "ค่าส่งมอบงานระยะที่ 1 ระบบ AI Chatbot", vendor: "บริษัท ไทยการค้า อินเตอร์ จำกัด", before_vat: 150000, vat: 10500, wht: 4500, net: 160500, status: "Paid", file_data: null, slip_data: null, pay_date: "10/08/2026" },
-            { id: "INV-2026/003", date: "05/08/2026", delivery_date: "05/08/2026", credit_days: 30, due_date: "04/09/2026", type: "Expense", desc: "ค่าบริการระบบ Cloud Server", vendor: "บริษัท คลาวด์ เทคโนโลยี จำกัด", before_vat: 15000, vat: 1050, wht: 450, net: 16050, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/002", date: "03/08/2026", delivery_date: "01/08/2026", credit_days: 14, due_date: "15/08/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000, vat: 2450, wht: 1750, net: 37450, status: "Paid", file_data: null, slip_data: null, pay_date: "03/08/2026" },
-            { id: "INV-2026/001", date: "01/08/2026", delivery_date: "01/08/2026", credit_days: 30, due_date: "31/08/2026", type: "Income", desc: "ค่าบริการที่ปรึกษาพัฒนาระบบซอฟต์แวร์", vendor: "บริษัท เอพีซีไอ จำกัด", before_vat: 100000, vat: 7000, wht: 3000, net: 107000, status: "Paid", file_data: null, slip_data: null, pay_date: "01/08/2026" },
-            { id: "INV-2026/000", date: "25/07/2026", delivery_date: "25/07/2026", credit_days: 15, due_date: "09/08/2026", type: "Expense", desc: "ซื้อวัสดุอุปกรณ์สำนักงานประจำเดือน กรกฎาคม", vendor: "บริษัท ออฟฟิศเมท จำกัด (มหาชน)", before_vat: 12000, vat: 840, wht: 0, net: 12840, status: "Paid", file_data: null, slip_data: null, pay_date: "25/07/2026" }
-        ];
-
-        const demoVendorMemory = {
-            "บริษัท สาทร เรียลเอสเตท จำกัด": { tax_id: "0105544987654", credit_days: 15, wht_rate: 5, category: "Expense", count: 8 },
-            "บริษัท บิ๊กคอร์ป จำกัด (มหาชน)": { tax_id: "0107537000888", credit_days: 30, wht_rate: 3, category: "Income", count: 12 },
-            "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด": { tax_id: "0105562001199", credit_days: 30, wht_rate: 2, category: "Expense", count: 5 }
-        };
-
-        // AUTO-LOAD DEMO TEST DATA ON STARTUP
-        let transactions = JSON.parse(JSON.stringify(demoTransactions));
-        let vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
-
-        function saveState() {
-            localStorage.setItem('TRANSACTIONS', JSON.stringify(transactions));
-            localStorage.setItem('AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
-        }
 
         // Global Date Helpers
         function formatDateDDMMYYYY(dateStr) {
@@ -1346,67 +1218,37 @@
             return dateStr;
         }
 
-        // --- SAFE NON-BLOCKING CLOUD SYNC ENGINE (ZERO FREEZE GUARANTEED) ---
-        async function manualCloudSync() {
-            if (isSyncing) return;
-            isSyncing = true;
-            
-            const dot = document.getElementById('cloud-status-dot');
-            const txt = document.getElementById('cloud-status-text');
+        // GLOBAL MONTH FILTER STATE
+        let selectedMonthFilter = "ALL";
 
-            if (dot && txt) {
-                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping";
-                txt.innerText = "☁️ กำลังซิงค์คลาวด์...";
-            }
+        // OFFICIAL V.1 & V.1.1 DEMO TEST DATA SET (PRESERVED 100%)
+        const demoTransactions = [
+            { id: "INV-2026/010", date: "15/09/2026", delivery_date: "15/09/2026", credit_days: 30, due_date: "15/10/2026", type: "Income", desc: "ค่าส่งมอบงานระยะที่ 2 ระบบ AI Chatbot", vendor: "บริษัท ไทยการค้า อินเตอร์ จำกัด", before_vat: 180000, vat: 12600, wht: 5400, net: 187200, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "INV-2026/009", date: "05/09/2026", delivery_date: "05/09/2026", credit_days: 15, due_date: "20/09/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000, vat: 2450, wht: 1750, net: 37450, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "INV-2026/008", date: "28/08/2026", delivery_date: "28/08/2026", credit_days: 30, due_date: "27/09/2026", type: "Income", desc: "ค่าสัญญาบริการรายเดือน (SLA Maintenance)", vendor: "บริษัท โกลบอล โลจิสติกส์ จำกัด", before_vat: 50000, vat: 3500, wht: 1500, net: 53500, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "INV-2026/007", date: "20/08/2026", delivery_date: "19/08/2026", credit_days: 31, due_date: "19/09/2026", type: "Expense", desc: "ซื้ออุปกรณ์คอมพิวเตอร์และจอมอนิเตอร์", vendor: "บริษัท ไอที ซิตี้ จำกัด (มหาชน)", before_vat: 28000, vat: 1960, wht: 0, net: 29960, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "INV-2026/006", date: "18/08/2026", delivery_date: "18/08/2026", credit_days: 30, due_date: "17/09/2026", type: "Expense", desc: "ค่าโฆษณา Facebook & Google Ads", vendor: "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด", before_vat: 20000, vat: 1400, wht: 400, net: 21400, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "INV-2026/005", date: "15/08/2026", delivery_date: "15/08/2026", credit_days: 0, due_date: "15/08/2026", type: "Expense", desc: "เงินเดือนพนักงานประจำเดือน สิงหาคม 2026", vendor: "ฝ่ายทรัพยากรบุคคล (Payroll)", before_vat: 85000, vat: 0, wht: 0, net: 85000, status: "Paid", file_data: null, slip_data: null, pay_date: "15/08/2026" },
+            { id: "INV-2026/004", date: "10/08/2026", delivery_date: "09/08/2026", credit_days: 31, due_date: "09/09/2026", type: "Income", desc: "ค่าส่งมอบงานระยะที่ 1 ระบบ AI Chatbot", vendor: "บริษัท ไทยการค้า อินเตอร์ จำกัด", before_vat: 150000, vat: 10500, wht: 4500, net: 160500, status: "Paid", file_data: null, slip_data: null, pay_date: "10/08/2026" },
+            { id: "INV-2026/003", date: "05/08/2026", delivery_date: "05/08/2026", credit_days: 30, due_date: "04/09/2026", type: "Expense", desc: "ค่าบริการระบบ Cloud Server", vendor: "บริษัท คลาวด์ เทคโนโลยี จำกัด", before_vat: 15000, vat: 1050, wht: 450, net: 16050, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
+            { id: "INV-2026/002", date: "03/08/2026", delivery_date: "01/08/2026", credit_days: 14, due_date: "15/08/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000, vat: 2450, wht: 1750, net: 37450, status: "Paid", file_data: null, slip_data: null, pay_date: "03/08/2026" },
+            { id: "INV-2026/001", date: "01/08/2026", delivery_date: "01/08/2026", credit_days: 30, due_date: "31/08/2026", type: "Income", desc: "ค่าบริการที่ปรึกษาพัฒนาระบบซอฟต์แวร์", vendor: "บริษัท เอพีซีไอ จำกัด", before_vat: 100000, vat: 7000, wht: 3000, net: 107000, status: "Paid", file_data: null, slip_data: null, pay_date: "01/08/2026" },
+            { id: "INV-2026/000", date: "25/07/2026", delivery_date: "25/07/2026", credit_days: 15, due_date: "09/08/2026", type: "Expense", desc: "ซื้อวัสดุอุปกรณ์สำนักงานประจำเดือน กรกฎาคม", vendor: "บริษัท ออฟฟิศเมท จำกัด (มหาชน)", before_vat: 12000, vat: 840, wht: 0, net: 12840, status: "Paid", file_data: null, slip_data: null, pay_date: "25/07/2026" }
+        ];
 
-            try {
-                // Non-blocking fetch simulation / cloud sync check with timeout
-                await new Promise(r => setTimeout(r, 600)); 
+        const demoVendorMemory = {
+            "บริษัท สาทร เรียลเอสเตท จำกัด": { tax_id: "0105544987654", credit_days: 15, wht_rate: 5, category: "Expense", count: 8 },
+            "บริษัท บิ๊กคอร์ป จำกัด (มหาชน)": { tax_id: "0107537000888", credit_days: 30, wht_rate: 3, category: "Income", count: 12 },
+            "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด": { tax_id: "0105562001199", credit_days: 30, wht_rate: 2, category: "Expense", count: 5 }
+        };
 
-                if (dot && txt) {
-                    dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
-                    txt.innerText = "☁️ ซิงค์คลาวด์สำเร็จ (Cloud Synced)";
-                }
-            } catch(e) {
-                if (dot && txt) {
-                    dot.className = "w-2.5 h-2.5 rounded-full bg-slate-400";
-                    txt.innerText = "📱 โหมดใช้งานในเครื่อง (Local Mode)";
-                }
-            } finally {
-                isSyncing = false;
-            }
-        }
+        // AUTO-LOAD V.1 DEMO TEST DATA ON INITIAL STARTUP
+        let transactions = JSON.parse(JSON.stringify(demoTransactions));
+        let vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
 
-        // --- LINE GROUP NOTIFICATION ENGINE ---
-        function saveLineSettings() {
-            const token = document.getElementById('line-notify-token').value.trim();
-            lineNotifyToken = token;
-            localStorage.setItem('LINE_NOTIFY_TOKEN', token);
-            alert("✅ บันทึก LINE Notify Token สำหรับกลุ่มไลน์เรียบร้อยแล้ว!");
-        }
-
-        async function sendTestLineNotify() {
-            const token = document.getElementById('line-notify-token').value.trim() || lineNotifyToken;
-            
-            const unpaidCount = transactions.filter(t => t.status !== 'Paid').length;
-            const unpaidSum = transactions.filter(t => t.status !== 'Paid').reduce((sum, t) => sum + t.net, 0);
-
-            const msg = `\n📢 [SPS บัญชี-การเงิน แจ้งเตือนการเงินในกลุ่ม]\n🗓️ ข้อมูล ณ วันที่: ${TODAY_DATE_STR}\n-----------------------------\n⏳ รายการค้างชำระทั้งหมด: ${unpaidCount} รายการ\n💰 ยอดค้างชำระรวม: ฿${unpaidSum.toLocaleString('en-US', {minimumFractionDigits: 2})}\n-----------------------------\n💡 ระบบแจ้งเตือนจาก SPS Financial AI Agent V2.0`;
-
-            if (!token) {
-                alert(`📱 ตัวอย่างข้อความที่จะส่งไปยังกลุ่ม LINE:\n${msg}\n\n⚠️ หมายเหตุ: หากต้องการส่งจริงไปยังกลุ่มไลน์ กรุณากรอก LINE Notify Token ในช่องแล้วกดบันทึก`);
-                return;
-            }
-
-            try {
-                alert(`📲 ส่งแจ้งเตือนไปยังกลุ่ม LINE เรียบร้อยแล้ว!\n\nข้อความที่ส่ง:\n${msg}`);
-            } catch(e) {
-                alert("❌ เกิดข้อผิดพลาดในการส่ง LINE Notify: " + e.message);
-            }
-        }
-
-        function toggleAutoSyncSetting() {
-            autoSyncActive = document.getElementById('auto-sync-toggle').checked;
+        function saveState() {
+            localStorage.setItem('TRANSACTIONS', JSON.stringify(transactions));
+            localStorage.setItem('AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
         }
 
         // MONTHLY FILTER ENGINE LOGIC
@@ -1533,18 +1375,18 @@
 
             const banner = document.getElementById('sim-status-banner');
             if (banner) {
-                banner.className = "bg-slate-900 text-slate-100 p-3 rounded-xl text-xs flex flex-col md:flex-row justify-between items-center gap-2 mb-6 border border-slate-800 shadow-sm";
+                banner.className = "bg-indigo-900 text-indigo-100 p-3 rounded-xl text-xs flex flex-col md:flex-row justify-between items-center gap-2 mb-6 border border-indigo-700 shadow-sm";
                 banner.innerHTML = `
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-database text-amber-300 text-base"></i>
-                        <span><strong>โหลดชุดข้อมูลทดสอบ V2.0 สำเร็จ (Demo Data Loaded):</strong> โหลด ${demoTransactions.length} รายการสมุดบัญชีแบบครอบคลุมหลายเดือน และคลังความรู้ AI 3 บริษัทตัวอย่าง</span>
+                        <span><strong>โหลดชุดข้อมูลทดสอบ V.1 สำเร็จ (Demo Data Loaded):</strong> โหลด ${demoTransactions.length} รายการสมุดบัญชีแบบครอบคลุมหลายเดือน และคลังความรู้ AI 3 บริษัทตัวอย่าง</span>
                     </div>
                     <span class="bg-amber-400 text-slate-900 font-bold px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider">Demo Data Active</span>
                 `;
             }
 
             renderLedger();
-            alert(`🔄 โหลดชุดข้อมูลตัวอย่าง ${demoTransactions.length} รายการ (ครอบคลุม ก.ค. - ต.ค. 2026) เรียบร้อยแล้ว! ข้อมูล V2.0 กลับมาสมบูรณ์ 100%`);
+            alert(`🔄 โหลดชุดข้อมูลตัวอย่าง ${demoTransactions.length} รายการ (ครอบคลุม ก.ค. - ต.ค. 2026) เรียบร้อยแล้ว! ข้อมูล V.1 กลับมาสมบูรณ์ 100%`);
         }
 
         let currentActiveDoc = null;
@@ -2764,7 +2606,7 @@
             closePaymentModal();
             renderLedger();
 
-            alert(`🎉 บันทึกการชำระเงินสำเร็จ!\n• เลขที่เอกสาร: ${currentPayTx.id}\n• วันที่ชำระ: ${formatDateDDMMYYYY(payDate)}\n• ยอดชำระ: ${formatTHB(currentPayTx.net)}\n• อัปเดตสถานะเป็น '🟢 ชำระแล้ว' เรียบร้อย!`);
+            alert(`🎉 บันทึกการชำระเงินสำเร็จ!\n• เลขที่เอกสาร: ${currentPayTx.id}\n• วันที่ชำระ: ${formatDateDDMMYYYY(payDate)}\n• ยอดชำระ: ${formatTHB(currentPayTx.net)}\n• อัปเดตสถานะเป็น '🟢 ชำระแล้ว' เชื่อมโยงลงสมุดรายรับ-รายจ่ายและสมุดบัญชีทั่วไปเรียบร้อยแล้ว!`);
         }
 
         function viewSlipProof(txId) {
@@ -2840,10 +2682,6 @@
             if (tabId === 'pending') renderPendingTab();
             if (tabId === 'supplier') renderSupplierLedger();
             if (tabId === 'inout') renderInOutLedger();
-            if (tabId === 'line-cloud') {
-                document.getElementById('line-notify-token').value = lineNotifyToken;
-                document.getElementById('cloud-namespace-input').value = cloudNamespace;
-            }
         }
 
         // File Upload Handler
@@ -3220,13 +3058,13 @@
             } else {
                 resDiv.innerHTML = `
                     <div class="text-amber-400 font-bold border-b border-slate-800 pb-2"><i class="fa-solid fa-chart-line mr-1"></i> การวิเคราะห์สุขภาพการเงินและอัตรากำไร</div>
-                    <p>• <strong>สถานะปัจจุบัน:</strong> ระบบ SPS Account V2.0 พร้อมเปิดใช้งานระบบคลาวด์ซิงค์และไลน์กลุ่ม</p>
+                    <p>• <strong>สถานะปัจจุบัน:</strong> รองรับระบบตัวกรองเดือน V.1.1 เรียบร้อยแล้ว</p>
                     <p>• <strong>คำแนะนำ:</strong> เลือกเปลี่ยนเดือนที่มุมขวาบนของระบบเพื่อดูวิเคราะห์งบแยกรายเดือนแบบ Real-time</p>
                 `;
             }
         }
 
-        // INIT SYSTEM ON LOAD WITH AUTOMATIC DEMO DATA RETENTION & SAFE CLOUD AUTO-CHECK
+        // INIT SYSTEM ON LOAD WITH AUTOMATIC DEMO DATA RETENTION
         window.onload = function() {
             const savedTx = localStorage.getItem('TRANSACTIONS');
             const savedMem = localStorage.getItem('AI_VENDOR_MEMORY');
@@ -3252,9 +3090,7 @@
                 vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
                 saveState();
             }
-            
             renderLedger();
-            manualCloudSync();
         };
     </script>
 </body>
