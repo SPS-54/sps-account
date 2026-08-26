@@ -1239,18 +1239,6 @@
         </div>
     </div>
 
-    <!-- VIEW SLIP PROOF MODAL -->
-    <div id="slip-view-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">       </div>
-
-            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end gap-2">
-                <button onclick="closeManualEntryModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ยกเลิก</button>
-                <button onclick="saveManualTransaction()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl flex items-center gap-1.5 shadow-md">
-                    <i class="fa-solid fa-floppy-disk"></i> 💾 บันทึกรายการ
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- AI MEMORY KNOWLEDGE MODAL -->
     <div id="ai-memory-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[85vh]">
@@ -1435,10 +1423,101 @@
         </div>
     </div>
 
+    <!-- SUPABASE CLOUD CONFIG MODAL -->
+    <div id="cloud-config-modal" style="display: none !important; pointer-events: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 flex flex-col pointer-events-auto">
+            <div class="bg-purple-900 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-purple-300 text-lg"></i>
+                    <h3 class="font-bold text-sm">ตั้งค่าการซิงก์ Supabase Cloud (Live Sync)</h3>
+                </div>
+                <button onclick="closeCloudConfigModal()" class="text-purple-300 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+                <div class="bg-purple-50 p-3 rounded-xl border border-purple-200 space-y-1">
+                    <p class="font-bold text-purple-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-sync text-purple-600"></i> ซิงก์ข้อมูลอัตโนมัติหลายอุปกรณ์ (Multi-Device Sync)
+                    </p>
+                    <p class="text-purple-800">ระบบจะอัปเดตและดึงข้อมูลจาก Supabase Cloud อัตโนมัติทุก 8 วินาที</p>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Supabase REST Endpoint URL:</label>
+                    <input type="text" id="supabase-url-input" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-xs outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Supabase Anon Key:</label>
+                    <input type="password" id="supabase-key-input" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-xs outline-none">
+                </div>
+                <div class="text-[11px] text-slate-500 font-mono" id="cloud-last-sync-time">
+                    ยังไม่มีการซิงก์ในเซสชันนี้
+                </div>
+            </div>
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center">
+                <button onclick="syncPullFromSupabase(true)" class="px-3 py-2 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold text-xs rounded-xl flex items-center gap-1">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> ดึงข้อมูลจาก Cloud
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="closeCloudConfigModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ยกเลิก</button>
+                    <button onclick="saveCloudConfig()" class="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl shadow">บันทึก & ซิงก์</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHANGE PIN MODAL -->
+    <div id="change-pin-modal" style="display: none !important; pointer-events: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 flex flex-col pointer-events-auto">
+            <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-key text-amber-400 text-lg"></i>
+                    <h3 class="font-bold text-sm">เปลี่ยนรหัสผ่าน PIN 6 หลัก</h3>
+                </div>
+                <button onclick="closeChangePinModal()" class="text-slate-400 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">รหัสผ่าน PIN เดิม (6 หลัก):</label>
+                    <input type="password" id="pin-old-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center font-bold text-sm outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">รหัสผ่าน PIN ใหม่ (6 หลัก):</label>
+                    <input type="password" id="pin-new-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center font-bold text-sm outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">ยืนยันรหัสผ่าน PIN ใหม่:</label>
+                    <input type="password" id="pin-confirm-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center font-bold text-sm outline-none">
+                </div>
+            </div>
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end gap-2">
+                <button onclick="closeChangePinModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ยกเลิก</button>
+                <button onclick="saveNewPin()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow">บันทึกรหัสใหม่</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MAIN SINGLE-ENGINE SCRIPT -->
     <script>
         const TODAY_DATE_STR = "22/08/2026";
         const TODAY_ISO = "2026-08-22";
+
+        // Global Modal Controls (Bulletproof pointer-events & display isolation)
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.setProperty('display', 'flex', 'important');
+                m.style.setProperty('pointer-events', 'auto', 'important');
+                m.classList.remove('hidden');
+            }
+        }
+
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.setProperty('display', 'none', 'important');
+                m.style.setProperty('pointer-events', 'none', 'important');
+                m.classList.add('hidden');
+            }
+        }
 
         // Global Date Helpers
         function formatDateDDMMYYYY(dateStr) {
@@ -1484,10 +1563,7 @@
         let isUnlocked = true;
 
         function checkPinStatus() {
-            const modal = document.getElementById('pin-lock-modal');
-            if (modal) {
-                modal.classList.add('hidden');
-            }
+            closeModal('pin-lock-modal');
         }
 
         function pressPinDigit(digit) {
@@ -1532,7 +1608,7 @@
             if (enteredPin === currentPin || enteredPin === "190119" || enteredPin === "787138" || enteredPin === "123456") {
                 isUnlocked = true;
                 localStorage.setItem('SYSTEM_UNLOCKED', 'true');
-                document.getElementById('pin-lock-modal').classList.add('hidden');
+                closeModal('pin-lock-modal');
                 enteredPin = "";
                 updatePinDots();
             } else {
@@ -1552,11 +1628,11 @@
             document.getElementById('pin-old-input').value = "";
             document.getElementById('pin-new-input').value = "";
             document.getElementById('pin-confirm-input').value = "";
-            document.getElementById('change-pin-modal').classList.remove('hidden');
+            openModal('change-pin-modal');
         }
 
         function closeChangePinModal() {
-            document.getElementById('change-pin-modal').classList.add('hidden');
+            closeModal('change-pin-modal');
         }
 
         function saveNewPin() {
@@ -1590,11 +1666,11 @@
         function openCloudConfigModal() {
             document.getElementById('supabase-url-input').value = supabaseUrl;
             document.getElementById('supabase-key-input').value = supabaseKey;
-            document.getElementById('cloud-config-modal').classList.remove('hidden');
+            openModal('cloud-config-modal');
         }
 
         function closeCloudConfigModal() {
-            document.getElementById('cloud-config-modal').classList.add('hidden');
+            closeModal('cloud-config-modal');
         }
 
         function saveCloudConfig() {
@@ -1883,11 +1959,11 @@
         function openLineNotifyModal() {
             document.getElementById('line-token-input').value = lineNotifyToken;
             updateLinePreviewMessage();
-            document.getElementById('line-notify-modal').classList.remove('hidden');
+            openModal('line-notify-modal');
         }
 
         function closeLineNotifyModal() {
-            document.getElementById('line-notify-modal').classList.add('hidden');
+            closeModal('line-notify-modal');
         }
 
         function saveLineSettings() {
