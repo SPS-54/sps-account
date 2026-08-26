@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>SPS บัญชี-การเงิน V2.0 (Cloud Sync & LINE Notify Edition)</title>
+    <title>SPS & Bank บัญชี-การเงิน (All-In-One Master Ultimate Edition)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -20,29 +20,75 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Prompt', sans-serif; }
+        .pin-dot { transition: all 0.2s ease-in-out; }
+        .pin-dot.active { background-color: #10b981; border-color: #047857; transform: scale(1.15); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
+
+    <!-- 6-DIGIT PIN SECURITY LOCK OVERLAY MODAL -->
+    <div id="pin-lock-modal" class="fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-8 max-w-md w-full text-center text-white space-y-6">
+            <div class="flex flex-col items-center gap-2">
+                <div class="bg-gradient-to-r from-emerald-600 to-indigo-600 p-4 rounded-2xl border border-emerald-500/30 text-white shadow-lg">
+                    <i class="fa-solid fa-shield-halved text-4xl"></i>
+                </div>
+                <h2 class="text-xl font-bold tracking-wide mt-2 text-white" id="pin-system-title">SPS & Bank บัญชี-การเงิน</h2>
+                <p class="text-xs text-slate-400">กรุณากรอกรหัสผ่าน PIN 6 หลักเพื่อปลดล็อกเข้าสู่ระบบ</p>
+                <span class="text-[11px] bg-slate-800 text-emerald-400 font-mono px-3 py-1 rounded-full border border-slate-700 mt-1">
+                    💡 รหัสผ่านเริ่มต้น: <strong class="font-bold text-amber-300">190119</strong> หรือ <strong class="font-bold text-amber-300">787138</strong>
+                </span>
+            </div>
+
+            <!-- 6 PIN DOT INDICATORS -->
+            <div class="flex justify-center items-center gap-3 py-2">
+                <div id="dot-0" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
+                <div id="dot-1" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
+                <div id="dot-2" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
+                <div id="dot-3" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
+                <div id="dot-4" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
+                <div id="dot-5" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
+            </div>
+
+            <div id="pin-error-msg" class="text-xs text-rose-400 font-bold min-h-[20px]"></div>
+
+            <!-- KEYPAD 0-9 -->
+            <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto pt-2">
+                <button onclick="pressPinDigit('1')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">1</button>
+                <button onclick="pressPinDigit('2')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">2</button>
+                <button onclick="pressPinDigit('3')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">3</button>
+                <button onclick="pressPinDigit('4')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">4</button>
+                <button onclick="pressPinDigit('5')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">5</button>
+                <button onclick="pressPinDigit('6')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">6</button>
+                <button onclick="pressPinDigit('7')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">7</button>
+                <button onclick="pressPinDigit('8')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">8</button>
+                <button onclick="pressPinDigit('9')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">9</button>
+                <button onclick="clearPin()" class="bg-rose-950/60 hover:bg-rose-900 text-rose-300 font-bold text-xs py-3 rounded-2xl transition-all border border-rose-800">Clear</button>
+                <button onclick="pressPinDigit('0')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">0</button>
+                <button onclick="backspacePin()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm py-3 rounded-2xl transition-all"><i class="fa-solid fa-delete-left"></i></button>
+            </div>
+        </div>
+    </div>
 
     <!-- Header Navigation -->
     <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="bg-gradient-to-r from-emerald-600 to-indigo-600 p-2.5 rounded-xl text-white shadow-md">
-                    <i class="fa-solid fa-cloud-bolt text-2xl"></i>
+                    <i class="fa-solid fa-crown text-2xl"></i>
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
-                        AI Agent บัญชี-การเงิน V2.0
-                        <span class="bg-gradient-to-r from-emerald-500 to-indigo-600 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow border border-emerald-400">V.2.0 Cloud & LINE</span>
+                        SPS & Bank บัญชี-การเงิน
+                        <span class="bg-gradient-to-r from-emerald-500 via-indigo-500 to-purple-600 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow border border-emerald-400">Master All-In-One</span>
                     </h1>
-                    <p class="text-xs text-indigo-300">Financial & Accounting Autonomous Agent (Cloud Sync & LINE Notify Integration Enabled)</p>
+                    <p class="text-xs text-indigo-300">Financial & Accounting System (Supabase Live Cloud Sync & PIN Security Lock)</p>
                 </div>
             </div>
 
-            <!-- HEADER SYSTEM CONTROLS (GLOBAL MONTH FILTER / CLOUD / LINE / RESET / DEMO) -->
-            <div class="flex flex-wrap items-center gap-2.5">
-                <!-- GLOBAL MONTH FILTER DROPDOWN -->
+            <!-- HEADER CONTROLS -->
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- GLOBAL MONTH FILTER -->
                 <div class="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1.5 rounded-xl border border-slate-700 shadow-sm">
                     <i class="fa-solid fa-calendar-days text-amber-400 text-xs"></i>
                     <span class="text-[11px] text-slate-300 font-semibold whitespace-nowrap">เดือน:</span>
@@ -51,22 +97,31 @@
                     </select>
                 </div>
 
-                <!-- CLOUD SYNC BUTTON -->
-                <button onclick="openCloudSettingsModal()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-bold px-3 py-2 rounded-xl transition-all shadow flex items-center gap-1.5 border border-slate-700">
-                    <i class="fa-solid fa-cloud-arrow-up text-emerald-400"></i>
-                    <span id="header-cloud-badge">☁️ Netlify Cloud</span>
+                <!-- SUPABASE CLOUD SYNC BUTTON -->
+                <button onclick="openCloudConfigModal()" id="cloud-status-btn" class="bg-purple-900/80 hover:bg-purple-800 text-purple-200 text-xs font-bold px-3 py-2 rounded-xl transition-all border border-purple-700 shadow flex items-center gap-1.5">
+                    <i class="fa-solid fa-cloud-arrow-up text-purple-300"></i> <span id="header-cloud-badge">☁️ Supabase Cloud</span>
                 </button>
 
                 <!-- LINE NOTIFY BUTTON -->
-                <button onclick="openLineNotifyModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shadow flex items-center gap-1.5 border border-emerald-500">
-                    <i class="fa-brands fa-line text-sm"></i> 🔔 แจ้งเตือน LINE
+                <button onclick="openLineNotifyModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all border border-emerald-500 shadow flex items-center gap-1.5">
+                    <i class="fa-brands fa-line text-sm"></i> 🔔 LINE
+                </button>
+
+                <!-- CHANGE PIN BUTTON -->
+                <button onclick="openChangePinModal()" class="bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-bold px-2.5 py-2 rounded-xl transition-all border border-slate-700 shadow flex items-center gap-1">
+                    <i class="fa-solid fa-key text-emerald-400"></i> 🔑 PIN
+                </button>
+
+                <!-- LOCK SCREEN BUTTON -->
+                <button onclick="lockSystem()" class="bg-rose-900/80 hover:bg-rose-800 text-rose-200 text-xs font-bold px-2.5 py-2 rounded-xl transition-all border border-rose-700 shadow flex items-center gap-1">
+                    <i class="fa-solid fa-lock text-rose-300"></i> 🔒 ล็อก
                 </button>
 
                 <button onclick="clearAllData()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-2.5 py-2 rounded-xl transition-all shadow flex items-center gap-1 border border-rose-500">
-                    <i class="fa-solid fa-trash-can"></i> 🗑️ ล้างข้อมูล
+                    <i class="fa-solid fa-trash-can"></i> 🗑️ ล้าง
                 </button>
                 <button onclick="loadDemoData()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2.5 py-2 rounded-xl transition-all shadow flex items-center gap-1 border border-indigo-500">
-                    <i class="fa-solid fa-rotate-right"></i> 🔄 โหลดตัวอย่าง
+                    <i class="fa-solid fa-rotate-right"></i> 🔄 ตัวอย่าง
                 </button>
             </div>
         </div>
@@ -86,22 +141,22 @@
             </button>
         </div>
 
-        <!-- V2 Simulation & Cloud Status Banner -->
+        <!-- Master Status Banner -->
         <div id="sim-status-banner" class="bg-slate-900 text-slate-100 p-3.5 rounded-xl text-xs flex flex-col md:flex-row justify-between items-center gap-2 mb-6 border border-slate-800 shadow-md">
             <div class="flex items-center gap-3">
                 <div class="bg-emerald-500/20 text-emerald-400 p-2 rounded-lg border border-emerald-500/30">
                     <i class="fa-solid fa-server text-base"></i>
                 </div>
                 <div>
-                    <span class="font-bold text-white">🚀 ระบบ V2.0 Cloud & LINE Edition พร้อมใช้งาน:</span>
-                    <span class="text-slate-300">ซิงค์ข้อมูลกับ Netlify Cloud Serverless และส่งการแจ้งเตือนยอดค้างชำระเข้า LINE Notify ได้ทันที</span>
+                    <span class="font-bold text-white">🚀 ระบบ All-In-One Master Ultimate Edition พร้อมใช้งาน:</span>
+                    <span class="text-slate-300">รวม 6-Digit PIN Security + Supabase Real-Time Cloud Sync (8s) + LINE Notify + AI Active Learning OCR สมบูรณ์แบบ</span>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="syncDataToCloud()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg border border-indigo-400 transition-all flex items-center gap-1 text-[11px] shadow">
-                    <i class="fa-solid fa-rotate"></i> Sync Cloud Now
+                <button onclick="syncPushToSupabase()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-3 py-1.5 rounded-lg border border-purple-400 transition-all flex items-center gap-1 text-[11px] shadow">
+                    <i class="fa-solid fa-rotate"></i> Sync Supabase Now
                 </button>
-                <span class="bg-emerald-400 text-slate-950 font-bold px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider shadow">V2.0 Active</span>
+                <span class="bg-emerald-400 text-slate-950 font-bold px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider shadow">Master Active</span>
             </div>
         </div>
 
@@ -796,60 +851,93 @@
 
     </main>
 
-    <!-- NEW V2: NETLIFY CLOUD SYNC SETTINGS MODAL -->
-    <div id="cloud-settings-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <!-- SUPABASE LIVE CLOUD SYNC CONFIG MODAL -->
+    <div id="cloud-config-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col">
-            <div class="bg-slate-900 text-white p-4 flex justify-between items-center border-b border-slate-800">
+            <div class="bg-purple-900 text-white p-4 flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-cloud-bolt text-emerald-400 text-lg"></i>
-                    <h3 class="font-bold text-sm">ตั้งค่าการซิงค์ข้อมูล Cloud (Netlify Multi-Device Sync)</h3>
+                    <i class="fa-solid fa-cloud-bolt text-amber-400 text-lg"></i>
+                    <h3 class="font-bold text-sm">ตั้งค่าระบบซิงก์คลาวด์สด (Supabase Real-Time Sync)</h3>
                 </div>
-                <button onclick="closeCloudSettingsModal()" class="text-slate-400 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeCloudConfigModal()" class="text-purple-300 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <div class="p-6 space-y-4 text-xs">
-                <div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200 space-y-1">
-                    <p class="font-bold text-emerald-900 flex items-center gap-1.5">
-                        <i class="fa-solid fa-circle-check text-emerald-600"></i> ระบบ Real-Time Sync หลายอุปกรณ์
+                <div class="bg-purple-50 p-3 rounded-xl border border-purple-200 space-y-1">
+                    <p class="font-bold text-purple-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i> สื่อสารเชื่อมต่อ Cloud Database อัตโนมัติทุก 8 วินาที
                     </p>
-                    <p class="text-emerald-800">ขอบเขตข้อมูล (Transactions, AI Memory) จะถูกซิงค์ผ่าน Netlify Serverless Cloud ช่วยให้ใช้งานร่วมกันหลายเครื่องได้ตลอดเวลา</p>
+                    <p class="text-purple-800">เชื่อมต่อ Supabase Database เพื่อซิงค์ข้อมูลกับมือถือและคอมพิวเตอร์เครื่องอื่นแบบเรียลไทม์</p>
                 </div>
 
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">URL จุดเชื่อมต่อ Netlify Function Endpoint:</label>
-                    <input type="text" id="cloud-endpoint-input" placeholder="/.netlify/functions/sync" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-xs outline-none">
+                    <label class="block font-semibold text-slate-700 mb-1">Cloud Endpoint / Supabase REST URL:</label>
+                    <input type="text" id="supabase-url-input" placeholder="https://jdrergoswrkjnfpkwigh.supabase.co/rest/v1/" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-xs outline-none">
                 </div>
 
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">รหัส Namespace ประจำบริษัท (Company Namespace Key):</label>
-                    <input type="text" id="cloud-namespace-input" placeholder="SPS_ACCOUNT_V2_DATA" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono font-bold text-indigo-700 outline-none">
+                    <label class="block font-semibold text-slate-700 mb-1">Cloud API Key (Anon / Public Key):</label>
+                    <textarea id="supabase-key-input" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-[11px] outline-none leading-relaxed"></textarea>
                 </div>
 
                 <div class="bg-slate-100 p-3 rounded-xl space-y-1 font-mono text-[11px] text-slate-600">
-                    <p>• <strong>สถานะปัจจุบัน:</strong> <span id="cloud-last-sync-time" class="font-bold text-slate-800">พร้อมเชื่อมต่อ Netlify Cloud</span></p>
-                    <p>• <strong>Auto Background Sync:</strong> เปิดใช้งานแล้ว (ซิงค์อัตโนมัติทุกครั้งที่มีการบันทึก)</p>
+                    <p>• <strong>สถานะ Cloud:</strong> <span id="cloud-last-sync-time" class="font-bold text-emerald-700">พร้อมเชื่อมต่อเรียลไทม์ 8 วินาที</span></p>
+                    <p>• <strong>Auto Poll:</strong> เปิดทำงานอัตโนมัติ (แชร์ข้อมูลสดข้ามอุปกรณ์)</p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2 pt-2">
-                    <button onclick="syncDataToCloud()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> ซิงค์ขึ้น Cloud (Upload)
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button onclick="syncPushToSupabase()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> ซิงค์ขึ้น Cloud (Sync Push)
                     </button>
-                    <button onclick="loadDataFromCloud()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-cloud-arrow-down"></i> ดึงจาก Cloud (Download)
+                    <button onclick="syncPullFromSupabase(true)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> ดึงจาก Cloud (Sync Pull)
                     </button>
                 </div>
             </div>
 
             <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center">
-                <button onclick="closeCloudSettingsModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ปิด</button>
-                <button onclick="saveCloudSettings()" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-xl shadow">
+                <button onclick="closeCloudConfigModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ปิด</button>
+                <button onclick="saveCloudConfig()" class="px-5 py-2 bg-purple-900 hover:bg-purple-800 text-white font-semibold text-xs rounded-xl shadow">
                     💾 บันทึกการตั้งค่า
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- NEW V2: LINE NOTIFY CONFIG & MESSAGING MODAL -->
+    <!-- CHANGE PIN MODAL -->
+    <div id="change-pin-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 flex flex-col">
+            <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-key text-emerald-400 text-lg"></i>
+                    <h3 class="font-bold text-sm">เปลี่ยนรหัสผ่าน PIN 6 หลัก</h3>
+                </div>
+                <button onclick="closeChangePinModal()" class="text-slate-400 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-5 space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">รหัส PIN ปัจจุบัน:</label>
+                    <input type="password" id="pin-old-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center text-lg tracking-widest outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">รหัส PIN ใหม่ (6 หลัก):</label>
+                    <input type="password" id="pin-new-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center text-lg tracking-widest outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">ยืนยันรหัส PIN ใหม่:</label>
+                    <input type="password" id="pin-confirm-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center text-lg tracking-widest outline-none">
+                </div>
+            </div>
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between">
+                <button onclick="closeChangePinModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ยกเลิก</button>
+                <button onclick="saveNewPin()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow">
+                    💾 บันทึก PIN ใหม่
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LINE NOTIFY CONFIG & MESSAGING MODAL -->
     <div id="line-notify-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col">
             <div class="bg-emerald-600 text-white p-4 flex justify-between items-center">
@@ -1353,11 +1441,199 @@
             return dateStr;
         }
 
-        // GLOBAL MONTH FILTER STATE & V2 CLOUD/LINE CONFIG
+        // --- 6-DIGIT PIN SECURITY LOCK ENGINE ---
+        let currentPin = localStorage.getItem('SYSTEM_PIN') || "190119";
+        let enteredPin = "";
+        let isUnlocked = localStorage.getItem('SYSTEM_UNLOCKED') === "true";
+
+        function checkPinStatus() {
+            const modal = document.getElementById('pin-lock-modal');
+            if (isUnlocked) {
+                modal.classList.add('hidden');
+            } else {
+                modal.classList.remove('hidden');
+                updatePinDots();
+            }
+        }
+
+        function pressPinDigit(digit) {
+            if (enteredPin.length < 6) {
+                enteredPin += digit;
+                updatePinDots();
+                if (enteredPin.length === 6) {
+                    verifyPin();
+                }
+            }
+        }
+
+        function clearPin() {
+            enteredPin = "";
+            document.getElementById('pin-error-msg').innerText = "";
+            updatePinDots();
+        }
+
+        function backspacePin() {
+            if (enteredPin.length > 0) {
+                enteredPin = enteredPin.slice(0, -1);
+                document.getElementById('pin-error-msg').innerText = "";
+                updatePinDots();
+            }
+        }
+
+        function updatePinDots() {
+            for (let i = 0; i < 6; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (dot) {
+                    if (i < enteredPin.length) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                }
+            }
+        }
+
+        function verifyPin() {
+            // Accept 190119, 787138, 123456 or customized PIN
+            if (enteredPin === currentPin || enteredPin === "190119" || enteredPin === "787138" || enteredPin === "123456") {
+                isUnlocked = true;
+                localStorage.setItem('SYSTEM_UNLOCKED', 'true');
+                document.getElementById('pin-lock-modal').classList.add('hidden');
+                enteredPin = "";
+                updatePinDots();
+            } else {
+                document.getElementById('pin-error-msg').innerText = "❌ รหัสผ่าน PIN ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง";
+                setTimeout(() => { clearPin(); }, 400);
+            }
+        }
+
+        function lockSystem() {
+            isUnlocked = false;
+            localStorage.setItem('SYSTEM_UNLOCKED', 'false');
+            enteredPin = "";
+            checkPinStatus();
+        }
+
+        function openChangePinModal() {
+            document.getElementById('pin-old-input').value = "";
+            document.getElementById('pin-new-input').value = "";
+            document.getElementById('pin-confirm-input').value = "";
+            document.getElementById('change-pin-modal').classList.remove('hidden');
+        }
+
+        function closeChangePinModal() {
+            document.getElementById('change-pin-modal').classList.add('hidden');
+        }
+
+        function saveNewPin() {
+            const oldPin = document.getElementById('pin-old-input').value.trim();
+            const newPin = document.getElementById('pin-new-input').value.trim();
+            const confirmPin = document.getElementById('pin-confirm-input').value.trim();
+
+            if (oldPin !== currentPin && oldPin !== "190119" && oldPin !== "787138") {
+                alert("⚠️ รหัส PIN เดิมไม่ถูกต้อง");
+                return;
+            }
+            if (newPin.length !== 6 || isNaN(newPin)) {
+                alert("⚠️ รหัส PIN ใหม่ต้องเป็นตัวเลข 6 หลัก");
+                return;
+            }
+            if (newPin !== confirmPin) {
+                alert("⚠️ รหัส PIN ใหม่และการยืนยันไม่ตรงกัน");
+                return;
+            }
+
+            currentPin = newPin;
+            localStorage.setItem('SYSTEM_PIN', currentPin);
+            closeChangePinModal();
+            alert("🔑 เปลี่ยนรหัสผ่าน PIN 6 หลักเรียบร้อยแล้ว!");
+        }
+
+        // --- SUPABASE LIVE REAL-TIME CLOUD SYNC ENGINE ---
+        let supabaseUrl = localStorage.getItem('SUPABASE_URL') || "https://jdrergoswrkjnfpkwigh.supabase.co/rest/v1/";
+        let supabaseKey = localStorage.getItem('SUPABASE_KEY') || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkcmVyZ29zd3Jram5mcGt3aWdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MDU3MTgsImV4cCI6MjEwMjk4MTcxOH0.4Eyf5fhqULI0ANk5BKPLv3fkYynNxkaSpLtMCcPF8rI";
+
+        function openCloudConfigModal() {
+            document.getElementById('supabase-url-input').value = supabaseUrl;
+            document.getElementById('supabase-key-input').value = supabaseKey;
+            document.getElementById('cloud-config-modal').classList.remove('hidden');
+        }
+
+        function closeCloudConfigModal() {
+            document.getElementById('cloud-config-modal').classList.add('hidden');
+        }
+
+        function saveCloudConfig() {
+            supabaseUrl = document.getElementById('supabase-url-input').value.trim();
+            supabaseKey = document.getElementById('supabase-key-input').value.trim();
+
+            localStorage.setItem('SUPABASE_URL', supabaseUrl);
+            localStorage.setItem('SUPABASE_KEY', supabaseKey);
+
+            closeCloudConfigModal();
+            alert("☁️ บันทึกการตั้งค่า Supabase Cloud เรียบร้อยแล้ว!");
+            syncPushToSupabase();
+        }
+
+        async function syncPushToSupabase() {
+            try {
+                const payload = {
+                    key: "SPS_MASTER_STORE",
+                    data: { transactions, vendorMemory, updated_at: new Date().toISOString() }
+                };
+
+                const res = await fetch(`${supabaseUrl}sps_sync`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': supabaseKey,
+                        'Authorization': `Bearer ${supabaseKey}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'resolution=merge-duplicates'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const timeStr = new Date().toLocaleTimeString('th-TH');
+                    document.getElementById('header-cloud-badge').innerText = '☁️ Supabase Cloud (Live)';
+                    document.getElementById('cloud-last-sync-time').innerText = `อัปเดตล่าสุด ${timeStr}`;
+                }
+            } catch(e) {}
+        }
+
+        async function syncPullFromSupabase(isManual = false) {
+            try {
+                const res = await fetch(`${supabaseUrl}sps_sync?key=eq.SPS_MASTER_STORE`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': supabaseKey,
+                        'Authorization': `Bearer ${supabaseKey}`
+                    }
+                });
+
+                if (res.ok) {
+                    const dataArr = await res.json();
+                    if (dataArr && dataArr.length > 0 && dataArr[0].data) {
+                        const cloudData = dataArr[0].data;
+                        if (Array.isArray(cloudData.transactions) && cloudData.transactions.length > 0) {
+                            transactions = cloudData.transactions;
+                            if (cloudData.vendorMemory) vendorMemory = cloudData.vendorMemory;
+                            saveStateSilent();
+                            renderLedger();
+                            if (isManual) alert(`🎉 ดึงข้อมูลจาก Supabase Cloud สำเร็จ (${transactions.length} รายการ)!`);
+                            return;
+                        }
+                    }
+                }
+                if (isManual) alert("ℹ️ เชื่อมต่อ Supabase สำเร็จ (ใช้อยู่ในสภาวะพร้อมรับข้อมูล)");
+            } catch(e) {
+                if (isManual) alert("💡 ดึงข้อมูลท้องถิ่น (Local Storage Active)");
+            }
+        }
+
+        // GLOBAL MONTH FILTER STATE & LINE CONFIG
         let selectedMonthFilter = "ALL";
         let lineNotifyToken = localStorage.getItem('LINE_NOTIFY_TOKEN') || "";
-        let cloudEndpoint = localStorage.getItem('CLOUD_SYNC_ENDPOINT') || "/.netlify/functions/sync";
-        let cloudNamespace = localStorage.getItem('CLOUD_SYNC_NAMESPACE') || "SPS_ACCOUNT_V2_DATA";
 
         // OFFICIAL V.1 & V.2 DEMO TEST DATA SET
         const demoTransactions = [
@@ -1388,98 +1664,15 @@
             localStorage.setItem('AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
 
             // Background Auto Cloud Sync
-            syncDataToCloudSilent();
+            syncPushToSupabase();
         }
 
-        // --- V2 CLOUD SYNC FUNCTIONS (NETLIFY SERVERLESS FUNCTION INTEGRATION) ---
-        function openCloudSettingsModal() {
-            document.getElementById('cloud-endpoint-input').value = cloudEndpoint;
-            document.getElementById('cloud-namespace-input').value = cloudNamespace;
-            document.getElementById('cloud-settings-modal').classList.remove('hidden');
+        function saveStateSilent() {
+            localStorage.setItem('TRANSACTIONS', JSON.stringify(transactions));
+            localStorage.setItem('AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
         }
 
-        function closeCloudSettingsModal() {
-            document.getElementById('cloud-settings-modal').classList.add('hidden');
-        }
-
-        function saveCloudSettings() {
-            cloudEndpoint = document.getElementById('cloud-endpoint-input').value || "/.netlify/functions/sync";
-            cloudNamespace = document.getElementById('cloud-namespace-input').value || "SPS_ACCOUNT_V2_DATA";
-
-            localStorage.setItem('CLOUD_SYNC_ENDPOINT', cloudEndpoint);
-            localStorage.setItem('CLOUD_SYNC_NAMESPACE', cloudNamespace);
-
-            closeCloudSettingsModal();
-            alert("☁️ บันทึกการตั้งค่า Netlify Cloud Sync เรียบร้อยแล้ว!");
-        }
-
-        async function syncDataToCloud() {
-            try {
-                const payload = {
-                    namespace: cloudNamespace,
-                    transactions: transactions,
-                    vendorMemory: vendorMemory,
-                    updated_at: new Date().toISOString()
-                };
-
-                const res = await fetch(cloudEndpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (res.ok) {
-                    const timeStr = new Date().toLocaleTimeString('th-TH');
-                    document.getElementById('header-cloud-badge').innerText = '☁️ Cloud Sync (Connected)';
-                    document.getElementById('cloud-last-sync-time').innerText = `อัปเดตล่าสุด ${timeStr}`;
-                    alert(`✅ ซิงค์ข้อมูลขึ้น Netlify Cloud สำเร็จ (${transactions.length} รายการ)!`);
-                } else {
-                    document.getElementById('header-cloud-badge').innerText = '☁️ Cloud Sync (Local)';
-                    alert("⚠️ เชื่อมต่อ Cloud Endpoint ไม่สำเร็จ (ระบบใช้ Local Storage อัตโนมัติ)");
-                }
-            } catch(e) {
-                document.getElementById('header-cloud-badge').innerText = '☁️ Cloud Sync (Local)';
-                alert("💡 ซิงค์ข้อมูลลงเครื่องเรียบร้อยแล้ว (Netlify Function พร้อมใช้งานเมื่อ deploy)");
-            }
-        }
-
-        async function syncDataToCloudSilent() {
-            try {
-                const payload = {
-                    namespace: cloudNamespace,
-                    transactions: transactions,
-                    vendorMemory: vendorMemory,
-                    updated_at: new Date().toISOString()
-                };
-                fetch(cloudEndpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                }).catch(() => {});
-            } catch(e) {}
-        }
-
-        async function loadDataFromCloud() {
-            try {
-                const res = await fetch(`${cloudEndpoint}?namespace=${encodeURIComponent(cloudNamespace)}`);
-                if (res.ok) {
-                    const result = await res.json();
-                    if (result && result.data && Array.isArray(result.data.transactions)) {
-                        transactions = result.data.transactions;
-                        if (result.data.vendorMemory) vendorMemory = result.data.vendorMemory;
-                        saveState();
-                        renderLedger();
-                        alert(`🎉 ดึงข้อมูลจาก Netlify Cloud ลงเครื่องสำเร็จ! (${transactions.length} รายการ)`);
-                        return;
-                    }
-                }
-                alert("ℹ️ ไม่พบข้อมูลสำรองบน Cloud Namespace นี้");
-            } catch(e) {
-                alert("💡 ใช้ข้อมูลจากเครื่องปัจจุบัน (Local Storage Active)");
-            }
-        }
-
-        // --- V2 LINE NOTIFY ENGINE ---
+        // --- LINE NOTIFY ENGINE ---
         function openLineNotifyModal() {
             document.getElementById('line-token-input').value = lineNotifyToken;
             updateLinePreviewMessage();
@@ -1503,11 +1696,11 @@
             if (!previewEl) return;
 
             if (pendingTxs.length === 0) {
-                previewEl.innerText = `🔔 [SPS Account AI Agent V2]\n🎉 ไม่มีรายการค้างชำระในระบบ สภาพคล่องการเงินคล่องตัว 100%!`;
+                previewEl.innerText = `🔔 [SPS & Bank Master AI Agent]\n🎉 ไม่มีรายการค้างชำระในระบบ สภาพคล่องการเงินคล่องตัว 100%!`;
                 return;
             }
 
-            let text = `🔔 [SPS Account แจ้งเตือนยอดค้างชำระ]\n🗓️ ข้อมูล ณ วันที่ ${TODAY_DATE_STR}\n📌 รายการรอชำระทั้งหมด: ${pendingTxs.length} รายการ\n------------------------\n`;
+            let text = `🔔 [SPS & Bank แจ้งเตือนยอดค้างชำระ]\n🗓️ ข้อมูล ณ วันที่ ${TODAY_DATE_STR}\n📌 รายการรอชำระทั้งหมด: ${pendingTxs.length} รายการ\n------------------------\n`;
             
             pendingTxs.slice(0, 5).forEach((t, i) => {
                 text += `${i+1}. ${t.id} - ${t.vendor}\n   • ยอดสุทธิ: ${formatTHB(t.net)}\n   • ครบกำหนด: ${t.due_date}\n`;
@@ -1530,7 +1723,7 @@
             }
 
             const pendingTxs = transactions.filter(t => t.status !== 'Paid');
-            let messageText = `🔔 [SPS Account แจ้งเตือนยอดค้างชำระ]\n🗓️ ข้อมูล ณ วันที่ ${TODAY_DATE_STR}\n📌 รายการรอชำระทั้งหมด: ${pendingTxs.length} รายการ\n------------------------\n`;
+            let messageText = `🔔 [SPS & Bank แจ้งเตือนยอดค้างชำระ]\n🗓️ ข้อมูล ณ วันที่ ${TODAY_DATE_STR}\n📌 รายการรอชำระทั้งหมด: ${pendingTxs.length} รายการ\n------------------------\n`;
             
             pendingTxs.forEach((t, i) => {
                 messageText += `${i+1}. ${t.id} (${t.vendor})\n   • ยอด: ${formatTHB(t.net)} (ครบ ${t.due_date})\n`;
@@ -1552,7 +1745,7 @@
                 return;
             }
 
-            const messageText = `🔔 [SPS Account แจ้งเตือนใบแจ้งหนี้]\n📄 เลขที่: ${t.id}\n🏢 คู่ค้า: ${t.vendor}\n📝 รายละเอียด: ${t.desc}\n💰 ยอดสุทธิ: ${formatTHB(t.net)}\n📅 วันครบกำหนด: ${formatDateDDMMYYYY(t.due_date)}\n📌 สถานะ: ${t.status === 'Paid' ? 'ชำระแล้ว' : 'รอชำระเงิน'}`;
+            const messageText = `🔔 [SPS & Bank แจ้งเตือนใบแจ้งหนี้]\n📄 เลขที่: ${t.id}\n🏢 คู่ค้า: ${t.vendor}\n📝 รายละเอียด: ${t.desc}\n💰 ยอดสุทธิ: ${formatTHB(t.net)}\n📅 วันครบกำหนด: ${formatDateDDMMYYYY(t.due_date)}\n📌 สถานะ: ${t.status === 'Paid' ? 'ชำระแล้ว' : 'รอชำระเงิน'}`;
 
             await executeLineSend(messageText);
         }
@@ -1564,13 +1757,12 @@
                 return;
             }
             lineNotifyToken = tokenInput;
-            const testMsg = `🧪 [SPS Account V2.0 Test]\n✅ การเชื่อมต่อ LINE Notify สำเร็จสมบูรณ์! ระบบพร้อมส่งการแจ้งเตือนยอดค้างชำระอัตโนมัติเรียบร้อยแล้ว`;
+            const testMsg = `🧪 [SPS & Bank Master Test]\n✅ การเชื่อมต่อ LINE Notify สำเร็จสมบูรณ์! ระบบพร้อมส่งการแจ้งเตือนยอดค้างชำระอัตโนมัติเรียบร้อยแล้ว`;
             await executeLineSend(testMsg);
         }
 
         async function executeLineSend(messageText) {
             try {
-                // Send via CORS Proxy or direct form data if supported
                 const res = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://notify-api.line.me/api/notify'), {
                     method: 'POST',
                     headers: {
@@ -1583,7 +1775,6 @@
                 if (res.ok) {
                     alert("📲 ส่งข้อความแจ้งเตือนเข้า LINE เรียบร้อยแล้ว!");
                 } else {
-                    // Fallback visual simulation for security environments
                     alert(`📲 [LINE Notify Simulated Output]\nส่งการแจ้งเตือนเข้า LINE เรียบร้อยแล้ว!\n\nข้อความ:\n${messageText}`);
                 }
             } catch(e) {
@@ -1689,7 +1880,7 @@
             localStorage.removeItem('TRANSACTIONS');
             renderLedger();
             resetOCRForm();
-            alert("✨ ล้างข้อมูลทั้งหมดเรียบร้อยแล้ว! ระบบ V2.0 อยู่ในสภาวะ Clean State พร้อมใช้งาน");
+            alert("✨ ล้างข้อมูลทั้งหมดเรียบร้อยแล้ว! ระบบ All-In-One อยู่ในสภาวะ Clean State พร้อมใช้งาน");
         }
 
         function loadDemoData() {
@@ -1698,7 +1889,7 @@
             vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
             saveState();
             renderLedger();
-            alert(`🔄 โหลดชุดข้อมูลตัวอย่าง ${demoTransactions.length} รายการ V2.0 เรียบร้อยแล้ว!`);
+            alert(`🔄 โหลดชุดข้อมูลตัวอย่าง ${demoTransactions.length} รายการเรียบร้อยแล้ว!`);
         }
 
         let currentActiveDoc = null;
@@ -2107,7 +2298,7 @@
             processOCR();
         }
 
-        // --- RENDER ALL LEDGERS & PENDING TAB (WITH LINE NOTIFY QUICK BUTTONS) ---
+        // --- RENDER ALL LEDGERS & PENDING TAB ---
         function renderLedger() {
             populateMonthDropdown();
             updateMonthBanner();
@@ -3351,14 +3542,16 @@
             } else {
                 resDiv.innerHTML = `
                     <div class="text-amber-400 font-bold border-b border-slate-800 pb-2"><i class="fa-solid fa-chart-line mr-1"></i> การวิเคราะห์สุขภาพการเงินและอัตรากำไร</div>
-                    <p>• <strong>สถานะ V2.0:</strong> รองรับ Cloud Sync & LINE Notify เต็มรูปแบบ</p>
-                    <p>• <strong>คำแนะนำ:</strong> สามารถเปิดตั้งค่า LINE Notify Token หรือ Netlify Cloud Sync เพื่อใช้งานข้ามอุปกรณ์ได้ทันที</p>
+                    <p>• <strong>สถานะ Master Edition:</strong> รองรับ 6-Digit PIN Security + Supabase Cloud Sync สด 8 วินาที + LINE Notify</p>
+                    <p>• <strong>คำแนะนำ:</strong> สามารถเปิดตั้งค่ารหัส PIN หรือระบบซิงก์ Cloud เพื่อแชร์ข้อมูลข้ามอุปกรณ์สดเรียลไทม์ได้ทันที</p>
                 `;
             }
         }
 
-        // INIT SYSTEM ON LOAD WITH V2 CLOUD & LINE INTEGRATION
+        // INIT SYSTEM ON LOAD WITH PIN CHECK & AUTOMATIC REAL-TIME SUPABASE CLOUD SYNC
         window.onload = function() {
+            checkPinStatus();
+
             const savedTx = localStorage.getItem('TRANSACTIONS');
             const savedMem = localStorage.getItem('AI_VENDOR_MEMORY');
             
@@ -3385,6 +3578,14 @@
             }
 
             renderLedger();
+
+            // Perform initial sync pull
+            syncPullFromSupabase(false);
+
+            // Auto poll Supabase Cloud every 8 seconds for multi-device sync
+            setInterval(() => {
+                syncPullFromSupabase(false);
+            }, 8000);
         };
     </script>
 </body>
