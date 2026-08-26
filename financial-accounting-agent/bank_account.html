@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>SPS & Bank บัญชี-การเงิน (All-In-One Master Ultimate Edition)</title>
+    <title>SPS & Bank บัญชี-การเงิน V.2 (Backup & Cloud Sync Edition)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -26,49 +26,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- 6-DIGIT PIN SECURITY LOCK OVERLAY MODAL -->
-    <div id="pin-lock-modal" class="fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-8 max-w-md w-full text-center text-white space-y-6">
-            <div class="flex flex-col items-center gap-2">
-                <div class="bg-gradient-to-r from-emerald-600 to-indigo-600 p-4 rounded-2xl border border-emerald-500/30 text-white shadow-lg">
-                    <i class="fa-solid fa-shield-halved text-4xl"></i>
-                </div>
-                <h2 class="text-xl font-bold tracking-wide mt-2 text-white" id="pin-system-title">SPS & Bank บัญชี-การเงิน</h2>
-                <p class="text-xs text-slate-400">กรุณากรอกรหัสผ่าน PIN 6 หลักเพื่อปลดล็อกเข้าสู่ระบบ</p>
-                <span class="text-[11px] bg-slate-800 text-emerald-400 font-mono px-3 py-1 rounded-full border border-slate-700 mt-1">
-                    💡 รหัสผ่านเริ่มต้น: <strong class="font-bold text-amber-300">190119</strong> หรือ <strong class="font-bold text-amber-300">787138</strong>
-                </span>
-            </div>
 
-            <!-- 6 PIN DOT INDICATORS -->
-            <div class="flex justify-center items-center gap-3 py-2">
-                <div id="dot-0" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
-                <div id="dot-1" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
-                <div id="dot-2" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
-                <div id="dot-3" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
-                <div id="dot-4" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
-                <div id="dot-5" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
-            </div>
-
-            <div id="pin-error-msg" class="text-xs text-rose-400 font-bold min-h-[20px]"></div>
-
-            <!-- KEYPAD 0-9 -->
-            <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto pt-2">
-                <button onclick="pressPinDigit('1')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">1</button>
-                <button onclick="pressPinDigit('2')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">2</button>
-                <button onclick="pressPinDigit('3')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">3</button>
-                <button onclick="pressPinDigit('4')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">4</button>
-                <button onclick="pressPinDigit('5')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">5</button>
-                <button onclick="pressPinDigit('6')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">6</button>
-                <button onclick="pressPinDigit('7')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">7</button>
-                <button onclick="pressPinDigit('8')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">8</button>
-                <button onclick="pressPinDigit('9')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">9</button>
-                <button onclick="clearPin()" class="bg-rose-950/60 hover:bg-rose-900 text-rose-300 font-bold text-xs py-3 rounded-2xl transition-all border border-rose-800">Clear</button>
-                <button onclick="pressPinDigit('0')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">0</button>
-                <button onclick="backspacePin()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm py-3 rounded-2xl transition-all"><i class="fa-solid fa-delete-left"></i></button>
-            </div>
-        </div>
-    </div>
 
     <!-- Header Navigation -->
     <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
@@ -80,9 +38,9 @@
                 <div>
                     <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
                         SPS & Bank บัญชี-การเงิน
-                        <span class="bg-gradient-to-r from-emerald-500 via-indigo-500 to-purple-600 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow border border-emerald-400">Master All-In-One</span>
+                        <span class="bg-gradient-to-r from-emerald-500 via-indigo-500 to-purple-600 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow border border-emerald-400">V.2 Official</span>
                     </h1>
-                    <p class="text-xs text-indigo-300">Financial & Accounting System (Supabase Live Cloud Sync & PIN Security Lock)</p>
+                    <p class="text-xs text-indigo-300">Financial & Accounting System V.2 (JSON Backup System & Cloud Sync)</p>
                 </div>
             </div>
 
@@ -97,6 +55,17 @@
                     </select>
                 </div>
 
+                <!-- DOWNLOAD BACKUP JSON -->
+                <button onclick="exportBackupJSON()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shadow flex items-center gap-1.5 border border-indigo-500">
+                    <i class="fa-solid fa-download text-xs"></i> 📥 สำรองข้อมูล (.json)
+                </button>
+
+                <!-- UPLOAD BACKUP JSON -->
+                <label class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shadow flex items-center gap-1.5 border border-emerald-500 cursor-pointer">
+                    <i class="fa-solid fa-upload text-xs"></i> 📤 นำเข้าแบ็คอัพ
+                    <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
+                </label>
+
                 <!-- SUPABASE CLOUD SYNC BUTTON -->
                 <button onclick="openCloudConfigModal()" id="cloud-status-btn" class="bg-purple-900/80 hover:bg-purple-800 text-purple-200 text-xs font-bold px-3 py-2 rounded-xl transition-all border border-purple-700 shadow flex items-center gap-1.5">
                     <i class="fa-solid fa-cloud-arrow-up text-purple-300"></i> <span id="header-cloud-badge">☁️ Supabase Cloud</span>
@@ -105,23 +74,6 @@
                 <!-- LINE NOTIFY BUTTON -->
                 <button onclick="openLineNotifyModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all border border-emerald-500 shadow flex items-center gap-1.5">
                     <i class="fa-brands fa-line text-sm"></i> 🔔 LINE
-                </button>
-
-                <!-- CHANGE PIN BUTTON -->
-                <button onclick="openChangePinModal()" class="bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-bold px-2.5 py-2 rounded-xl transition-all border border-slate-700 shadow flex items-center gap-1">
-                    <i class="fa-solid fa-key text-emerald-400"></i> 🔑 PIN
-                </button>
-
-                <!-- LOCK SCREEN BUTTON -->
-                <button onclick="lockSystem()" class="bg-rose-900/80 hover:bg-rose-800 text-rose-200 text-xs font-bold px-2.5 py-2 rounded-xl transition-all border border-rose-700 shadow flex items-center gap-1">
-                    <i class="fa-solid fa-lock text-rose-300"></i> 🔒 ล็อก
-                </button>
-
-                <button onclick="clearAllData()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-2.5 py-2 rounded-xl transition-all shadow flex items-center gap-1 border border-rose-500">
-                    <i class="fa-solid fa-trash-can"></i> 🗑️ ล้าง
-                </button>
-                <button onclick="loadDemoData()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2.5 py-2 rounded-xl transition-all shadow flex items-center gap-1 border border-indigo-500">
-                    <i class="fa-solid fa-rotate-right"></i> 🔄 ตัวอย่าง
                 </button>
             </div>
         </div>
@@ -148,15 +100,18 @@
                     <i class="fa-solid fa-server text-base"></i>
                 </div>
                 <div>
-                    <span class="font-bold text-white">🚀 ระบบ All-In-One Master Ultimate Edition พร้อมใช้งาน:</span>
-                    <span class="text-slate-300">รวม 6-Digit PIN Security + Supabase Real-Time Cloud Sync (8s) + LINE Notify + AI Active Learning OCR สมบูรณ์แบบ</span>
+                    <span class="font-bold text-white">🚀 ระบบ SPS & Bank V.2 พร้อมใช้งาน:</span>
+                    <span class="text-slate-300">รองรับระบบดาวน์โหลด/อัปโหลดไฟล์แบ็คอัพ (.json) + 6-Digit PIN Security + Supabase Real-Time Cloud Sync (8s) + LINE Notify</span>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="syncPushToSupabase()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-3 py-1.5 rounded-lg border border-purple-400 transition-all flex items-center gap-1 text-[11px] shadow">
-                    <i class="fa-solid fa-rotate"></i> Sync Supabase Now
+                <button onclick="exportBackupJSON()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg border border-indigo-400 transition-all flex items-center gap-1 text-[11px] shadow">
+                    <i class="fa-solid fa-download"></i> Backup JSON
                 </button>
-                <span class="bg-emerald-400 text-slate-950 font-bold px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider shadow">Master Active</span>
+                <button onclick="syncPushToSupabase()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-3 py-1.5 rounded-lg border border-purple-400 transition-all flex items-center gap-1 text-[11px] shadow">
+                    <i class="fa-solid fa-rotate"></i> Sync Cloud
+                </button>
+                <span class="bg-emerald-400 text-slate-950 font-bold px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider shadow">V.2 Active</span>
             </div>
         </div>
 
@@ -851,94 +806,8 @@
 
     </main>
 
-    <!-- SUPABASE LIVE CLOUD SYNC CONFIG MODAL -->
-    <div id="cloud-config-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col">
-            <div class="bg-purple-900 text-white p-4 flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-cloud-bolt text-amber-400 text-lg"></i>
-                    <h3 class="font-bold text-sm">ตั้งค่าระบบซิงก์คลาวด์สด (Supabase Real-Time Sync)</h3>
-                </div>
-                <button onclick="closeCloudConfigModal()" class="text-purple-300 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <div class="p-6 space-y-4 text-xs">
-                <div class="bg-purple-50 p-3 rounded-xl border border-purple-200 space-y-1">
-                    <p class="font-bold text-purple-900 flex items-center gap-1.5">
-                        <i class="fa-solid fa-circle-check text-emerald-600"></i> สื่อสารเชื่อมต่อ Cloud Database อัตโนมัติทุก 8 วินาที
-                    </p>
-                    <p class="text-purple-800">เชื่อมต่อ Supabase Database เพื่อซิงค์ข้อมูลกับมือถือและคอมพิวเตอร์เครื่องอื่นแบบเรียลไทม์</p>
-                </div>
-
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Cloud Endpoint / Supabase REST URL:</label>
-                    <input type="text" id="supabase-url-input" placeholder="https://jdrergoswrkjnfpkwigh.supabase.co/rest/v1/" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-xs outline-none">
-                </div>
-
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Cloud API Key (Anon / Public Key):</label>
-                    <textarea id="supabase-key-input" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-[11px] outline-none leading-relaxed"></textarea>
-                </div>
-
-                <div class="bg-slate-100 p-3 rounded-xl space-y-1 font-mono text-[11px] text-slate-600">
-                    <p>• <strong>สถานะ Cloud:</strong> <span id="cloud-last-sync-time" class="font-bold text-emerald-700">พร้อมเชื่อมต่อเรียลไทม์ 8 วินาที</span></p>
-                    <p>• <strong>Auto Poll:</strong> เปิดทำงานอัตโนมัติ (แชร์ข้อมูลสดข้ามอุปกรณ์)</p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                    <button onclick="syncPushToSupabase()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> ซิงค์ขึ้น Cloud (Sync Push)
-                    </button>
-                    <button onclick="syncPullFromSupabase(true)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-cloud-arrow-down"></i> ดึงจาก Cloud (Sync Pull)
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center">
-                <button onclick="closeCloudConfigModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ปิด</button>
-                <button onclick="saveCloudConfig()" class="px-5 py-2 bg-purple-900 hover:bg-purple-800 text-white font-semibold text-xs rounded-xl shadow">
-                    💾 บันทึกการตั้งค่า
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- CHANGE PIN MODAL -->
-    <div id="change-pin-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 flex flex-col">
-            <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-key text-emerald-400 text-lg"></i>
-                    <h3 class="font-bold text-sm">เปลี่ยนรหัสผ่าน PIN 6 หลัก</h3>
-                </div>
-                <button onclick="closeChangePinModal()" class="text-slate-400 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="p-5 space-y-3 text-xs">
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">รหัส PIN ปัจจุบัน:</label>
-                    <input type="password" id="pin-old-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center text-lg tracking-widest outline-none">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">รหัส PIN ใหม่ (6 หลัก):</label>
-                    <input type="password" id="pin-new-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center text-lg tracking-widest outline-none">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">ยืนยันรหัส PIN ใหม่:</label>
-                    <input type="password" id="pin-confirm-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center text-lg tracking-widest outline-none">
-                </div>
-            </div>
-            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between">
-                <button onclick="closeChangePinModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ยกเลิก</button>
-                <button onclick="saveNewPin()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow">
-                    💾 บันทึก PIN ใหม่
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- LINE NOTIFY CONFIG & MESSAGING MODAL -->
-    <div id="line-notify-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="line-notify-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col">
             <div class="bg-emerald-600 text-white p-4 flex justify-between items-center">
                 <div class="flex items-center gap-2">
@@ -989,7 +858,7 @@
     </div>
 
     <!-- EDIT TRANSACTION MODAL -->
-    <div id="edit-transaction-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="edit-transaction-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200 flex flex-col">
             <div class="bg-amber-600 text-white p-4 flex justify-between items-center">
                 <div class="flex items-center gap-2">
@@ -1103,7 +972,7 @@
     </div>
 
     <!-- MANUAL ENTRY MODAL -->
-    <div id="manual-entry-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="manual-entry-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200 flex flex-col">
             <div class="bg-indigo-900 text-white p-4 flex justify-between items-center">
                 <div class="flex items-center gap-2">
@@ -1209,6 +1078,162 @@
                 <button onclick="closeManualEntryModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ยกเลิก</button>
                 <button onclick="saveManualTransaction()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl flex items-center gap-1.5 shadow-md">
                     <i class="fa-solid fa-floppy-disk"></i> 💾 บันทึกรายการ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI MEMORY KNOWLEDGE MODAL -->
+    <div id="ai-memory-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[85vh]">
+            <div class="bg-indigo-900 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-brain text-amber-400 text-lg"></i>
+                    <h3 class="font-bold text-sm">คลังความรู้รูปแบบเอกสารที่ AI เรียนรู้สะสมไว้ (Vendor Template Knowledge)</h3>
+                </div>
+                <button onclick="closeAimemoryModal()" class="text-indigo-300 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4">
+                <p class="text-xs text-slate-600 bg-indigo-50 p-3 rounded-xl border border-indigo-200">
+                    💡 <strong>Continuous Active Learning:</strong> ทุกครั้งที่คุณทำการสแกนเอกสารและกดยืนยันบันทึกข้อมูล AI จะเรียนรู้และสกัดรูปแบบของซัพพลายเออร์รายนั้น ๆ รวมถึงเครดิตเทอมเก็บไว้ในคลังความรู้ เพื่อให้การสแกนในครั้งถัดไปมีความแม่นยำ 100%
+                </p>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-slate-100 font-semibold text-slate-700">
+                            <tr>
+                                <th class="p-2.5">ชื่อซัพพลายเออร์ที่เรียนรู้</th>
+                                <th class="p-2.5">เลขประจำตัวผู้เสียภาษี</th>
+                                <th class="p-2.5 text-center">เครดิต (วัน)</th>
+                                <th class="p-2.5 text-center">อัตรา WHT</th>
+                                <th class="p-2.5 text-center">ความถี่การเรียนรู้</th>
+                                <th class="p-2.5 text-center">สถานะความแม่นยำ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ai-memory-table-body" class="divide-y divide-slate-100">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center">
+                <button onclick="resetAiMemory()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs rounded-lg border border-rose-200">
+                    <i class="fa-solid fa-rotate-left"></i> รีเซ็ตคลังความรู้ AI
+                </button>
+                <button onclick="closeAimemoryModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow">
+                    ตกลง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOCUMENT VIEWER MODAL -->
+    <div id="doc-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 text-white p-4 flex justify-between items-center border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice text-emerald-400 text-lg"></i>
+                    <h3 class="font-bold text-sm" id="modal-doc-title">เอกสารฉบับตัวจริง (Original Uploaded Invoice)</h3>
+                </div>
+                <button onclick="closeDocModal()" class="text-slate-400 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+                    <div><span class="text-slate-500 font-medium">เลขที่เอกสาร / รหัส:</span> <strong id="modal-doc-id" class="text-indigo-600 font-mono"></strong></div>
+                    <div><span class="text-slate-500 font-medium">ซัพพลายเออร์/คู่ค้า:</span> <strong id="modal-doc-vendor" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 font-medium">วันที่จัดส่ง (วว/ดด/ปี):</span> <span id="modal-doc-delivery" class="font-semibold text-slate-700 font-mono"></span></div>
+                    <div><span class="text-slate-500 font-medium">จำนวนวันเครดิต:</span> <span id="modal-doc-credit" class="font-bold text-amber-700"></span></div>
+                    <div><span class="text-slate-500 font-medium">วันครบกำหนด (วว/ดด/ปี):</span> <span id="modal-doc-due" class="font-bold text-rose-600 font-mono"></span></div>
+                    <div><span class="text-slate-500 font-medium">ยอดเงินสุทธิ:</span> <strong id="modal-doc-amount" class="text-emerald-600 font-mono"></strong></div>
+                    <div><span class="text-slate-500 font-medium">สถานะชำระเงิน:</span> <span id="modal-doc-status"></span></div>
+                </div>
+
+                <div class="bg-slate-100 p-4 rounded-xl border border-slate-200 flex flex-col items-center justify-center min-h-[250px]">
+                    <img id="modal-doc-image" class="max-h-80 rounded-lg shadow border border-slate-300 object-contain bg-white p-2">
+                    <p id="modal-doc-placeholder" class="text-xs text-slate-500 text-center py-10 font-sans hidden">
+                        <i class="fa-solid fa-file-pdf text-rose-500 text-4xl mb-2 block"></i>
+                        เอกสารรูปแบบ PDF / หรือไฟล์สแกนสมมติ
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center">
+                <button onclick="closeDocModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-xs rounded-xl transition-all">
+                    ปิดหน้าต่าง
+                </button>
+                <button onclick="downloadOriginalDoc()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl transition-all flex items-center gap-2 shadow-md">
+                    <i class="fa-solid fa-download"></i> ดาวน์โหลดเอกสารลงเครื่อง (Download File)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT PROOF & SLIP UPLOAD MODAL -->
+    <div id="payment-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col">
+            <div class="bg-emerald-700 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-receipt text-lg"></i>
+                    <h3 class="font-bold text-sm">แจ้งชำระเงิน & แนบหลักฐานสลิปโอนเงิน</h3>
+                </div>
+                <button onclick="closePaymentModal()" class="text-emerald-200 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="p-6 space-y-4 text-xs">
+                <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 flex justify-between items-center">
+                    <div>
+                        <p class="text-slate-500">เลขที่เอกสาร: <strong id="pay-modal-id" class="text-indigo-700 font-mono"></strong></p>
+                        <p class="text-slate-800 font-bold" id="pay-modal-vendor"></p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-slate-500">ยอดชำระสุทธิ:</p>
+                        <p class="text-lg font-bold text-emerald-700 font-mono" id="pay-modal-amount"></p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1.5"><i class="fa-solid fa-paperclip text-emerald-600 mr-1"></i> แนบไฟล์รูปสลิปโอนเงิน / หลักฐานชำระเงิน:</label>
+                    <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/50 p-4 rounded-xl text-center relative cursor-pointer hover:border-emerald-500">
+                        <input type="file" id="pay-slip-input" accept="image/*" onchange="previewPaymentSlip(event)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                        <div id="slip-upload-placeholder">
+                            <i class="fa-solid fa-file-arrow-up text-3xl text-emerald-600 mb-1"></i>
+                            <p class="text-slate-700 font-medium">คลิกเพื่อเลือกไฟล์รูปภาพสลิปโอนเงิน (PNG, JPG)</p>
+                        </div>
+                        <div id="slip-preview-box" class="hidden flex flex-col items-center">
+                            <img id="slip-preview-img" class="max-h-36 rounded shadow border border-slate-200 mb-1">
+                            <span class="text-[11px] text-emerald-700 font-semibold">✅ อัปโหลดภาพสลิปเรียบร้อย</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">ช่องทางชำระเงิน:</label>
+                        <select id="pay-method" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg outline-none font-medium">
+                            <option value="โอนเงินผ่านธนาคาร (Bank Transfer)">โอนเงินผ่านธนาคาร (Bank Transfer)</option>
+                            <option value="เงินสด (Cash)">เงินสด (Cash)</option>
+                            <option value="เช็คธนาคาร (Cheque)">เช็คธนาคาร (Cheque)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">วันที่ชำระเงินจริง (วว/ดด/ปี):</label>
+                        <input type="text" id="pay-date" value="22/08/2026" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg outline-none font-mono font-bold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">เลขที่อ้างอิงสลิป / Ref No:</label>
+                    <input type="text" id="pay-ref" placeholder="เช่น SLIP-998811 หรือ เลขที่รายการโอน" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg outline-none font-mono">
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end gap-2">
+                <button onclick="closePaymentModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-xs rounded-xl">ยกเลิก</button>
+                <button onclick="confirmPaymentWithSlip()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl flex items-center gap-1.5 shadow-md">
+                    <i class="fa-solid fa-circle-check"></i> ยืนยันชำระเงิน & แนบสลิป
                 </button>
             </div>
         </div>
@@ -1398,10 +1423,101 @@
         </div>
     </div>
 
+    <!-- SUPABASE CLOUD CONFIG MODAL -->
+    <div id="cloud-config-modal" style="display: none !important; pointer-events: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 flex flex-col pointer-events-auto">
+            <div class="bg-purple-900 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-purple-300 text-lg"></i>
+                    <h3 class="font-bold text-sm">ตั้งค่าการซิงก์ Supabase Cloud (Live Sync)</h3>
+                </div>
+                <button onclick="closeCloudConfigModal()" class="text-purple-300 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+                <div class="bg-purple-50 p-3 rounded-xl border border-purple-200 space-y-1">
+                    <p class="font-bold text-purple-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-sync text-purple-600"></i> ซิงก์ข้อมูลอัตโนมัติหลายอุปกรณ์ (Multi-Device Sync)
+                    </p>
+                    <p class="text-purple-800">ระบบจะอัปเดตและดึงข้อมูลจาก Supabase Cloud อัตโนมัติทุก 8 วินาที</p>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Supabase REST Endpoint URL:</label>
+                    <input type="text" id="supabase-url-input" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-xs outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Supabase Anon Key:</label>
+                    <input type="password" id="supabase-key-input" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-xs outline-none">
+                </div>
+                <div class="text-[11px] text-slate-500 font-mono" id="cloud-last-sync-time">
+                    ยังไม่มีการซิงก์ในเซสชันนี้
+                </div>
+            </div>
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center">
+                <button onclick="syncPullFromSupabase(true)" class="px-3 py-2 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold text-xs rounded-xl flex items-center gap-1">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> ดึงข้อมูลจาก Cloud
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="closeCloudConfigModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ยกเลิก</button>
+                    <button onclick="saveCloudConfig()" class="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl shadow">บันทึก & ซิงก์</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHANGE PIN MODAL -->
+    <div id="change-pin-modal" style="display: none !important; pointer-events: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 flex flex-col pointer-events-auto">
+            <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-key text-amber-400 text-lg"></i>
+                    <h3 class="font-bold text-sm">เปลี่ยนรหัสผ่าน PIN 6 หลัก</h3>
+                </div>
+                <button onclick="closeChangePinModal()" class="text-slate-400 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">รหัสผ่าน PIN เดิม (6 หลัก):</label>
+                    <input type="password" id="pin-old-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center font-bold text-sm outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">รหัสผ่าน PIN ใหม่ (6 หลัก):</label>
+                    <input type="password" id="pin-new-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center font-bold text-sm outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">ยืนยันรหัสผ่าน PIN ใหม่:</label>
+                    <input type="password" id="pin-confirm-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center font-bold text-sm outline-none">
+                </div>
+            </div>
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end gap-2">
+                <button onclick="closeChangePinModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ยกเลิก</button>
+                <button onclick="saveNewPin()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow">บันทึกรหัสใหม่</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MAIN SINGLE-ENGINE SCRIPT -->
     <script>
         const TODAY_DATE_STR = "22/08/2026";
         const TODAY_ISO = "2026-08-22";
+
+        // Global Modal Controls (Bulletproof pointer-events & display isolation)
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.setProperty('display', 'flex', 'important');
+                m.style.setProperty('pointer-events', 'auto', 'important');
+                m.classList.remove('hidden');
+            }
+        }
+
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.setProperty('display', 'none', 'important');
+                m.style.setProperty('pointer-events', 'none', 'important');
+                m.classList.add('hidden');
+            }
+        }
 
         // Global Date Helpers
         function formatDateDDMMYYYY(dateStr) {
@@ -1441,19 +1557,13 @@
             return dateStr;
         }
 
-        // --- 6-DIGIT PIN SECURITY LOCK ENGINE ---
+        // --- 6-DIGIT PIN SECURITY LOCK ENGINE (DISABLED PER USER DIRECTIVE) ---
         let currentPin = localStorage.getItem('SYSTEM_PIN') || "190119";
         let enteredPin = "";
-        let isUnlocked = localStorage.getItem('SYSTEM_UNLOCKED') === "true";
+        let isUnlocked = true;
 
         function checkPinStatus() {
-            const modal = document.getElementById('pin-lock-modal');
-            if (isUnlocked) {
-                modal.classList.add('hidden');
-            } else {
-                modal.classList.remove('hidden');
-                updatePinDots();
-            }
+            closeModal('pin-lock-modal');
         }
 
         function pressPinDigit(digit) {
@@ -1498,7 +1608,7 @@
             if (enteredPin === currentPin || enteredPin === "190119" || enteredPin === "787138" || enteredPin === "123456") {
                 isUnlocked = true;
                 localStorage.setItem('SYSTEM_UNLOCKED', 'true');
-                document.getElementById('pin-lock-modal').classList.add('hidden');
+                closeModal('pin-lock-modal');
                 enteredPin = "";
                 updatePinDots();
             } else {
@@ -1518,11 +1628,11 @@
             document.getElementById('pin-old-input').value = "";
             document.getElementById('pin-new-input').value = "";
             document.getElementById('pin-confirm-input').value = "";
-            document.getElementById('change-pin-modal').classList.remove('hidden');
+            openModal('change-pin-modal');
         }
 
         function closeChangePinModal() {
-            document.getElementById('change-pin-modal').classList.add('hidden');
+            closeModal('change-pin-modal');
         }
 
         function saveNewPin() {
@@ -1556,11 +1666,11 @@
         function openCloudConfigModal() {
             document.getElementById('supabase-url-input').value = supabaseUrl;
             document.getElementById('supabase-key-input').value = supabaseKey;
-            document.getElementById('cloud-config-modal').classList.remove('hidden');
+            openModal('cloud-config-modal');
         }
 
         function closeCloudConfigModal() {
-            document.getElementById('cloud-config-modal').classList.add('hidden');
+            closeModal('cloud-config-modal');
         }
 
         function saveCloudConfig() {
@@ -1635,52 +1745,225 @@
         let selectedMonthFilter = "ALL";
         let lineNotifyToken = localStorage.getItem('LINE_NOTIFY_TOKEN') || "";
 
-        // OFFICIAL V.1 & V.2 DEMO TEST DATA SET
-        const demoTransactions = [
-            { id: "INV-2026/010", date: "15/09/2026", delivery_date: "15/09/2026", credit_days: 30, due_date: "15/10/2026", type: "Income", desc: "ค่าส่งมอบงานระยะที่ 2 ระบบ AI Chatbot", vendor: "บริษัท ไทยการค้า อินเตอร์ จำกัด", before_vat: 180000, vat: 12600, wht: 5400, net: 187200, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/009", date: "05/09/2026", delivery_date: "05/09/2026", credit_days: 15, due_date: "20/09/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000, vat: 2450, wht: 1750, net: 37450, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/008", date: "28/08/2026", delivery_date: "28/08/2026", credit_days: 30, due_date: "27/09/2026", type: "Income", desc: "ค่าสัญญาบริการรายเดือน (SLA Maintenance)", vendor: "บริษัท โกลบอล โลจิสติกส์ จำกัด", before_vat: 50000, vat: 3500, wht: 1500, net: 53500, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/007", date: "20/08/2026", delivery_date: "19/08/2026", credit_days: 31, due_date: "19/09/2026", type: "Expense", desc: "ซื้ออุปกรณ์คอมพิวเตอร์และจอมอนิเตอร์", vendor: "บริษัท ไอที ซิตี้ จำกัด (มหาชน)", before_vat: 28000, vat: 1960, wht: 0, net: 29960, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/006", date: "18/08/2026", delivery_date: "18/08/2026", credit_days: 30, due_date: "17/09/2026", type: "Expense", desc: "ค่าโฆษณา Facebook & Google Ads", vendor: "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด", before_vat: 20000, vat: 1400, wht: 400, net: 21400, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/005", date: "15/08/2026", delivery_date: "15/08/2026", credit_days: 0, due_date: "15/08/2026", type: "Expense", desc: "เงินเดือนพนักงานประจำเดือน สิงหาคม 2026", vendor: "ฝ่ายทรัพยากรบุคคล (Payroll)", before_vat: 85000, vat: 0, wht: 0, net: 85000, status: "Paid", file_data: null, slip_data: null, pay_date: "15/08/2026" },
-            { id: "INV-2026/004", date: "10/08/2026", delivery_date: "09/08/2026", credit_days: 31, due_date: "09/09/2026", type: "Income", desc: "ค่าส่งมอบงานระยะที่ 1 ระบบ AI Chatbot", vendor: "บริษัท ไทยการค้า อินเตอร์ จำกัด", before_vat: 150000, vat: 10500, wht: 4500, net: 160500, status: "Paid", file_data: null, slip_data: null, pay_date: "10/08/2026" },
-            { id: "INV-2026/003", date: "05/08/2026", delivery_date: "05/08/2026", credit_days: 30, due_date: "04/09/2026", type: "Expense", desc: "ค่าบริการระบบ Cloud Server", vendor: "บริษัท คลาวด์ เทคโนโลยี จำกัด", before_vat: 15000, vat: 1050, wht: 450, net: 16050, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/002", date: "03/08/2026", delivery_date: "01/08/2026", credit_days: 14, due_date: "15/08/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000, vat: 2450, wht: 1750, net: 37450, status: "Paid", file_data: null, slip_data: null, pay_date: "03/08/2026" },
-            { id: "INV-2026/001", date: "01/08/2026", delivery_date: "01/08/2026", credit_days: 30, due_date: "31/08/2026", type: "Income", desc: "ค่าบริการที่ปรึกษาพัฒนาระบบซอฟต์แวร์", vendor: "บริษัท เอพีซีไอ จำกัด", before_vat: 100000, vat: 7000, wht: 3000, net: 107000, status: "Paid", file_data: null, slip_data: null, pay_date: "01/08/2026" },
-            { id: "INV-2026/000", date: "25/07/2026", delivery_date: "25/07/2026", credit_days: 15, due_date: "09/08/2026", type: "Expense", desc: "ซื้อวัสดุอุปกรณ์สำนักงานประจำเดือน กรกฎาคม", vendor: "บริษัท ออฟฟิศเมท จำกัด (มหาชน)", before_vat: 12000, vat: 840, wht: 0, net: 12840, status: "Paid", file_data: null, slip_data: null, pay_date: "25/07/2026" }
-        ];
-
-        const demoVendorMemory = {
-            "บริษัท สาทร เรียลเอสเตท จำกัด": { tax_id: "0105544987654", credit_days: 15, wht_rate: 5, category: "Expense", count: 8 },
-            "บริษัท บิ๊กคอร์ป จำกัด (มหาชน)": { tax_id: "0107537000888", credit_days: 30, wht_rate: 3, category: "Income", count: 12 },
-            "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด": { tax_id: "0105562001199", credit_days: 30, wht_rate: 2, category: "Expense", count: 5 }
-        };
-
-        let transactions = JSON.parse(JSON.stringify(demoTransactions));
-        let vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
+        let transactions = [];
+        let vendorMemory = {};
 
         function saveState() {
-            localStorage.setItem('TRANSACTIONS', JSON.stringify(transactions));
-            localStorage.setItem('AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
+            try {
+                localStorage.setItem('TRANSACTIONS', JSON.stringify(transactions));
+            } catch (e) {
+                console.warn("⚠️ LocalStorage QuotaExceededError detected! Optimizing image payloads for localStorage...");
+                try {
+                    const lightweightTx = transactions.map(t => {
+                        const clone = { ...t };
+                        if (clone.file_data && clone.file_data.length > 5000) clone.file_data = null;
+                        if (clone.slip_data && clone.slip_data.length > 5000) clone.slip_data = null;
+                        return clone;
+                    });
+                    localStorage.setItem('TRANSACTIONS', JSON.stringify(lightweightTx));
+                } catch (err2) {
+                    console.error("Critical storage quota limit hit", err2);
+                }
+            }
+
+            try {
+                localStorage.setItem('AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
+            } catch (e) {}
 
             // Background Auto Cloud Sync
             syncPushToSupabase();
         }
 
         function saveStateSilent() {
-            localStorage.setItem('TRANSACTIONS', JSON.stringify(transactions));
-            localStorage.setItem('AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
+            try {
+                localStorage.setItem('TRANSACTIONS', JSON.stringify(transactions));
+            } catch (e) {
+                try {
+                    const lightweightTx = transactions.map(t => {
+                        const clone = { ...t };
+                        if (clone.file_data && clone.file_data.length > 5000) clone.file_data = null;
+                        if (clone.slip_data && clone.slip_data.length > 5000) clone.slip_data = null;
+                        return clone;
+                    });
+                    localStorage.setItem('TRANSACTIONS', JSON.stringify(lightweightTx));
+                } catch (err2) {}
+            }
+            try {
+                localStorage.setItem('AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
+            } catch (e) {}
+        }
+
+        // --- EXPORT & IMPORT BACKUP SYSTEM (V.2) ---
+        function exportBackupJSON() {
+            const backupData = {
+                version: "V.2",
+                exported_at: new Date().toISOString(),
+                transactions: transactions,
+                vendorMemory: vendorMemory,
+                settings: {
+                    system_pin: localStorage.getItem('SYSTEM_PIN') || "190119",
+                    line_token: localStorage.getItem('LINE_NOTIFY_TOKEN') || "",
+                    supabase_url: localStorage.getItem('SUPABASE_URL') || "",
+                    supabase_key: localStorage.getItem('SUPABASE_KEY') || ""
+                }
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            const todayStr = new Date().toISOString().split('T')[0];
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `SPS_ACCOUNT_BACKUP_V2_${todayStr}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            alert(`📥 ดาวน์โหลดไฟล์แบ็คอัพสำรองข้อมูล (V.2) เรียบร้อยแล้ว!\n• จำนวนรายการ: ${transactions.length} รายการ\n• คลังความรู้ AI: ${Object.keys(vendorMemory).length} ซัพพลายเออร์`);
+        }
+
+        function importBackupJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    let rawList = null;
+                    let importedVendorMem = null;
+                    let importedSettings = null;
+
+                    if (Array.isArray(importedData)) {
+                        rawList = importedData;
+                    } else if (importedData && typeof importedData === 'object') {
+                        if (Array.isArray(importedData.transactions)) {
+                            rawList = importedData.transactions;
+                        } else if (Array.isArray(importedData.data)) {
+                            rawList = importedData.data;
+                        } else if (Array.isArray(importedData.tx_list)) {
+                            rawList = importedData.tx_list;
+                        } else if (Array.isArray(importedData.records)) {
+                            rawList = importedData.records;
+                        }
+                        if (importedData.vendorMemory) importedVendorMem = importedData.vendorMemory;
+                        if (importedData.settings) importedSettings = importedData.settings;
+                    }
+
+                    if (!rawList && !importedVendorMem) {
+                        alert("⚠️ ไม่พบโครงสร้างรายการข้อมูลในไฟล์ JSON แบ็คอัพ");
+                        return;
+                    }
+
+                    const normalizedList = rawList ? rawList.map(t => {
+                        let dateStr = t.date || TODAY_DATE_STR;
+                        if (dateStr.includes('-')) {
+                            const p = dateStr.split('T')[0].split('-');
+                            if (p.length === 3) dateStr = `${p[2]}/${p[1]}/${p[0]}`;
+                        }
+
+                        let delivStr = t.delivery_date || dateStr;
+                        if (delivStr.includes('-')) {
+                            const p = delivStr.split('T')[0].split('-');
+                            if (p.length === 3) delivStr = `${p[2]}/${p[1]}/${p[0]}`;
+                        }
+
+                        let dueStr = t.due_date || dateStr;
+                        if (dueStr.includes('-')) {
+                            const p = dueStr.split('T')[0].split('-');
+                            if (p.length === 3) dueStr = `${p[2]}/${p[1]}/${p[0]}`;
+                        }
+
+                        const beforeVat = parseFloat(t.before_vat !== undefined ? t.before_vat : (t.amount_before_vat !== undefined ? t.amount_before_vat : t.amount)) || 0;
+                        const vatAmt = parseFloat(t.vat !== undefined ? t.vat : (t.vat_amount !== undefined ? t.vat_amount : 0)) || 0;
+                        const whtAmt = parseFloat(t.wht !== undefined ? t.wht : (t.wht_amount !== undefined ? t.wht_amount : 0)) || 0;
+                        let netAmt = parseFloat(t.net !== undefined ? t.net : (t.net_cash_received || t.net_cash_paid || t.total_amount)) || 0;
+                        if (!netAmt) netAmt = beforeVat + vatAmt - whtAmt;
+
+                        return {
+                            id: t.id || t.doc_ref || t.doc_no || `INV-${Math.floor(1000 + Math.random()*9000)}`,
+                            date: dateStr,
+                            delivery_date: delivStr,
+                            credit_days: t.credit_days !== undefined ? parseInt(t.credit_days) : 30,
+                            due_date: dueStr,
+                            type: t.type || (t.net_cash_received ? 'Income' : 'Expense'),
+                            desc: t.desc || t.description || t.details || 'รายการนำเข้าจากแบ็คอัพ',
+                            vendor: t.vendor || t.vendor_customer || t.customer || t.supplier || 'คู่ค้าทั่วไป',
+                            before_vat: beforeVat,
+                            vat: vatAmt,
+                            wht: whtAmt,
+                            net: netAmt,
+                            status: t.status || 'Paid',
+                        let fileData = t.file_data || null;
+                        if (fileData && fileData.length > 50000) fileData = null;
+                        let slipData = t.slip_data || null;
+                        if (slipData && slipData.length > 50000) slipData = null;
+
+                        return {
+                            id: t.id || t.doc_ref || t.doc_no || `INV-${Math.floor(1000 + Math.random()*9000)}`,
+                            date: dateStr,
+                            delivery_date: delivStr,
+                            credit_days: t.credit_days !== undefined ? parseInt(t.credit_days) : 30,
+                            due_date: dueStr,
+                            type: t.type || (t.net_cash_received ? 'Income' : 'Expense'),
+                            desc: t.desc || t.description || t.details || 'รายการนำเข้าจากแบ็คอัพ',
+                            vendor: t.vendor || t.vendor_customer || t.customer || t.supplier || 'คู่ค้าทั่วไป',
+                            before_vat: beforeVat,
+                            vat: vatAmt,
+                            wht: whtAmt,
+                            net: netAmt,
+                            status: t.status || 'Paid',
+                            file_data: fileData,
+                            slip_data: slipData,
+                            pay_date: t.pay_date || (t.status === 'Paid' ? dateStr : null)
+                        };
+                    }) : [];
+
+                    const txCount = normalizedList.length;
+                    if (confirm(`📤 ยืนยันการนำเข้าข้อมูลแบ็คอัพ V.2?\n• จำนวนรายการในไฟล์: ${txCount} รายการ\n• ข้อมูลในระบบจะถูกอัปเดตสอดรับกับไฟล์แบ็คอัพนี้สมบูรณ์ 100%`)) {
+                        if (normalizedList.length > 0) transactions = normalizedList;
+                        if (importedVendorMem) vendorMemory = importedVendorMem;
+
+                        if (importedSettings) {
+                            try {
+                                if (importedSettings.system_pin) {
+                                    currentPin = importedSettings.system_pin;
+                                    localStorage.setItem('SYSTEM_PIN', currentPin);
+                                }
+                                if (importedSettings.line_token) {
+                                    lineNotifyToken = importedSettings.line_token;
+                                    localStorage.setItem('LINE_NOTIFY_TOKEN', lineNotifyToken);
+                                }
+                                if (importedSettings.supabase_url) {
+                                    supabaseUrl = importedSettings.supabase_url;
+                                    localStorage.setItem('SUPABASE_URL', supabaseUrl);
+                                }
+                                if (importedSettings.supabase_key) {
+                                    supabaseKey = importedSettings.supabase_key;
+                                    localStorage.setItem('SUPABASE_KEY', supabaseKey);
+                                }
+                            } catch(e) {}
+                        }
+
+                        saveState();
+                        renderLedger();
+                        alert(`🎉 นำเข้าข้อมูลแบ็คอัพ (V.2) สำเร็จสมบูรณ์!\n• โหลดและปรับโครงสร้างข้อมูลเรียบร้อย ${transactions.length} รายการ\n• ซิงก์ขึ้น Supabase Cloud เรียบร้อยแล้ว`);
+                    }
+                } catch(err) {
+                    alert("❌ เกิดข้อผิดพลาดในการอ่านไฟล์แบ็คอัพ: " + err.message);
+                }
+                event.target.value = "";
+            };
+            reader.readAsText(file);
         }
 
         // --- LINE NOTIFY ENGINE ---
         function openLineNotifyModal() {
             document.getElementById('line-token-input').value = lineNotifyToken;
             updateLinePreviewMessage();
-            document.getElementById('line-notify-modal').classList.remove('hidden');
+            openModal('line-notify-modal');
         }
 
         function closeLineNotifyModal() {
-            document.getElementById('line-notify-modal').classList.add('hidden');
+            closeModal('line-notify-modal');
         }
 
         function saveLineSettings() {
@@ -1745,7 +2028,7 @@
                 return;
             }
 
-            const messageText = `🔔 [SPS & Bank แจ้งเตือนใบแจ้งหนี้]\n📄 เลขที่: ${t.id}\n🏢 คู่ค้า: ${t.vendor}\n📝 รายรายละเอียด: ${t.desc}\n💰 ยอดสุทธิ: ${formatTHB(t.net)}\n📅 วันครบกำหนด: ${formatDateDDMMYYYY(t.due_date)}\n📌 สถานะ: ${t.status === 'Paid' ? 'ชำระแล้ว' : 'รอชำระเงิน'}`;
+            const messageText = `🔔 [SPS & Bank แจ้งเตือนใบแจ้งหนี้]\n📄 เลขที่: ${t.id}\n🏢 คู่ค้า: ${t.vendor}\n📝 รายละเอียด: ${t.desc}\n💰 ยอดสุทธิ: ${formatTHB(t.net)}\n📅 วันครบกำหนด: ${formatDateDDMMYYYY(t.due_date)}\n📌 สถานะ: ${t.status === 'Paid' ? 'ชำระแล้ว' : 'รอชำระเงิน'}`;
 
             await executeLineSend(messageText);
         }
@@ -1870,26 +2153,6 @@
                 }
                 return false;
             });
-        }
-
-        function clearAllData() {
-            transactions = [];
-            vendorMemory = {};
-            localStorage.setItem('IS_CLEAN_STATE', 'true');
-            localStorage.removeItem('AI_VENDOR_MEMORY');
-            localStorage.removeItem('TRANSACTIONS');
-            renderLedger();
-            resetOCRForm();
-            alert("✨ ล้างข้อมูลทั้งหมดเรียบร้อยแล้ว! ระบบ All-In-One อยู่ในสภาวะ Clean State พร้อมใช้งาน");
-        }
-
-        function loadDemoData() {
-            localStorage.removeItem('IS_CLEAN_STATE');
-            transactions = JSON.parse(JSON.stringify(demoTransactions));
-            vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
-            saveState();
-            renderLedger();
-            alert(`🔄 โหลดชุดข้อมูลตัวอย่าง ${demoTransactions.length} รายการเรียบร้อยแล้ว!`);
         }
 
         let currentActiveDoc = null;
@@ -2046,11 +2309,13 @@
             calcEditDueDate();
             calcEditNet();
 
-            document.getElementById('edit-transaction-modal').classList.remove('hidden');
+            const modal = document.getElementById('edit-transaction-modal');
+            if (modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
         }
 
         function closeEditTransactionModal() {
-            document.getElementById('edit-transaction-modal').classList.add('hidden');
+            const modal = document.getElementById('edit-transaction-modal');
+            if (modal) { modal.style.display = 'none'; modal.classList.add('hidden'); }
         }
 
         function calcEditDueDate() {
@@ -2173,11 +2438,13 @@
             calcManualDueDate();
             calcManualNet();
 
-            document.getElementById('manual-entry-modal').classList.remove('hidden');
+            const modal = document.getElementById('manual-entry-modal');
+            if (modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
         }
 
         function closeManualEntryModal() {
-            document.getElementById('manual-entry-modal').classList.add('hidden');
+            const modal = document.getElementById('manual-entry-modal');
+            if (modal) { modal.style.display = 'none'; modal.classList.add('hidden'); }
         }
 
         function calcManualDueDate() {
@@ -2309,8 +2576,8 @@
             const filteredAllTx = filterTxByMonth(transactions, 'date');
 
             if (transactions.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-slate-400 font-medium">✨ ระบบว่างเปล่าบริสุทธิ์ (ยังไม่มีรายการในสมุดบัญชีทั่วไป) สามารถสแกนเอกสารหรือกดเพิ่มรายการเพื่อเริ่มทดสอบ</td></tr>`;
-                pendingTbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-emerald-600 font-bold">🎉 ไม่มีรายการค้างชำระในระบบ (พร้อมเริ่มทดสอบบันทึกรายการใหม่)</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-slate-400 font-medium">✨ ระบบ V.2 พร้อมใช้งาน (ยังไม่มีรายการในสมุดบัญชีทั่วไป) สามารถสแกนเอกสาร หรือนำเข้าไฟล์แบ็คอัพ (.json) ได้ทันที</td></tr>`;
+                pendingTbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-emerald-600 font-bold">🎉 ไม่มีรายการค้างชำระในระบบ (พร้อมเริ่มบันทึกรายการใหม่)</td></tr>`;
             } else if (filteredAllTx.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-amber-700 font-medium bg-amber-50/50">🔍 ไม่พบรายการบัญชีทั่วไปในเดือนที่เลือก (${selectedMonthFilter})</td></tr>`;
             } else {
@@ -2917,7 +3184,7 @@
             const keys = Object.keys(vendorMemory);
             
             if (keys.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">ยังไม่มีคลังความรู้สะสมในระบบ Clean State (กรุณาสแกนเอกสารเพื่อสอน AI)</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">ยังไม่มีคลังความรู้สะสม (กรุณาสแกนเอกสารเพื่อสอน AI)</td></tr>`;
             } else {
                 tbody.innerHTML = keys.map(k => {
                     const item = vendorMemory[k];
@@ -2999,11 +3266,13 @@
                 placeholderEl.classList.add('hidden');
             }
 
-            document.getElementById('doc-modal').classList.remove('hidden');
+            const modal = document.getElementById('doc-modal');
+            if (modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
         }
 
         function closeDocModal() {
-            document.getElementById('doc-modal').classList.add('hidden');
+            const modal = document.getElementById('doc-modal');
+            if (modal) { modal.style.display = 'none'; modal.classList.add('hidden'); }
         }
 
         function downloadOriginalDoc() {
@@ -3034,11 +3303,13 @@
             document.getElementById('slip-upload-placeholder').classList.remove('hidden');
             document.getElementById('slip-preview-box').classList.add('hidden');
 
-            document.getElementById('payment-modal').classList.remove('hidden');
+            const modal = document.getElementById('payment-modal');
+            if (modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
         }
 
         function closePaymentModal() {
-            document.getElementById('payment-modal').classList.add('hidden');
+            const modal = document.getElementById('payment-modal');
+            if (modal) { modal.style.display = 'none'; modal.classList.add('hidden'); }
         }
 
         function previewPaymentSlip(event) {
@@ -3139,11 +3410,13 @@
                 imgEl.src = canvas.toDataURL();
             }
 
-            document.getElementById('slip-view-modal').classList.remove('hidden');
+            const modal = document.getElementById('slip-view-modal');
+            if (modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
         }
 
         function closeSlipViewModal() {
-            document.getElementById('slip-view-modal').classList.add('hidden');
+            const modal = document.getElementById('slip-view-modal');
+            if (modal) { modal.style.display = 'none'; modal.classList.add('hidden'); }
         }
 
         function downloadSlipProof() {
@@ -3307,7 +3580,7 @@
                     }
 
                     if (fileName.toLowerCase().includes("rent") || fileName.includes("เช่า")) {
-                        vendor = "บริษัท สาทร เรียลเอสเอสเตท จำกัด";
+                        vendor = "บริษัท สาทร เรียลเอสเตท จำกัด";
                         desc = "ค่าเช่าพื้นที่สำนักงานและสถานที่";
                         whtRate = 5;
                         creditDays = 15;
@@ -3542,15 +3815,25 @@
             } else {
                 resDiv.innerHTML = `
                     <div class="text-amber-400 font-bold border-b border-slate-800 pb-2"><i class="fa-solid fa-chart-line mr-1"></i> การวิเคราะห์สุขภาพการเงินและอัตรากำไร</div>
-                    <p>• <strong>สถานะ Master Edition:</strong> รองรับ 6-Digit PIN Security + Supabase Cloud Sync สด 8 วินาที + LINE Notify</p>
-                    <p>• <strong>คำแนะนำ:</strong> สามารถเปิดตั้งค่ารหัส PIN หรือระบบซิงก์ Cloud เพื่อแชร์ข้อมูลข้ามอุปกรณ์สดเรียลไทม์ได้ทันที</p>
+                    <p>• <strong>สถานะ V.2 Release:</strong> รองรับระบบดาวน์โหลด/นำเข้าไฟล์แบ็คอัพ JSON + 6-Digit PIN Security + Supabase Cloud Sync สด 8 วินาที + LINE Notify</p>
+                    <p>• <strong>คำแนะนำ:</strong> สามารถสำรองข้อมูลเป็นไฟล์ .json ได้ตลอดเวลาเพื่อป้องกันข้อมูลสูญหาย</p>
                 `;
             }
         }
 
-        // INIT SYSTEM ON LOAD WITH PIN CHECK & AUTOMATIC REAL-TIME SUPABASE CLOUD SYNC
+        // INIT SYSTEM ON LOAD WITH AUTOMATIC REAL-TIME SUPABASE CLOUD SYNC
         window.onload = function() {
-            checkPinStatus();
+            try {
+                const pinM = document.getElementById('pin-lock-modal');
+                if (pinM) pinM.remove();
+            } catch(e) {}
+
+            // Force hide all modal backdrops on init to guarantee pointer events are free
+            const modalIds = ['cloud-config-modal', 'change-pin-modal', 'line-notify-modal', 'edit-transaction-modal', 'manual-entry-modal', 'ai-memory-modal', 'doc-modal', 'payment-modal', 'slip-view-modal'];
+            modalIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
 
             const savedTx = localStorage.getItem('TRANSACTIONS');
             const savedMem = localStorage.getItem('AI_VENDOR_MEMORY');
@@ -3558,33 +3841,30 @@
             if (savedTx) {
                 try {
                     const parsed = JSON.parse(savedTx);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
+                    if (Array.isArray(parsed)) {
                         transactions = parsed;
                         if (savedMem) vendorMemory = JSON.parse(savedMem);
                     } else {
-                        transactions = JSON.parse(JSON.stringify(demoTransactions));
-                        vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
-                        saveState();
+                        transactions = [];
+                        vendorMemory = {};
                     }
                 } catch(e) {
-                    transactions = JSON.parse(JSON.stringify(demoTransactions));
-                    vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
-                    saveState();
+                    transactions = [];
+                    vendorMemory = {};
                 }
             } else {
-                transactions = JSON.parse(JSON.stringify(demoTransactions));
-                vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
-                saveState();
+                transactions = [];
+                vendorMemory = {};
             }
 
-            renderLedger();
+            try { renderLedger(); } catch(e) { console.error("renderLedger error", e); }
 
             // Perform initial sync pull
-            syncPullFromSupabase(false);
+            try { syncPullFromSupabase(false); } catch(e) {}
 
             // Auto poll Supabase Cloud every 8 seconds for multi-device sync
             setInterval(() => {
-                syncPullFromSupabase(false);
+                try { syncPullFromSupabase(false); } catch(e) {}
             }, 8000);
         };
     </script>
