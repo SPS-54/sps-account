@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>SPS & Bank บัญชี-การเงิน (All-In-One Master Ultimate Edition)</title>
+    <title>SPS & Bank บัญชี-การเงิน V.2 (Backup & Cloud Sync Edition)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -33,7 +33,7 @@
                 <div class="bg-gradient-to-r from-emerald-600 to-indigo-600 p-4 rounded-2xl border border-emerald-500/30 text-white shadow-lg">
                     <i class="fa-solid fa-shield-halved text-4xl"></i>
                 </div>
-                <h2 class="text-xl font-bold tracking-wide mt-2 text-white" id="pin-system-title">SPS & Bank บัญชี-การเงิน</h2>
+                <h2 class="text-xl font-bold tracking-wide mt-2 text-white" id="pin-system-title">SPS & Bank บัญชี-การเงิน V.2</h2>
                 <p class="text-xs text-slate-400">กรุณากรอกรหัสผ่าน PIN 6 หลักเพื่อปลดล็อกเข้าสู่ระบบ</p>
                 <span class="text-[11px] bg-slate-800 text-emerald-400 font-mono px-3 py-1 rounded-full border border-slate-700 mt-1">
                     💡 รหัสผ่านเริ่มต้น: <strong class="font-bold text-amber-300">190119</strong> หรือ <strong class="font-bold text-amber-300">787138</strong>
@@ -80,9 +80,9 @@
                 <div>
                     <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
                         SPS & Bank บัญชี-การเงิน
-                        <span class="bg-gradient-to-r from-emerald-500 via-indigo-500 to-purple-600 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow border border-emerald-400">Master All-In-One</span>
+                        <span class="bg-gradient-to-r from-emerald-500 via-indigo-500 to-purple-600 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow border border-emerald-400">V.2 Official</span>
                     </h1>
-                    <p class="text-xs text-indigo-300">Financial & Accounting System (Supabase Live Cloud Sync & PIN Security Lock)</p>
+                    <p class="text-xs text-indigo-300">Financial & Accounting System V.2 (JSON Backup System & Cloud Sync)</p>
                 </div>
             </div>
 
@@ -96,6 +96,17 @@
                         <option value="ALL">🗓️ ทุกเดือน (All)</option>
                     </select>
                 </div>
+
+                <!-- DOWNLOAD BACKUP JSON -->
+                <button onclick="exportBackupJSON()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shadow flex items-center gap-1.5 border border-indigo-500">
+                    <i class="fa-solid fa-download text-xs"></i> 📥 สำรองข้อมูล (.json)
+                </button>
+
+                <!-- UPLOAD BACKUP JSON -->
+                <label class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shadow flex items-center gap-1.5 border border-emerald-500 cursor-pointer">
+                    <i class="fa-solid fa-upload text-xs"></i> 📤 นำเข้าแบ็คอัพ
+                    <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
+                </label>
 
                 <!-- SUPABASE CLOUD SYNC BUTTON -->
                 <button onclick="openCloudConfigModal()" id="cloud-status-btn" class="bg-purple-900/80 hover:bg-purple-800 text-purple-200 text-xs font-bold px-3 py-2 rounded-xl transition-all border border-purple-700 shadow flex items-center gap-1.5">
@@ -115,13 +126,6 @@
                 <!-- LOCK SCREEN BUTTON -->
                 <button onclick="lockSystem()" class="bg-rose-900/80 hover:bg-rose-800 text-rose-200 text-xs font-bold px-2.5 py-2 rounded-xl transition-all border border-rose-700 shadow flex items-center gap-1">
                     <i class="fa-solid fa-lock text-rose-300"></i> 🔒 ล็อก
-                </button>
-
-                <button onclick="clearAllData()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-2.5 py-2 rounded-xl transition-all shadow flex items-center gap-1 border border-rose-500">
-                    <i class="fa-solid fa-trash-can"></i> 🗑️ ล้าง
-                </button>
-                <button onclick="loadDemoData()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2.5 py-2 rounded-xl transition-all shadow flex items-center gap-1 border border-indigo-500">
-                    <i class="fa-solid fa-rotate-right"></i> 🔄 ตัวอย่าง
                 </button>
             </div>
         </div>
@@ -148,15 +152,18 @@
                     <i class="fa-solid fa-server text-base"></i>
                 </div>
                 <div>
-                    <span class="font-bold text-white">🚀 ระบบ All-In-One Master Ultimate Edition พร้อมใช้งาน:</span>
-                    <span class="text-slate-300">รวม 6-Digit PIN Security + Supabase Real-Time Cloud Sync (8s) + LINE Notify + AI Active Learning OCR สมบูรณ์แบบ</span>
+                    <span class="font-bold text-white">🚀 ระบบ SPS & Bank V.2 พร้อมใช้งาน:</span>
+                    <span class="text-slate-300">รองรับระบบดาวน์โหลด/อัปโหลดไฟล์แบ็คอัพ (.json) + 6-Digit PIN Security + Supabase Real-Time Cloud Sync (8s) + LINE Notify</span>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="syncPushToSupabase()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-3 py-1.5 rounded-lg border border-purple-400 transition-all flex items-center gap-1 text-[11px] shadow">
-                    <i class="fa-solid fa-rotate"></i> Sync Supabase Now
+                <button onclick="exportBackupJSON()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg border border-indigo-400 transition-all flex items-center gap-1 text-[11px] shadow">
+                    <i class="fa-solid fa-download"></i> Backup JSON
                 </button>
-                <span class="bg-emerald-400 text-slate-950 font-bold px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider shadow">Master Active</span>
+                <button onclick="syncPushToSupabase()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-3 py-1.5 rounded-lg border border-purple-400 transition-all flex items-center gap-1 text-[11px] shadow">
+                    <i class="fa-solid fa-rotate"></i> Sync Cloud
+                </button>
+                <span class="bg-emerald-400 text-slate-950 font-bold px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider shadow">V.2 Active</span>
             </div>
         </div>
 
@@ -1635,29 +1642,8 @@
         let selectedMonthFilter = "ALL";
         let lineNotifyToken = localStorage.getItem('LINE_NOTIFY_TOKEN') || "";
 
-        // OFFICIAL V.1 & V.2 DEMO TEST DATA SET
-        const demoTransactions = [
-            { id: "INV-2026/010", date: "15/09/2026", delivery_date: "15/09/2026", credit_days: 30, due_date: "15/10/2026", type: "Income", desc: "ค่าส่งมอบงานระยะที่ 2 ระบบ AI Chatbot", vendor: "บริษัท ไทยการค้า อินเตอร์ จำกัด", before_vat: 180000, vat: 12600, wht: 5400, net: 187200, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/009", date: "05/09/2026", delivery_date: "05/09/2026", credit_days: 15, due_date: "20/09/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000, vat: 2450, wht: 1750, net: 37450, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/008", date: "28/08/2026", delivery_date: "28/08/2026", credit_days: 30, due_date: "27/09/2026", type: "Income", desc: "ค่าสัญญาบริการรายเดือน (SLA Maintenance)", vendor: "บริษัท โกลบอล โลจิสติกส์ จำกัด", before_vat: 50000, vat: 3500, wht: 1500, net: 53500, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/007", date: "20/08/2026", delivery_date: "19/08/2026", credit_days: 31, due_date: "19/09/2026", type: "Expense", desc: "ซื้ออุปกรณ์คอมพิวเตอร์และจอมอนิเตอร์", vendor: "บริษัท ไอที ซิตี้ จำกัด (มหาชน)", before_vat: 28000, vat: 1960, wht: 0, net: 29960, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/006", date: "18/08/2026", delivery_date: "18/08/2026", credit_days: 30, due_date: "17/09/2026", type: "Expense", desc: "ค่าโฆษณา Facebook & Google Ads", vendor: "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด", before_vat: 20000, vat: 1400, wht: 400, net: 21400, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/005", date: "15/08/2026", delivery_date: "15/08/2026", credit_days: 0, due_date: "15/08/2026", type: "Expense", desc: "เงินเดือนพนักงานประจำเดือน สิงหาคม 2026", vendor: "ฝ่ายทรัพยากรบุคคล (Payroll)", before_vat: 85000, vat: 0, wht: 0, net: 85000, status: "Paid", file_data: null, slip_data: null, pay_date: "15/08/2026" },
-            { id: "INV-2026/004", date: "10/08/2026", delivery_date: "09/08/2026", credit_days: 31, due_date: "09/09/2026", type: "Income", desc: "ค่าส่งมอบงานระยะที่ 1 ระบบ AI Chatbot", vendor: "บริษัท ไทยการค้า อินเตอร์ จำกัด", before_vat: 150000, vat: 10500, wht: 4500, net: 160500, status: "Paid", file_data: null, slip_data: null, pay_date: "10/08/2026" },
-            { id: "INV-2026/003", date: "05/08/2026", delivery_date: "05/08/2026", credit_days: 30, due_date: "04/09/2026", type: "Expense", desc: "ค่าบริการระบบ Cloud Server", vendor: "บริษัท คลาวด์ เทคโนโลยี จำกัด", before_vat: 15000, vat: 1050, wht: 450, net: 16050, status: "Unpaid", file_data: null, slip_data: null, pay_date: null },
-            { id: "INV-2026/002", date: "03/08/2026", delivery_date: "01/08/2026", credit_days: 14, due_date: "15/08/2026", type: "Expense", desc: "ค่าเช่าพื้นที่สำนักงาน อาคารสาทรทาวเวอร์", vendor: "บริษัท สาทร เรียลเอสเตท จำกัด", before_vat: 35000, vat: 2450, wht: 1750, net: 37450, status: "Paid", file_data: null, slip_data: null, pay_date: "03/08/2026" },
-            { id: "INV-2026/001", date: "01/08/2026", delivery_date: "01/08/2026", credit_days: 30, due_date: "31/08/2026", type: "Income", desc: "ค่าบริการที่ปรึกษาพัฒนาระบบซอฟต์แวร์", vendor: "บริษัท เอพีซีไอ จำกัด", before_vat: 100000, vat: 7000, wht: 3000, net: 107000, status: "Paid", file_data: null, slip_data: null, pay_date: "01/08/2026" },
-            { id: "INV-2026/000", date: "25/07/2026", delivery_date: "25/07/2026", credit_days: 15, due_date: "09/08/2026", type: "Expense", desc: "ซื้อวัสดุอุปกรณ์สำนักงานประจำเดือน กรกฎาคม", vendor: "บริษัท ออฟฟิศเมท จำกัด (มหาชน)", before_vat: 12000, vat: 840, wht: 0, net: 12840, status: "Paid", file_data: null, slip_data: null, pay_date: "25/07/2026" }
-        ];
-
-        const demoVendorMemory = {
-            "บริษัท สาทร เรียลเอสเตท จำกัด": { tax_id: "0105544987654", credit_days: 15, wht_rate: 5, category: "Expense", count: 8 },
-            "บริษัท บิ๊กคอร์ป จำกัด (มหาชน)": { tax_id: "0107537000888", credit_days: 30, wht_rate: 3, category: "Income", count: 12 },
-            "บริษัท ดิจิทัล มาร์เก็ตติ้ง เอเจนซี่ จำกัด": { tax_id: "0105562001199", credit_days: 30, wht_rate: 2, category: "Expense", count: 5 }
-        };
-
-        let transactions = JSON.parse(JSON.stringify(demoTransactions));
-        let vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
+        let transactions = [];
+        let vendorMemory = {};
 
         function saveState() {
             localStorage.setItem('TRANSACTIONS', JSON.stringify(transactions));
@@ -1670,6 +1656,85 @@
         function saveStateSilent() {
             localStorage.setItem('TRANSACTIONS', JSON.stringify(transactions));
             localStorage.setItem('AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
+        }
+
+        // --- EXPORT & IMPORT BACKUP SYSTEM (V.2) ---
+        function exportBackupJSON() {
+            const backupData = {
+                version: "V.2",
+                exported_at: new Date().toISOString(),
+                transactions: transactions,
+                vendorMemory: vendorMemory,
+                settings: {
+                    system_pin: localStorage.getItem('SYSTEM_PIN') || "190119",
+                    line_token: localStorage.getItem('LINE_NOTIFY_TOKEN') || "",
+                    supabase_url: localStorage.getItem('SUPABASE_URL') || "",
+                    supabase_key: localStorage.getItem('SUPABASE_KEY') || ""
+                }
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            const todayStr = new Date().toISOString().split('T')[0];
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `SPS_ACCOUNT_BACKUP_V2_${todayStr}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            alert(`📥 ดาวน์โหลดไฟล์แบ็คอัพสำรองข้อมูล (V.2) เรียบร้อยแล้ว!\n• จำนวนรายการ: ${transactions.length} รายการ\n• คลังความรู้ AI: ${Object.keys(vendorMemory).length} ซัพพลายเออร์`);
+        }
+
+        function importBackupJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (!importedData || (!Array.isArray(importedData.transactions) && !importedData.vendorMemory)) {
+                        alert("⚠️ รูปแบบไฟล์สำรองข้อมูล JSON ไม่ถูกต้อง");
+                        return;
+                    }
+
+                    const txCount = importedData.transactions ? importedData.transactions.length : 0;
+                    if (confirm(`📤 ยืนยันการนำเข้าข้อมูลแบ็คอัพ?\n• จำนวนรายการในไฟล์: ${txCount} รายการ\n• ข้อมูลปัจจุบันจะถูกอัปเดตด้วยข้อมูลจากไฟล์แบ็คอัพนี้`)) {
+                        if (Array.isArray(importedData.transactions)) {
+                            transactions = importedData.transactions;
+                        }
+                        if (importedData.vendorMemory) {
+                            vendorMemory = importedData.vendorMemory;
+                        }
+                        if (importedData.settings) {
+                            if (importedData.settings.system_pin) {
+                                currentPin = importedData.settings.system_pin;
+                                localStorage.setItem('SYSTEM_PIN', currentPin);
+                            }
+                            if (importedData.settings.line_token) {
+                                lineNotifyToken = importedData.settings.line_token;
+                                localStorage.setItem('LINE_NOTIFY_TOKEN', lineNotifyToken);
+                            }
+                            if (importedData.settings.supabase_url) {
+                                supabaseUrl = importedData.settings.supabase_url;
+                                localStorage.setItem('SUPABASE_URL', supabaseUrl);
+                            }
+                            if (importedData.settings.supabase_key) {
+                                supabaseKey = importedData.settings.supabase_key;
+                                localStorage.setItem('SUPABASE_KEY', supabaseKey);
+                            }
+                        }
+
+                        saveState();
+                        renderLedger();
+                        alert(`🎉 นำเข้าข้อมูลแบ็คอัพ (V.2) สำเร็จสมบูรณ์!\n• โหลดข้อมูลเรียบร้อย ${transactions.length} รายการ\n• ซิงก์ขึ้น Supabase Cloud เรียบร้อยแล้ว`);
+                    }
+                } catch(err) {
+                    alert("❌ เกิดข้อผิดพลาดในการอ่านไฟล์แบ็คอัพ: " + err.message);
+                }
+                event.target.value = "";
+            };
+            reader.readAsText(file);
         }
 
         // --- LINE NOTIFY ENGINE ---
@@ -1870,26 +1935,6 @@
                 }
                 return false;
             });
-        }
-
-        function clearAllData() {
-            transactions = [];
-            vendorMemory = {};
-            localStorage.setItem('IS_CLEAN_STATE', 'true');
-            localStorage.removeItem('AI_VENDOR_MEMORY');
-            localStorage.removeItem('TRANSACTIONS');
-            renderLedger();
-            resetOCRForm();
-            alert("✨ ล้างข้อมูลทั้งหมดเรียบร้อยแล้ว! ระบบ All-In-One อยู่ในสภาวะ Clean State พร้อมใช้งาน");
-        }
-
-        function loadDemoData() {
-            localStorage.removeItem('IS_CLEAN_STATE');
-            transactions = JSON.parse(JSON.stringify(demoTransactions));
-            vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
-            saveState();
-            renderLedger();
-            alert(`🔄 โหลดชุดข้อมูลตัวอย่าง ${demoTransactions.length} รายการเรียบร้อยแล้ว!`);
         }
 
         let currentActiveDoc = null;
@@ -2309,8 +2354,8 @@
             const filteredAllTx = filterTxByMonth(transactions, 'date');
 
             if (transactions.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-slate-400 font-medium">✨ ระบบว่างเปล่าบริสุทธิ์ (ยังไม่มีรายการในสมุดบัญชีทั่วไป) สามารถสแกนเอกสารหรือกดเพิ่มรายการเพื่อเริ่มทดสอบ</td></tr>`;
-                pendingTbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-emerald-600 font-bold">🎉 ไม่มีรายการค้างชำระในระบบ (พร้อมเริ่มทดสอบบันทึกรายการใหม่)</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-slate-400 font-medium">✨ ระบบ V.2 พร้อมใช้งาน (ยังไม่มีรายการในสมุดบัญชีทั่วไป) สามารถสแกนเอกสาร หรือนำเข้าไฟล์แบ็คอัพ (.json) ได้ทันที</td></tr>`;
+                pendingTbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-emerald-600 font-bold">🎉 ไม่มีรายการค้างชำระในระบบ (พร้อมเริ่มบันทึกรายการใหม่)</td></tr>`;
             } else if (filteredAllTx.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-amber-700 font-medium bg-amber-50/50">🔍 ไม่พบรายการบัญชีทั่วไปในเดือนที่เลือก (${selectedMonthFilter})</td></tr>`;
             } else {
@@ -2917,7 +2962,7 @@
             const keys = Object.keys(vendorMemory);
             
             if (keys.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">ยังไม่มีคลังความรู้สะสมในระบบ Clean State (กรุณาสแกนเอกสารเพื่อสอน AI)</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">ยังไม่มีคลังความรู้สะสม (กรุณาสแกนเอกสารเพื่อสอน AI)</td></tr>`;
             } else {
                 tbody.innerHTML = keys.map(k => {
                     const item = vendorMemory[k];
@@ -3542,8 +3587,8 @@
             } else {
                 resDiv.innerHTML = `
                     <div class="text-amber-400 font-bold border-b border-slate-800 pb-2"><i class="fa-solid fa-chart-line mr-1"></i> การวิเคราะห์สุขภาพการเงินและอัตรากำไร</div>
-                    <p>• <strong>สถานะ Master Edition:</strong> รองรับ 6-Digit PIN Security + Supabase Cloud Sync สด 8 วินาที + LINE Notify</p>
-                    <p>• <strong>คำแนะนำ:</strong> สามารถเปิดตั้งค่ารหัส PIN หรือระบบซิงก์ Cloud เพื่อแชร์ข้อมูลข้ามอุปกรณ์สดเรียลไทม์ได้ทันที</p>
+                    <p>• <strong>สถานะ V.2 Release:</strong> รองรับระบบดาวน์โหลด/นำเข้าไฟล์แบ็คอัพ JSON + 6-Digit PIN Security + Supabase Cloud Sync สด 8 วินาที + LINE Notify</p>
+                    <p>• <strong>คำแนะนำ:</strong> สามารถสำรองข้อมูลเป็นไฟล์ .json ได้ตลอดเวลาเพื่อป้องกันข้อมูลสูญหาย</p>
                 `;
             }
         }
@@ -3558,23 +3603,20 @@
             if (savedTx) {
                 try {
                     const parsed = JSON.parse(savedTx);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
+                    if (Array.isArray(parsed)) {
                         transactions = parsed;
                         if (savedMem) vendorMemory = JSON.parse(savedMem);
                     } else {
-                        transactions = JSON.parse(JSON.stringify(demoTransactions));
-                        vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
-                        saveState();
+                        transactions = [];
+                        vendorMemory = {};
                     }
                 } catch(e) {
-                    transactions = JSON.parse(JSON.stringify(demoTransactions));
-                    vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
-                    saveState();
+                    transactions = [];
+                    vendorMemory = {};
                 }
             } else {
-                transactions = JSON.parse(JSON.stringify(demoTransactions));
-                vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
-                saveState();
+                transactions = [];
+                vendorMemory = {};
             }
 
             renderLedger();
