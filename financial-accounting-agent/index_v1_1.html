@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Agent สำหรับงานบัญชี-การเงิน (Financial & Accounting AI Agent - V.1.1)</title>
+    <!-- Anti-Cache Meta Tags to prevent browser freeze on stale JS -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>SPS บัญชี-การเงิน V2 (Financial & Accounting AI Agent)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -3064,16 +3068,24 @@
         window.onload = function() {
             const savedTx = localStorage.getItem('TRANSACTIONS');
             const savedMem = localStorage.getItem('AI_VENDOR_MEMORY');
-            const isClean = localStorage.getItem('IS_CLEAN_STATE');
             
-            if (savedTx && JSON.parse(savedTx).length > 0) {
-                transactions = JSON.parse(savedTx);
-                if (savedMem) vendorMemory = JSON.parse(savedMem);
-            } else if (isClean === 'true') {
-                transactions = [];
-                vendorMemory = {};
+            if (savedTx) {
+                try {
+                    const parsed = JSON.parse(savedTx);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        transactions = parsed;
+                        if (savedMem) vendorMemory = JSON.parse(savedMem);
+                    } else {
+                        transactions = JSON.parse(JSON.stringify(demoTransactions));
+                        vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
+                        saveState();
+                    }
+                } catch(e) {
+                    transactions = JSON.parse(JSON.stringify(demoTransactions));
+                    vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
+                    saveState();
+                }
             } else {
-                // Default: Auto load demo transactions from V.1 & V.1.1 on startup so test data NEVER disappears!
                 transactions = JSON.parse(JSON.stringify(demoTransactions));
                 vendorMemory = JSON.parse(JSON.stringify(demoVendorMemory));
                 saveState();
