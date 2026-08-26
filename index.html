@@ -1693,41 +1693,103 @@
             reader.onload = function(e) {
                 try {
                     const importedData = JSON.parse(e.target.result);
-                    if (!importedData || (!Array.isArray(importedData.transactions) && !importedData.vendorMemory)) {
-                        alert("⚠️ รูปแบบไฟล์สำรองข้อมูล JSON ไม่ถูกต้อง");
+                    let rawList = null;
+                    let importedVendorMem = null;
+                    let importedSettings = null;
+
+                    if (Array.isArray(importedData)) {
+                        rawList = importedData;
+                    } else if (importedData && typeof importedData === 'object') {
+                        if (Array.isArray(importedData.transactions)) {
+                            rawList = importedData.transactions;
+                        } else if (Array.isArray(importedData.data)) {
+                            rawList = importedData.data;
+                        } else if (Array.isArray(importedData.tx_list)) {
+                            rawList = importedData.tx_list;
+                        } else if (Array.isArray(importedData.records)) {
+                            rawList = importedData.records;
+                        }
+                        if (importedData.vendorMemory) importedVendorMem = importedData.vendorMemory;
+                        if (importedData.settings) importedSettings = importedData.settings;
+                    }
+
+                    if (!rawList && !importedVendorMem) {
+                        alert("⚠️ ไม่พบโครงสร้างรายการข้อมูลในไฟล์ JSON แบ็คอัพ");
                         return;
                     }
 
-                    const txCount = importedData.transactions ? importedData.transactions.length : 0;
-                    if (confirm(`📤 ยืนยันการนำเข้าข้อมูลแบ็คอัพ?\n• จำนวนรายการในไฟล์: ${txCount} รายการ\n• ข้อมูลปัจจุบันจะถูกอัปเดตด้วยข้อมูลจากไฟล์แบ็คอัพนี้`)) {
-                        if (Array.isArray(importedData.transactions)) {
-                            transactions = importedData.transactions;
+                    const normalizedList = rawList ? rawList.map(t => {
+                        let dateStr = t.date || TODAY_DATE_STR;
+                        if (dateStr.includes('-')) {
+                            const p = dateStr.split('T')[0].split('-');
+                            if (p.length === 3) dateStr = `${p[2]}/${p[1]}/${p[0]}`;
                         }
-                        if (importedData.vendorMemory) {
-                            vendorMemory = importedData.vendorMemory;
+
+                        let delivStr = t.delivery_date || dateStr;
+                        if (delivStr.includes('-')) {
+                            const p = delivStr.split('T')[0].split('-');
+                            if (p.length === 3) delivStr = `${p[2]}/${p[1]}/${p[0]}`;
                         }
-                        if (importedData.settings) {
-                            if (importedData.settings.system_pin) {
-                                currentPin = importedData.settings.system_pin;
+
+                        let dueStr = t.due_date || dateStr;
+                        if (dueStr.includes('-')) {
+                            const p = dueStr.split('T')[0].split('-');
+                            if (p.length === 3) dueStr = `${p[2]}/${p[1]}/${p[0]}`;
+                        }
+
+                        const beforeVat = parseFloat(t.before_vat !== undefined ? t.before_vat : (t.amount_before_vat !== undefined ? t.amount_before_vat : t.amount)) || 0;
+                        const vatAmt = parseFloat(t.vat !== undefined ? t.vat : (t.vat_amount !== undefined ? t.vat_amount : 0)) || 0;
+                        const whtAmt = parseFloat(t.wht !== undefined ? t.wht : (t.wht_amount !== undefined ? t.wht_amount : 0)) || 0;
+                        let netAmt = parseFloat(t.net !== undefined ? t.net : (t.net_cash_received || t.net_cash_paid || t.total_amount)) || 0;
+                        if (!netAmt) netAmt = beforeVat + vatAmt - whtAmt;
+
+                        return {
+                            id: t.id || t.doc_ref || t.doc_no || `INV-${Math.floor(1000 + Math.random()*9000)}`,
+                            date: dateStr,
+                            delivery_date: delivStr,
+                            credit_days: t.credit_days !== undefined ? parseInt(t.credit_days) : 30,
+                            due_date: dueStr,
+                            type: t.type || (t.net_cash_received ? 'Income' : 'Expense'),
+                            desc: t.desc || t.description || t.details || 'รายการนำเข้าจากแบ็คอัพ',
+                            vendor: t.vendor || t.vendor_customer || t.customer || t.supplier || 'คู่ค้าทั่วไป',
+                            before_vat: beforeVat,
+                            vat: vatAmt,
+                            wht: whtAmt,
+                            net: netAmt,
+                            status: t.status || 'Paid',
+                            file_data: t.file_data || null,
+                            slip_data: t.slip_data || null,
+                            pay_date: t.pay_date || (t.status === 'Paid' ? dateStr : null)
+                        };
+                    }) : [];
+
+                    const txCount = normalizedList.length;
+                    if (confirm(`📤 ยืนยันการนำเข้าข้อมูลแบ็คอัพ V.2?\n• จำนวนรายการในไฟล์: ${txCount} รายการ\n• ข้อมูลในระบบจะถูกอัปเดตสอดรับกับไฟล์แบ็คอัพนี้สมบูรณ์ 100%`)) {
+                        if (normalizedList.length > 0) transactions = normalizedList;
+                        if (importedVendorMem) vendorMemory = importedVendorMem;
+
+                        if (importedSettings) {
+                            if (importedSettings.system_pin) {
+                                currentPin = importedSettings.system_pin;
                                 localStorage.setItem('SYSTEM_PIN', currentPin);
                             }
-                            if (importedData.settings.line_token) {
-                                lineNotifyToken = importedData.settings.line_token;
+                            if (importedSettings.line_token) {
+                                lineNotifyToken = importedSettings.line_token;
                                 localStorage.setItem('LINE_NOTIFY_TOKEN', lineNotifyToken);
                             }
-                            if (importedData.settings.supabase_url) {
-                                supabaseUrl = importedData.settings.supabase_url;
+                            if (importedSettings.supabase_url) {
+                                supabaseUrl = importedSettings.supabase_url;
                                 localStorage.setItem('SUPABASE_URL', supabaseUrl);
                             }
-                            if (importedData.settings.supabase_key) {
-                                supabaseKey = importedData.settings.supabase_key;
+                            if (importedSettings.supabase_key) {
+                                supabaseKey = importedSettings.supabase_key;
                                 localStorage.setItem('SUPABASE_KEY', supabaseKey);
                             }
                         }
 
                         saveState();
                         renderLedger();
-                        alert(`🎉 นำเข้าข้อมูลแบ็คอัพ (V.2) สำเร็จสมบูรณ์!\n• โหลดข้อมูลเรียบร้อย ${transactions.length} รายการ\n• ซิงก์ขึ้น Supabase Cloud เรียบร้อยแล้ว`);
+                        alert(`🎉 นำเข้าข้อมูลแบ็คอัพ (V.2) สำเร็จสมบูรณ์!\n• โหลดและปรับโครงสร้างข้อมูลเรียบร้อย ${transactions.length} รายการ\n• ซิงก์ขึ้น Supabase Cloud เรียบร้อยแล้ว`);
                     }
                 } catch(err) {
                     alert("❌ เกิดข้อผิดพลาดในการอ่านไฟล์แบ็คอัพ: " + err.message);
