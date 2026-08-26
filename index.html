@@ -26,49 +26,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- 6-DIGIT PIN SECURITY LOCK OVERLAY MODAL (DISABLED BY USER REQUEST) -->
-    <div id="pin-lock-modal" class="hidden fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-8 max-w-md w-full text-center text-white space-y-6">
-            <div class="flex flex-col items-center gap-2">
-                <div class="bg-gradient-to-r from-emerald-600 to-indigo-600 p-4 rounded-2xl border border-emerald-500/30 text-white shadow-lg">
-                    <i class="fa-solid fa-shield-halved text-4xl"></i>
-                </div>
-                <h2 class="text-xl font-bold tracking-wide mt-2 text-white" id="pin-system-title">SPS & Bank บัญชี-การเงิน V.2</h2>
-                <p class="text-xs text-slate-400">กรุณากรอกรหัสผ่าน PIN 6 หลักเพื่อปลดล็อกเข้าสู่ระบบ</p>
-                <span class="text-[11px] bg-slate-800 text-emerald-400 font-mono px-3 py-1 rounded-full border border-slate-700 mt-1">
-                    💡 รหัสผ่านเริ่มต้น: <strong class="font-bold text-amber-300">190119</strong> หรือ <strong class="font-bold text-amber-300">787138</strong>
-                </span>
-            </div>
 
-            <!-- 6 PIN DOT INDICATORS -->
-            <div class="flex justify-center items-center gap-3 py-2">
-                <div id="dot-0" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
-                <div id="dot-1" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
-                <div id="dot-2" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
-                <div id="dot-3" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
-                <div id="dot-4" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
-                <div id="dot-5" class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
-            </div>
-
-            <div id="pin-error-msg" class="text-xs text-rose-400 font-bold min-h-[20px]"></div>
-
-            <!-- KEYPAD 0-9 -->
-            <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto pt-2">
-                <button onclick="pressPinDigit('1')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">1</button>
-                <button onclick="pressPinDigit('2')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">2</button>
-                <button onclick="pressPinDigit('3')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">3</button>
-                <button onclick="pressPinDigit('4')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">4</button>
-                <button onclick="pressPinDigit('5')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">5</button>
-                <button onclick="pressPinDigit('6')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">6</button>
-                <button onclick="pressPinDigit('7')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">7</button>
-                <button onclick="pressPinDigit('8')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">8</button>
-                <button onclick="pressPinDigit('9')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">9</button>
-                <button onclick="clearPin()" class="bg-rose-950/60 hover:bg-rose-900 text-rose-300 font-bold text-xs py-3 rounded-2xl transition-all border border-rose-800">Clear</button>
-                <button onclick="pressPinDigit('0')" class="bg-slate-800 hover:bg-slate-700 active:bg-emerald-600 text-white font-bold text-xl py-3 rounded-2xl transition-all shadow-md">0</button>
-                <button onclick="backspacePin()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm py-3 rounded-2xl transition-all"><i class="fa-solid fa-delete-left"></i></button>
-            </div>
-        </div>
-    </div>
 
     <!-- Header Navigation -->
     <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
@@ -848,94 +806,8 @@
 
     </main>
 
-    <!-- SUPABASE LIVE CLOUD SYNC CONFIG MODAL -->
-    <div id="cloud-config-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col">
-            <div class="bg-purple-900 text-white p-4 flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-cloud-bolt text-amber-400 text-lg"></i>
-                    <h3 class="font-bold text-sm">ตั้งค่าระบบซิงก์คลาวด์สด (Supabase Real-Time Sync)</h3>
-                </div>
-                <button onclick="closeCloudConfigModal()" class="text-purple-300 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <div class="p-6 space-y-4 text-xs">
-                <div class="bg-purple-50 p-3 rounded-xl border border-purple-200 space-y-1">
-                    <p class="font-bold text-purple-900 flex items-center gap-1.5">
-                        <i class="fa-solid fa-circle-check text-emerald-600"></i> สื่อสารเชื่อมต่อ Cloud Database อัตโนมัติทุก 8 วินาที
-                    </p>
-                    <p class="text-purple-800">เชื่อมต่อ Supabase Database เพื่อซิงค์ข้อมูลกับมือถือและคอมพิวเตอร์เครื่องอื่นแบบเรียลไทม์</p>
-                </div>
-
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Cloud Endpoint / Supabase REST URL:</label>
-                    <input type="text" id="supabase-url-input" placeholder="https://jdrergoswrkjnfpkwigh.supabase.co/rest/v1/" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-xs outline-none">
-                </div>
-
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Cloud API Key (Anon / Public Key):</label>
-                    <textarea id="supabase-key-input" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-[11px] outline-none leading-relaxed"></textarea>
-                </div>
-
-                <div class="bg-slate-100 p-3 rounded-xl space-y-1 font-mono text-[11px] text-slate-600">
-                    <p>• <strong>สถานะ Cloud:</strong> <span id="cloud-last-sync-time" class="font-bold text-emerald-700">พร้อมเชื่อมต่อเรียลไทม์ 8 วินาที</span></p>
-                    <p>• <strong>Auto Poll:</strong> เปิดทำงานอัตโนมัติ (แชร์ข้อมูลสดข้ามอุปกรณ์)</p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 pt-1">
-                    <button onclick="syncPushToSupabase()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> ซิงค์ขึ้น Cloud (Sync Push)
-                    </button>
-                    <button onclick="syncPullFromSupabase(true)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-cloud-arrow-down"></i> ดึงจาก Cloud (Sync Pull)
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center">
-                <button onclick="closeCloudConfigModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ปิด</button>
-                <button onclick="saveCloudConfig()" class="px-5 py-2 bg-purple-900 hover:bg-purple-800 text-white font-semibold text-xs rounded-xl shadow">
-                    💾 บันทึกการตั้งค่า
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- CHANGE PIN MODAL -->
-    <div id="change-pin-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 flex flex-col">
-            <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-key text-emerald-400 text-lg"></i>
-                    <h3 class="font-bold text-sm">เปลี่ยนรหัสผ่าน PIN 6 หลัก</h3>
-                </div>
-                <button onclick="closeChangePinModal()" class="text-slate-400 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="p-5 space-y-3 text-xs">
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">รหัส PIN ปัจจุบัน:</label>
-                    <input type="password" id="pin-old-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center text-lg tracking-widest outline-none">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">รหัส PIN ใหม่ (6 หลัก):</label>
-                    <input type="password" id="pin-new-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center text-lg tracking-widest outline-none">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">ยืนยันรหัส PIN ใหม่:</label>
-                    <input type="password" id="pin-confirm-input" maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-center text-lg tracking-widest outline-none">
-                </div>
-            </div>
-            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between">
-                <button onclick="closeChangePinModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ยกเลิก</button>
-                <button onclick="saveNewPin()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow">
-                    💾 บันทึก PIN ใหม่
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- LINE NOTIFY CONFIG & MESSAGING MODAL -->
-    <div id="line-notify-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="line-notify-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col">
             <div class="bg-emerald-600 text-white p-4 flex justify-between items-center">
                 <div class="flex items-center gap-2">
@@ -986,7 +858,7 @@
     </div>
 
     <!-- EDIT TRANSACTION MODAL -->
-    <div id="edit-transaction-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="edit-transaction-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200 flex flex-col">
             <div class="bg-amber-600 text-white p-4 flex justify-between items-center">
                 <div class="flex items-center gap-2">
@@ -1100,7 +972,7 @@
     </div>
 
     <!-- MANUAL ENTRY MODAL -->
-    <div id="manual-entry-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="manual-entry-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200 flex flex-col">
             <div class="bg-indigo-900 text-white p-4 flex justify-between items-center">
                 <div class="flex items-center gap-2">
@@ -1201,6 +1073,174 @@
                     </select>
                 </div>
             </div>
+
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end gap-2">
+                <button onclick="closeManualEntryModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ยกเลิก</button>
+                <button onclick="saveManualTransaction()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl flex items-center gap-1.5 shadow-md">
+                    <i class="fa-solid fa-floppy-disk"></i> 💾 บันทึกรายการ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI MEMORY KNOWLEDGE MODAL -->
+    <div id="ai-memory-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[85vh]">
+            <div class="bg-indigo-900 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-brain text-amber-400 text-lg"></i>
+                    <h3 class="font-bold text-sm">คลังความรู้รูปแบบเอกสารที่ AI เรียนรู้สะสมไว้ (Vendor Template Knowledge)</h3>
+                </div>
+                <button onclick="closeAimemoryModal()" class="text-indigo-300 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4">
+                <p class="text-xs text-slate-600 bg-indigo-50 p-3 rounded-xl border border-indigo-200">
+                    💡 <strong>Continuous Active Learning:</strong> ทุกครั้งที่คุณทำการสแกนเอกสารและกดยืนยันบันทึกข้อมูล AI จะเรียนรู้และสกัดรูปแบบของซัพพลายเออร์รายนั้น ๆ รวมถึงเครดิตเทอมเก็บไว้ในคลังความรู้ เพื่อให้การสแกนในครั้งถัดไปมีความแม่นยำ 100%
+                </p>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-slate-100 font-semibold text-slate-700">
+                            <tr>
+                                <th class="p-2.5">ชื่อซัพพลายเออร์ที่เรียนรู้</th>
+                                <th class="p-2.5">เลขประจำตัวผู้เสียภาษี</th>
+                                <th class="p-2.5 text-center">เครดิต (วัน)</th>
+                                <th class="p-2.5 text-center">อัตรา WHT</th>
+                                <th class="p-2.5 text-center">ความถี่การเรียนรู้</th>
+                                <th class="p-2.5 text-center">สถานะความแม่นยำ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ai-memory-table-body" class="divide-y divide-slate-100">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center">
+                <button onclick="resetAiMemory()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs rounded-lg border border-rose-200">
+                    <i class="fa-solid fa-rotate-left"></i> รีเซ็ตคลังความรู้ AI
+                </button>
+                <button onclick="closeAimemoryModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow">
+                    ตกลง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOCUMENT VIEWER MODAL -->
+    <div id="doc-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 text-white p-4 flex justify-between items-center border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice text-emerald-400 text-lg"></i>
+                    <h3 class="font-bold text-sm" id="modal-doc-title">เอกสารฉบับตัวจริง (Original Uploaded Invoice)</h3>
+                </div>
+                <button onclick="closeDocModal()" class="text-slate-400 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+                    <div><span class="text-slate-500 font-medium">เลขที่เอกสาร / รหัส:</span> <strong id="modal-doc-id" class="text-indigo-600 font-mono"></strong></div>
+                    <div><span class="text-slate-500 font-medium">ซัพพลายเออร์/คู่ค้า:</span> <strong id="modal-doc-vendor" class="text-slate-800"></strong></div>
+                    <div><span class="text-slate-500 font-medium">วันที่จัดส่ง (วว/ดด/ปี):</span> <span id="modal-doc-delivery" class="font-semibold text-slate-700 font-mono"></span></div>
+                    <div><span class="text-slate-500 font-medium">จำนวนวันเครดิต:</span> <span id="modal-doc-credit" class="font-bold text-amber-700"></span></div>
+                    <div><span class="text-slate-500 font-medium">วันครบกำหนด (วว/ดด/ปี):</span> <span id="modal-doc-due" class="font-bold text-rose-600 font-mono"></span></div>
+                    <div><span class="text-slate-500 font-medium">ยอดเงินสุทธิ:</span> <strong id="modal-doc-amount" class="text-emerald-600 font-mono"></strong></div>
+                    <div><span class="text-slate-500 font-medium">สถานะชำระเงิน:</span> <span id="modal-doc-status"></span></div>
+                </div>
+
+                <div class="bg-slate-100 p-4 rounded-xl border border-slate-200 flex flex-col items-center justify-center min-h-[250px]">
+                    <img id="modal-doc-image" class="max-h-80 rounded-lg shadow border border-slate-300 object-contain bg-white p-2">
+                    <p id="modal-doc-placeholder" class="text-xs text-slate-500 text-center py-10 font-sans hidden">
+                        <i class="fa-solid fa-file-pdf text-rose-500 text-4xl mb-2 block"></i>
+                        เอกสารรูปแบบ PDF / หรือไฟล์สแกนสมมติ
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center">
+                <button onclick="closeDocModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-xs rounded-xl transition-all">
+                    ปิดหน้าต่าง
+                </button>
+                <button onclick="downloadOriginalDoc()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl transition-all flex items-center gap-2 shadow-md">
+                    <i class="fa-solid fa-download"></i> ดาวน์โหลดเอกสารลงเครื่อง (Download File)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT PROOF & SLIP UPLOAD MODAL -->
+    <div id="payment-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col">
+            <div class="bg-emerald-700 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-receipt text-lg"></i>
+                    <h3 class="font-bold text-sm">แจ้งชำระเงิน & แนบหลักฐานสลิปโอนเงิน</h3>
+                </div>
+                <button onclick="closePaymentModal()" class="text-emerald-200 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="p-6 space-y-4 text-xs">
+                <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 flex justify-between items-center">
+                    <div>
+                        <p class="text-slate-500">เลขที่เอกสาร: <strong id="pay-modal-id" class="text-indigo-700 font-mono"></strong></p>
+                        <p class="text-slate-800 font-bold" id="pay-modal-vendor"></p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-slate-500">ยอดชำระสุทธิ:</p>
+                        <p class="text-lg font-bold text-emerald-700 font-mono" id="pay-modal-amount"></p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1.5"><i class="fa-solid fa-paperclip text-emerald-600 mr-1"></i> แนบไฟล์รูปสลิปโอนเงิน / หลักฐานชำระเงิน:</label>
+                    <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/50 p-4 rounded-xl text-center relative cursor-pointer hover:border-emerald-500">
+                        <input type="file" id="pay-slip-input" accept="image/*" onchange="previewPaymentSlip(event)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                        <div id="slip-upload-placeholder">
+                            <i class="fa-solid fa-file-arrow-up text-3xl text-emerald-600 mb-1"></i>
+                            <p class="text-slate-700 font-medium">คลิกเพื่อเลือกไฟล์รูปภาพสลิปโอนเงิน (PNG, JPG)</p>
+                        </div>
+                        <div id="slip-preview-box" class="hidden flex flex-col items-center">
+                            <img id="slip-preview-img" class="max-h-36 rounded shadow border border-slate-200 mb-1">
+                            <span class="text-[11px] text-emerald-700 font-semibold">✅ อัปโหลดภาพสลิปเรียบร้อย</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">ช่องทางชำระเงิน:</label>
+                        <select id="pay-method" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg outline-none font-medium">
+                            <option value="โอนเงินผ่านธนาคาร (Bank Transfer)">โอนเงินผ่านธนาคาร (Bank Transfer)</option>
+                            <option value="เงินสด (Cash)">เงินสด (Cash)</option>
+                            <option value="เช็คธนาคาร (Cheque)">เช็คธนาคาร (Cheque)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">วันที่ชำระเงินจริง (วว/ดด/ปี):</label>
+                        <input type="text" id="pay-date" value="22/08/2026" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg outline-none font-mono font-bold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">เลขที่อ้างอิงสลิป / Ref No:</label>
+                    <input type="text" id="pay-ref" placeholder="เช่น SLIP-998811 หรือ เลขที่รายการโอน" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg outline-none font-mono">
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end gap-2">
+                <button onclick="closePaymentModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-xs rounded-xl">ยกเลิก</button>
+                <button onclick="confirmPaymentWithSlip()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl flex items-center gap-1.5 shadow-md">
+                    <i class="fa-solid fa-circle-check"></i> ยืนยันชำระเงิน & แนบสลิป
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW SLIP PROOF MODAL -->
+    <div id="slip-view-modal" style="display: none !important;" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">       </div>
 
             <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end gap-2">
                 <button onclick="closeManualEntryModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl">ยกเลิก</button>
@@ -2193,11 +2233,13 @@
             calcEditDueDate();
             calcEditNet();
 
-            document.getElementById('edit-transaction-modal').classList.remove('hidden');
+            const modal = document.getElementById('edit-transaction-modal');
+            if (modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
         }
 
         function closeEditTransactionModal() {
-            document.getElementById('edit-transaction-modal').classList.add('hidden');
+            const modal = document.getElementById('edit-transaction-modal');
+            if (modal) { modal.style.display = 'none'; modal.classList.add('hidden'); }
         }
 
         function calcEditDueDate() {
@@ -2320,11 +2362,13 @@
             calcManualDueDate();
             calcManualNet();
 
-            document.getElementById('manual-entry-modal').classList.remove('hidden');
+            const modal = document.getElementById('manual-entry-modal');
+            if (modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
         }
 
         function closeManualEntryModal() {
-            document.getElementById('manual-entry-modal').classList.add('hidden');
+            const modal = document.getElementById('manual-entry-modal');
+            if (modal) { modal.style.display = 'none'; modal.classList.add('hidden'); }
         }
 
         function calcManualDueDate() {
@@ -3146,11 +3190,13 @@
                 placeholderEl.classList.add('hidden');
             }
 
-            document.getElementById('doc-modal').classList.remove('hidden');
+            const modal = document.getElementById('doc-modal');
+            if (modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
         }
 
         function closeDocModal() {
-            document.getElementById('doc-modal').classList.add('hidden');
+            const modal = document.getElementById('doc-modal');
+            if (modal) { modal.style.display = 'none'; modal.classList.add('hidden'); }
         }
 
         function downloadOriginalDoc() {
@@ -3181,11 +3227,13 @@
             document.getElementById('slip-upload-placeholder').classList.remove('hidden');
             document.getElementById('slip-preview-box').classList.add('hidden');
 
-            document.getElementById('payment-modal').classList.remove('hidden');
+            const modal = document.getElementById('payment-modal');
+            if (modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
         }
 
         function closePaymentModal() {
-            document.getElementById('payment-modal').classList.add('hidden');
+            const modal = document.getElementById('payment-modal');
+            if (modal) { modal.style.display = 'none'; modal.classList.add('hidden'); }
         }
 
         function previewPaymentSlip(event) {
@@ -3286,11 +3334,13 @@
                 imgEl.src = canvas.toDataURL();
             }
 
-            document.getElementById('slip-view-modal').classList.remove('hidden');
+            const modal = document.getElementById('slip-view-modal');
+            if (modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
         }
 
         function closeSlipViewModal() {
-            document.getElementById('slip-view-modal').classList.add('hidden');
+            const modal = document.getElementById('slip-view-modal');
+            if (modal) { modal.style.display = 'none'; modal.classList.add('hidden'); }
         }
 
         function downloadSlipProof() {
@@ -3695,9 +3745,19 @@
             }
         }
 
-        // INIT SYSTEM ON LOAD WITH PIN CHECK & AUTOMATIC REAL-TIME SUPABASE CLOUD SYNC
+        // INIT SYSTEM ON LOAD WITH AUTOMATIC REAL-TIME SUPABASE CLOUD SYNC
         window.onload = function() {
-            checkPinStatus();
+            try {
+                const pinM = document.getElementById('pin-lock-modal');
+                if (pinM) pinM.remove();
+            } catch(e) {}
+
+            // Force hide all modal backdrops on init to guarantee pointer events are free
+            const modalIds = ['cloud-config-modal', 'change-pin-modal', 'line-notify-modal', 'edit-transaction-modal', 'manual-entry-modal', 'ai-memory-modal', 'doc-modal', 'payment-modal', 'slip-view-modal'];
+            modalIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
 
             const savedTx = localStorage.getItem('TRANSACTIONS');
             const savedMem = localStorage.getItem('AI_VENDOR_MEMORY');
@@ -3721,14 +3781,14 @@
                 vendorMemory = {};
             }
 
-            renderLedger();
+            try { renderLedger(); } catch(e) { console.error("renderLedger error", e); }
 
             // Perform initial sync pull
-            syncPullFromSupabase(false);
+            try { syncPullFromSupabase(false); } catch(e) {}
 
             // Auto poll Supabase Cloud every 8 seconds for multi-device sync
             setInterval(() => {
-                syncPullFromSupabase(false);
+                try { syncPullFromSupabase(false); } catch(e) {}
             }, 8000);
         };
     </script>
