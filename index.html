@@ -1646,16 +1646,48 @@
         let vendorMemory = {};
 
         function saveState() {
-            localStorage.setItem('TRANSACTIONS', JSON.stringify(transactions));
-            localStorage.setItem('AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
+            try {
+                localStorage.setItem('TRANSACTIONS', JSON.stringify(transactions));
+            } catch (e) {
+                console.warn("⚠️ LocalStorage QuotaExceededError detected! Optimizing image payloads for localStorage...");
+                try {
+                    const lightweightTx = transactions.map(t => {
+                        const clone = { ...t };
+                        if (clone.file_data && clone.file_data.length > 5000) clone.file_data = null;
+                        if (clone.slip_data && clone.slip_data.length > 5000) clone.slip_data = null;
+                        return clone;
+                    });
+                    localStorage.setItem('TRANSACTIONS', JSON.stringify(lightweightTx));
+                } catch (err2) {
+                    console.error("Critical storage quota limit hit", err2);
+                }
+            }
+
+            try {
+                localStorage.setItem('AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
+            } catch (e) {}
 
             // Background Auto Cloud Sync
             syncPushToSupabase();
         }
 
         function saveStateSilent() {
-            localStorage.setItem('TRANSACTIONS', JSON.stringify(transactions));
-            localStorage.setItem('AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
+            try {
+                localStorage.setItem('TRANSACTIONS', JSON.stringify(transactions));
+            } catch (e) {
+                try {
+                    const lightweightTx = transactions.map(t => {
+                        const clone = { ...t };
+                        if (clone.file_data && clone.file_data.length > 5000) clone.file_data = null;
+                        if (clone.slip_data && clone.slip_data.length > 5000) clone.slip_data = null;
+                        return clone;
+                    });
+                    localStorage.setItem('TRANSACTIONS', JSON.stringify(lightweightTx));
+                } catch (err2) {}
+            }
+            try {
+                localStorage.setItem('AI_VENDOR_MEMORY', JSON.stringify(vendorMemory));
+            } catch (e) {}
         }
 
         // --- EXPORT & IMPORT BACKUP SYSTEM (V.2) ---
@@ -1757,8 +1789,27 @@
                             wht: whtAmt,
                             net: netAmt,
                             status: t.status || 'Paid',
-                            file_data: t.file_data || null,
-                            slip_data: t.slip_data || null,
+                        let fileData = t.file_data || null;
+                        if (fileData && fileData.length > 50000) fileData = null;
+                        let slipData = t.slip_data || null;
+                        if (slipData && slipData.length > 50000) slipData = null;
+
+                        return {
+                            id: t.id || t.doc_ref || t.doc_no || `INV-${Math.floor(1000 + Math.random()*9000)}`,
+                            date: dateStr,
+                            delivery_date: delivStr,
+                            credit_days: t.credit_days !== undefined ? parseInt(t.credit_days) : 30,
+                            due_date: dueStr,
+                            type: t.type || (t.net_cash_received ? 'Income' : 'Expense'),
+                            desc: t.desc || t.description || t.details || 'รายการนำเข้าจากแบ็คอัพ',
+                            vendor: t.vendor || t.vendor_customer || t.customer || t.supplier || 'คู่ค้าทั่วไป',
+                            before_vat: beforeVat,
+                            vat: vatAmt,
+                            wht: whtAmt,
+                            net: netAmt,
+                            status: t.status || 'Paid',
+                            file_data: fileData,
+                            slip_data: slipData,
                             pay_date: t.pay_date || (t.status === 'Paid' ? dateStr : null)
                         };
                     }) : [];
@@ -1769,22 +1820,24 @@
                         if (importedVendorMem) vendorMemory = importedVendorMem;
 
                         if (importedSettings) {
-                            if (importedSettings.system_pin) {
-                                currentPin = importedSettings.system_pin;
-                                localStorage.setItem('SYSTEM_PIN', currentPin);
-                            }
-                            if (importedSettings.line_token) {
-                                lineNotifyToken = importedSettings.line_token;
-                                localStorage.setItem('LINE_NOTIFY_TOKEN', lineNotifyToken);
-                            }
-                            if (importedSettings.supabase_url) {
-                                supabaseUrl = importedSettings.supabase_url;
-                                localStorage.setItem('SUPABASE_URL', supabaseUrl);
-                            }
-                            if (importedSettings.supabase_key) {
-                                supabaseKey = importedSettings.supabase_key;
-                                localStorage.setItem('SUPABASE_KEY', supabaseKey);
-                            }
+                            try {
+                                if (importedSettings.system_pin) {
+                                    currentPin = importedSettings.system_pin;
+                                    localStorage.setItem('SYSTEM_PIN', currentPin);
+                                }
+                                if (importedSettings.line_token) {
+                                    lineNotifyToken = importedSettings.line_token;
+                                    localStorage.setItem('LINE_NOTIFY_TOKEN', lineNotifyToken);
+                                }
+                                if (importedSettings.supabase_url) {
+                                    supabaseUrl = importedSettings.supabase_url;
+                                    localStorage.setItem('SUPABASE_URL', supabaseUrl);
+                                }
+                                if (importedSettings.supabase_key) {
+                                    supabaseKey = importedSettings.supabase_key;
+                                    localStorage.setItem('SUPABASE_KEY', supabaseKey);
+                                }
+                            } catch(e) {}
                         }
 
                         saveState();
