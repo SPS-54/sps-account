@@ -26,8 +26,8 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- 6-DIGIT PIN SECURITY LOCK OVERLAY MODAL -->
-    <div id="pin-lock-modal" class="fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center p-4">
+    <!-- 6-DIGIT PIN SECURITY LOCK OVERLAY MODAL (DISABLED BY USER REQUEST) -->
+    <div id="pin-lock-modal" class="hidden fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-8 max-w-md w-full text-center text-white space-y-6">
             <div class="flex flex-col items-center gap-2">
                 <div class="bg-gradient-to-r from-emerald-600 to-indigo-600 p-4 rounded-2xl border border-emerald-500/30 text-white shadow-lg">
@@ -116,16 +116,6 @@
                 <!-- LINE NOTIFY BUTTON -->
                 <button onclick="openLineNotifyModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all border border-emerald-500 shadow flex items-center gap-1.5">
                     <i class="fa-brands fa-line text-sm"></i> 🔔 LINE
-                </button>
-
-                <!-- CHANGE PIN BUTTON -->
-                <button onclick="openChangePinModal()" class="bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-bold px-2.5 py-2 rounded-xl transition-all border border-slate-700 shadow flex items-center gap-1">
-                    <i class="fa-solid fa-key text-emerald-400"></i> 🔑 PIN
-                </button>
-
-                <!-- LOCK SCREEN BUTTON -->
-                <button onclick="lockSystem()" class="bg-rose-900/80 hover:bg-rose-800 text-rose-200 text-xs font-bold px-2.5 py-2 rounded-xl transition-all border border-rose-700 shadow flex items-center gap-1">
-                    <i class="fa-solid fa-lock text-rose-300"></i> 🔒 ล็อก
                 </button>
             </div>
         </div>
@@ -1448,18 +1438,15 @@
             return dateStr;
         }
 
-        // --- 6-DIGIT PIN SECURITY LOCK ENGINE ---
+        // --- 6-DIGIT PIN SECURITY LOCK ENGINE (DISABLED PER USER DIRECTIVE) ---
         let currentPin = localStorage.getItem('SYSTEM_PIN') || "190119";
         let enteredPin = "";
-        let isUnlocked = localStorage.getItem('SYSTEM_UNLOCKED') === "true";
+        let isUnlocked = true;
 
         function checkPinStatus() {
             const modal = document.getElementById('pin-lock-modal');
-            if (isUnlocked) {
+            if (modal) {
                 modal.classList.add('hidden');
-            } else {
-                modal.classList.remove('hidden');
-                updatePinDots();
             }
         }
 
