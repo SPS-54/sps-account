@@ -1072,7 +1072,7 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">วันที่เอกสาร (วว/ดด/ปี):</label>
-                        <input type="text" id="m-date" value="22/08/2026" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono outline-none">
+                        <input type="text" id="m-date" placeholder="วว/ดด/ปี" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono outline-none">
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">เครดิต (วัน):</label>
@@ -1083,11 +1083,11 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">วันที่จัดส่ง (วว/ดด/ปี):</label>
-                        <input type="text" id="m-deliv-date" value="22/08/2026" oninput="calcManualDueDate()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono outline-none">
+                        <input type="text" id="m-deliv-date" placeholder="วว/ดด/ปี" oninput="calcManualDueDate()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg font-mono outline-none">
                     </div>
                     <div>
                         <label class="block font-semibold text-rose-700 mb-1">วันครบกำหนด (วว/ดด/ปี):</label>
-                        <input type="text" id="m-due-date" value="21/09/2026" oninput="calcManualCreditDays()" class="w-full p-2.5 bg-rose-50 border border-rose-200 text-rose-700 font-mono font-bold rounded-lg outline-none">
+                        <input type="text" id="m-due-date" placeholder="วว/ดด/ปี" oninput="calcManualCreditDays()" class="w-full p-2.5 bg-rose-50 border border-rose-200 text-rose-700 font-mono font-bold rounded-lg outline-none">
                     </div>
                 </div>
 
@@ -1450,8 +1450,24 @@
 
     <!-- MAIN SINGLE-ENGINE SCRIPT -->
     <script>
-        const TODAY_DATE_STR = "22/08/2026";
-        const TODAY_ISO = "2026-08-22";
+        function getDynamicTodayDDMMYYYY() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const y = now.getFullYear();
+            return `${d}/${m}/${y}`;
+        }
+
+        function getDynamicTodayISO() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const y = now.getFullYear();
+            return `${y}-${m}-${d}`;
+        }
+
+        let TODAY_DATE_STR = getDynamicTodayDDMMYYYY();
+        let TODAY_ISO = getDynamicTodayISO();
 
         // Global Modal Controls
         function openModal(id) {
@@ -2137,6 +2153,8 @@
         }
 
         function resetOCRForm() {
+            TODAY_DATE_STR = getDynamicTodayDDMMYYYY();
+            TODAY_ISO = getDynamicTodayISO();
             uploadedFileObject = null;
             document.getElementById('ocr-file-input').value = "";
             document.getElementById('upload-placeholder').classList.remove('hidden');
@@ -2369,7 +2387,10 @@
 
         // Manual Entry Modal Logic
         function openManualEntryModal() {
-            document.getElementById('m-doc-no').value = `INV-2026/00${transactions.length + 1}`;
+            TODAY_DATE_STR = getDynamicTodayDDMMYYYY();
+            TODAY_ISO = getDynamicTodayISO();
+            const currentYear = new Date().getFullYear();
+            document.getElementById('m-doc-no').value = `INV-${currentYear}/00${transactions.length + 1}`;
             document.getElementById('m-date').value = TODAY_DATE_STR;
             document.getElementById('m-deliv-date').value = TODAY_DATE_STR;
             document.getElementById('m-credit-days').value = 30;
@@ -3442,6 +3463,8 @@
         }
 
         function openPaymentModal(txId) {
+            TODAY_DATE_STR = getDynamicTodayDDMMYYYY();
+            TODAY_ISO = getDynamicTodayISO();
             const t = transactions.find(item => item.id === txId);
             if (!t) return;
 
@@ -4021,6 +4044,9 @@
 
         // INIT SYSTEM ON LOAD WITH AUTOMATIC REAL-TIME SUPABASE CLOUD SYNC
         window.onload = function() {
+            TODAY_DATE_STR = getDynamicTodayDDMMYYYY();
+            TODAY_ISO = getDynamicTodayISO();
+
             try {
                 const pinM = document.getElementById('pin-lock-modal');
                 if (pinM) pinM.remove();
